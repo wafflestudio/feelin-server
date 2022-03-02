@@ -44,7 +44,7 @@ jobs:
       id: docker_meta
       uses: crazy-max/ghaction-docker-meta@v1
       with:
-        images: feelin/springboot
+        images: yeonsumia/waffle-music-sns
         tag-semver: |
           {{version}}
           {{major}}.{{minor}}
