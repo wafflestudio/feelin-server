@@ -5,7 +5,7 @@ services:
         platform: linux/x86_64
         image: mysql:8.0.27
         container_name: feelin_db
-        environmnet:
+        environment:
             - MYSQL_DATABASE=feelinDB
             - MYSQL_ROOT_HOST=%
             - MYSQL_ROOT_PASSWORD=feelin
