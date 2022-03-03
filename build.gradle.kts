@@ -48,6 +48,9 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 
     implementation("org.hibernate.validator:hibernate-validator")
+
+    implementation("io.springfox:springfox-swagger2:2.9.2")
+    implementation("io.springfox:springfox-swagger-ui:2.9.2")
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
