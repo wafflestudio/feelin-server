@@ -12,25 +12,20 @@ services:
         command: ['--character-set-server=utf8mb4', '--character-set-server=utf8mb4_unicode_ci']
 
         ports:
-            - 3306:3306
+            - "3306:3306"
         volumes:
             - /home/revision/docker_spring/database/feelinDB/:/var/lib/mysql
-        networks:
-            - feelin_network_02
 
     application:
-        build: .
         restart: always
-        ports:
-            - 80:8080
-        depends_on:
-            - database
-        container_name: app_test01
+        image: yeonsumia/waffle-music-sns:develop
+        container_name: feelin_app
+        build: .
         environment:
-            SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/feelin?serverTimezone=UTC
+            SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/feelinDB?serverTimezone=UTC
             SRPING_DATASOURCE_USERNAME: feelin
             SPRING_DATASOURCE_PASSWORD: feelin
-        networks:
-            - feelin_network_02
-networks:
-    feelin_network_02:
+        ports:
+            - "8080:8080"
+        depends_on:
+            - database

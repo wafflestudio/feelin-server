@@ -1,0 +1,59 @@
+name: Deploy to AWS EC2
+
+on:
+    push:
+        branches: [ main ]
+
+permissions:
+    id-token: write
+    contents: read
+
+jobs:
+  CD:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+
+    environment: prod
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Make directory for zip
+      run: mkdir deploy
+
+    - name: Copy docker-compose.yml
+      run: cp docker-compose.yml ./deploy/
+
+    - name: Copy appspec.yml
+      run: cp appspec.yml ./deploy/
+
+    - name: Copy deploy scripts
+      run: cp -r ./scripts/deploy/ ./deploy/
+
+    - name: Zip deploy directory
+      run: zip -r -qq -j ./waffle-music-sns.zip ./deploy
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_IAM_MANAGER_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_IAM_MANAGER_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Copy zip file to AWS S3
+      run: |
+        aws s3 cp \
+        --region ${{ secrets.AWS_REGION }} \
+        --acl private \
+        ./waffle-music-sns.zip s3://${{ secrets.AWS_BUCKET }}/
+
+    - name: Deploy to EC2
+      run: |
+        aws deploy create-deployment \
+        --application-name waffle-music-sns \
+        --deployment-group-name waffle-music-sns-group \
+        --file-exists-behavior OVERWRITE \
+        --s3-location bucket=${{ secrets.AWS_BUCKET }},bundleType=zip,key=waffle-music-sns.zip \
+        --region ${{ secrets.AWS_REGION }}

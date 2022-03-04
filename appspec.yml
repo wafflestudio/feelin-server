@@ -1,5 +1,5 @@
-
 version: 0.0
+
 os: linux
 files:
     - source: /
@@ -13,10 +13,14 @@ permissions:
 
 hooks:
     AfterInstall:
-        - location: stop.sh
+        - location: pullDocker.sh
           timeout: 60
           runas: ec2-user
     ApplicationStart:
-        - location: start.sh
+        - location: runDocker.sh
+          timeout: 60
+          runas: ec2-user
+    ApplicationStop:
+        - location: stopDocker.sh
           timeout: 60
           runas: ec2-user
