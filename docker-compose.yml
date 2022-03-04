@@ -22,7 +22,7 @@ services:
         container_name: feelin_app
         build: .
         environment:
-            SPRING_DATASOURCE_URL: jdbc:mysql://feelin_db:3306/feelin?serverTimezone=UTC
+            SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/feelinDB?serverTimezone=UTC
             SRPING_DATASOURCE_USERNAME: feelin
             SPRING_DATASOURCE_PASSWORD: feelin
         ports:
