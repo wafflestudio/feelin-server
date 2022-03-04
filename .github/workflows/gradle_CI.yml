@@ -2,7 +2,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ aws-CD ]
+    branches: [ develop ]
 
 jobs:
   CI:
