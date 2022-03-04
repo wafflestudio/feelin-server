@@ -54,6 +54,5 @@ jobs:
         aws deploy create-deployment \
         --application-name waffle-music-sns \
         --deployment-group-name dev \
-        --file-exists-behavior OVERWRITE \
         --s3-location bucket=${{ secrets.AWS_BUCKET }},bundleType=zip,key=waffle-music-sns.zip \
         --region ${{ secrets.AWS_REGION }}
