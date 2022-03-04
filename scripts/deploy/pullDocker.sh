@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 
 PORT_USING_PID=$(lsof -ti tcp:8080)
 
