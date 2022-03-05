@@ -4,4 +4,4 @@ ARG JAR_FILE=./build/libs/*.jar
 # Add into docker container
 COPY ${JAR_FILE} app.jar
 # execute app.jar when running docker
-ENTRYPOINT ["./scripts/deploy/run.sh"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
