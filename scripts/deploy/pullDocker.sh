@@ -6,7 +6,7 @@ if [[ -z $PORT_USING_PID ]];
 then
     echo "[Deploy] : Port available"
     # docker login
-    docker login -u $DOCKERHUB_USERNAME --password-stdin < ~/deploy/password
+    docker login -u $DOCKERHUB_USERNAME --password-stdin < ~/deploy/password.txt
     # pull docker image
     docker pull yeonsumia/waffle-music-sns:develop
 else
