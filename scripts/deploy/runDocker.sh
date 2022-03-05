@@ -3,8 +3,8 @@
 if [ "$DEPLOYMENT_GROUP_NAME" == "dev" ]
 then
     # Remove any anonymous volumes attached to containers
-    docker-compose -f /home/ec2-user/build/docker-compose.yml rm -v
+    sudo docker-compose -f ~/build/docker-compose.yml rm -v
     # build images and run containers
     echo "[Deploy] : Running new Application"
-    docker-compose -f /home/ec2-user/build/docker-compose.yml up --detach --renew-anon-volumes
+    sudo docker-compose -f ~/build/docker-compose.yml up --detach --renew-anon-volumes
 fi
