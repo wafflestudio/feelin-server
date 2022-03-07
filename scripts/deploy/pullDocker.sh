@@ -8,7 +8,6 @@ then
     # docker login
     docker login -u $DOCKERHUB_USERNAME --password-stdin < ~/deploy/password.txt
     # pull docker image
-    docker-compose rm -f
     docker-compose pull
 else
     echo "[Deploy] : Another application is using port"
