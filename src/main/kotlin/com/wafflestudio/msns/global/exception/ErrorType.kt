@@ -9,6 +9,7 @@ enum class ErrorType(
 
     DATA_NOT_FOUND(4000),
     BAD_REQUEST(4001),
+    TOKEN_NOT_FOUND(4002),
 
     CONFLICT(9000),
 
