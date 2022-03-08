@@ -14,7 +14,7 @@ services:
         ports:
             - "3306:3306"
         volumes:
-            - home/mysql:/var/lib/mysql
+            - /home/mysql:/var/lib/mysql
 
     application:
         restart: always
