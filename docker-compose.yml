@@ -14,7 +14,7 @@ services:
         ports:
             - "3306:3306"
         volumes:
-            - /home/revision/docker_spring/database/feelinDB/:/var/lib/mysql
+            - ./database/feelinDB:/var/lib/mysql
 
     application:
         restart: always
