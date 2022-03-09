@@ -17,7 +17,6 @@ services:
             - ./database/feelinDB:/var/lib/mysql
 
     application:
-        restart: always
         image: yeonsumia/waffle-music-sns:develop
         container_name: feelin_app
         build: .
