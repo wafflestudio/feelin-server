@@ -50,6 +50,15 @@ jobs:
         aws deploy delete-deployment-group \
         --application-name waffle-music-sns \
         --deployment-group-name dev
+
+    - name: Create new Deployment group
+      run: |
+        aws deploy create-deployment-group \
+        --application-name waffle-music-sns \
+        --ec2-tag-filters Key=Name,Type=KEY_AND_VALUE,Value=waffle-music-sns \
+        --deployment-style '{"deploymentType":"IN_PLACE","deploymentOption": "WITHOUT_TRAFFIC_CONTROL"}' \
+        --deployment-group-name dev \
+        --service-role-arn ${{ AWS_SERVICE_ROLE_ARN }}
     - name: Deploy to EC2
       run: |
         aws deploy create-deployment \
