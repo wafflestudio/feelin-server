@@ -45,6 +45,11 @@ jobs:
         --acl private \
         ./waffle-music-sns.zip s3://${{ secrets.AWS_BUCKET }}/
 
+    - name: Remove exist Deployment group
+      run: |
+        aws deploy delete-deployment-group \
+        --application-name waffle-music-sns \
+        --deployment-group-name dev
     - name: Deploy to EC2
       run: |
         aws deploy create-deployment \
