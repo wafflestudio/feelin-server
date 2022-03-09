@@ -12,7 +12,7 @@ spring:
     activate:
       on-profile: local
   datasource:
-    url: jdbc:mysql://database:3306/feelinDB?serverTimezone=UTC
+    url: jdbc:mysql://database:3306/feelinDB?serverTimezone=UTC&useSSL=false
     username: feelin
     password: feelin
     driver-class-name: com.mysql.cj.jdbc.Driver
