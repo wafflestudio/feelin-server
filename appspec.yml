@@ -19,7 +19,7 @@ hooks:
       runas: ec2-user
   ApplicationStart:
     - location: runDocker.sh
-      timeout: 60
+      timeout: 120
       runas: ec2-user
   ApplicationStop:
     - location: stopDocker.sh
