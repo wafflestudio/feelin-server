@@ -9,6 +9,9 @@ services:
             - MYSQL_DATABASE=feelinDB
             - MYSQL_ROOT_HOST=%
             - MYSQL_ROOT_PASSWORD=feelin
+            - MYSQL_USER=feelin
+            - MYSQL_PASSWORD=feelin
+
         command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
 
         ports:
