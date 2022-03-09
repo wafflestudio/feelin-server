@@ -7,7 +7,6 @@ services:
         container_name: feelin_db
         environment:
             - MYSQL_DATABASE=feelinDB
-            - MYSQL_ROOT_HOST=%
             - MYSQL_ROOT_PASSWORD=feelin
             - MYSQL_USER=feelin
             - MYSQL_PASSWORD=feelin
