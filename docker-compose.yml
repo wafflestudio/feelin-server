@@ -20,6 +20,7 @@ services:
 
     application:
         image: yeonsumia/waffle-music-sns:develop
+        restart: on-failure
         container_name: feelin_app
         build: .
         environment:
