@@ -20,6 +20,7 @@ spring:
     init:
       mode: always
   jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     generate-ddl: true
     hibernate:
       ddl-auto: create
