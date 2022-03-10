@@ -2,6 +2,7 @@ package com.wafflestudio.msns.domain.user.model
 
 import com.wafflestudio.msns.domain.model.BaseEntity
 import com.wafflestudio.msns.domain.post.model.Post
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.OneToMany
@@ -27,6 +28,15 @@ class User(
 
     @field:NotBlank
     var password: String,
+
+    @field:NotBlank
+    var phoneNumber: String,
+
+    @Column
+    var firstName: String? = null,
+
+    @Column
+    var lastName: String? = null,
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [])
     val posts: MutableList<Post> = mutableListOf(),
