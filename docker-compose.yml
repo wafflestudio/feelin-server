@@ -31,3 +31,12 @@ services:
             - "8080:8080"
         depends_on:
             - database
+
+    nginx:
+        image: nginx
+        ports:
+            - "80:80"
+        volumes:
+            - ./nginx/conf.d:/etc/nginx/conf.d
+        depends_on:
+            - application
