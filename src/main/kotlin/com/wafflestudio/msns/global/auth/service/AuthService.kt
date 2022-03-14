@@ -85,6 +85,15 @@ class AuthService(
     //     return true
     // }
 
+    fun verifyCode(verifyRequest: AuthRequest.VerifyCode): Boolean {
+        val email = verifyRequest.email
+        val code = verifyRequest.code
+
+        val verificationToken = verificationTokenRepository.findByEmail(email)
+
+        return verificationToken!!.authenticationCode == code
+    }
+
     private fun createRandomCode(): String {
         return (100000..999999).random().toString()
     }

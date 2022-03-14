@@ -23,4 +23,12 @@ class AuthController(
     ): AuthResponse.ExistUser {
         return AuthResponse.ExistUser(authService.signUpEmail(emailRequest))
     }
+
+    @PostMapping("/user/auth-code")
+    @ResponseStatus(HttpStatus.OK)
+    fun verifyCode(
+        @Valid @RequestBody verifyRequest: AuthRequest.VerifyCode
+    ): AuthResponse.VerifyingCode {
+        return AuthResponse.VerifyingCode(authService.verifyCode(verifyRequest))
+    }
 }
