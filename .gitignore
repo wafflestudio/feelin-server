@@ -26,6 +26,9 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+### Application Account ###
+src/main/resources/application-mail.yml
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
