@@ -1,22 +1,27 @@
-
 version: 0.0
+
 os: linux
 files:
-    - source: /
-      destination: /home/ec2-user/build/
-      overwrite: yes
+  - source: /
+    destination: /home/ec2-user/deploy/
+    overwrite: yes
+
 permissions:
-    - object: /
-      pattern: "**"
-      owner: ec2-user
-      group: ec2-user
+  - object: /
+    pattern: "**"
+    owner: ec2-user
+    group: ec2-user
 
 hooks:
-    AfterInstall:
-        - location: stop.sh
-          timeout: 60
-          runas: ec2-user
-    ApplicationStart:
-        - location: start.sh
-          timeout: 60
-          runas: ec2-user
+  AfterInstall:
+    - location: pullDocker.sh
+      timeout: 120
+      runas: ec2-user
+  ApplicationStart:
+    - location: runDocker.sh
+      timeout: 120
+      runas: ec2-user
+  ApplicationStop:
+    - location: stopDocker.sh
+      timeout: 60
+      runas: ec2-user

@@ -12,7 +12,7 @@ spring:
     activate:
       on-profile: local
   datasource:
-    url: jdbc:mysql://localhost:3306/feelin?serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/feelinDB?serverTimezone=UTC
     username: feelin
     password: feelin
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -23,3 +23,23 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: create
+    show-sql: true
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mysql://database:3306/feelinDB?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+    username: feelin
+    password: feelin
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: always
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    show-sql: true
