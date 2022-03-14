@@ -24,7 +24,7 @@ class AuthController(
         return AuthResponse.ExistUser(authService.signUpEmail(emailRequest))
     }
 
-    @PostMapping("/user/auth-code")
+    @PostMapping("/user/verify-code")
     @ResponseStatus(HttpStatus.OK)
     fun verifyCode(
         @Valid @RequestBody verifyRequest: AuthRequest.VerifyCode
