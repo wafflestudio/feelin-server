@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <title>Sign In Code</title>
+    <style>
+        a:visited { color: black; text-decoration: none; }
+        h1 { text-align: center; }
+    </style>
+</head>
+<body>
+<div class="header" style="margin-top: 30px; margin-left: -10px;">
+    <h1>코드 발송</h1>
+</div>
+<div class="body" style="margin-left: -10px;">
+    <div class="explain" style="width: auto; height: 80px; border-radius: 7px; background-color: rgb(249, 249, 250); color: gray; font-size: 13px; border: 1px solid rgb(223,226,230);">
+        <div style="margin-top: 13px; margin-left: 13px;">
+            <text>안녕하세요! Feelin 입니다.</text> <br>
+            <text>인증코드 : </text>
+            <text th:text="${code}"></text> <br>
+            <text>만약에 실수로 요청하셨거나, 본인이 요청하지 않았다면, 이 메일을 무시하세요.</text>
+        </div>
+    </div>
+    <a th:href="${link}" style="color: black; text-decoration: none;">
+        <div class="go" style="width: auto; margin-top: 10px; height: 40px; border-radius: 7px; background-color: rgb(127, 96, 239); color: white; font-size: 15px; line-height: 40px; text-align: center;">
+            <text>Feelin</text>
+        </div>
+    </a>
+</div>
+</body>
+</html>

@@ -36,6 +36,7 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -52,7 +53,8 @@ dependencies {
     implementation("io.springfox:springfox-swagger2:2.9.2")
     implementation("io.springfox:springfox-swagger-ui:2.9.2")
 
-    implementation("org.springframework:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("commons-io:commons-io:2.6")
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
