@@ -17,6 +17,8 @@ class VerificationToken(
 
     var token: String,
 
+    var authenticationCode: String,
+
     val role: String = "user",
 
 ) : BaseTimeEntity()
