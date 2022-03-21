@@ -16,7 +16,7 @@ import javax.validation.Valid
 class AuthController(
     private val authService: AuthService,
 ) {
-    @PostMapping("/user")
+    @PostMapping("/send-email")
     @ResponseStatus(HttpStatus.OK)
     fun signUpEmail(
         @Valid @RequestBody emailRequest: AuthRequest.JoinEmail
@@ -24,7 +24,7 @@ class AuthController(
         return AuthResponse.ExistUser(authService.signUpEmail(emailRequest))
     }
 
-    @PostMapping("/user/verify-code")
+    @PostMapping("/verify-code")
     @ResponseStatus(HttpStatus.OK)
     fun verifyCode(
         @Valid @RequestBody verifyRequest: AuthRequest.VerifyCode
