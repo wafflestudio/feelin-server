@@ -17,7 +17,7 @@ class AuthController(
     private val authService: AuthService,
 ) {
     @PostMapping("/user")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     fun signUpEmail(
         @Valid @RequestBody emailRequest: AuthRequest.JoinEmail
     ): AuthResponse.ExistUser {

@@ -2,6 +2,7 @@ package com.wafflestudio.msns.global.auth.service
 
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
+import com.wafflestudio.msns.global.auth.exception.InvalidVerificationCodeException
 import com.wafflestudio.msns.global.auth.exception.JWTInvalidException
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationToken
@@ -91,7 +92,10 @@ class AuthService(
 
         val verificationToken = verificationTokenRepository.findByEmail(email)
 
-        return verificationToken!!.authenticationCode == code
+        if (code != verificationToken!!.authenticationCode)
+            throw InvalidVerificationCodeException("Invalid code.")
+
+        return true
     }
 
     private fun createRandomCode(): String {
