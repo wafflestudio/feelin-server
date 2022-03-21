@@ -7,10 +7,12 @@ class UserResponse {
     data class SimpleUserInfo(
         val id: Long,
         val email: String,
+        val username: String,
     ) {
         constructor(user: User) : this(
             id = user.id,
             email = user.email,
+            username = user.username,
         )
     }
 

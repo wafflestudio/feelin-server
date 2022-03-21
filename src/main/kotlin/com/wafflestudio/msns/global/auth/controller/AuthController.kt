@@ -1,5 +1,7 @@
 package com.wafflestudio.msns.global.auth.controller
 
+import com.wafflestudio.msns.domain.user.dto.UserRequest
+import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
 import com.wafflestudio.msns.global.auth.service.AuthService
@@ -30,5 +32,13 @@ class AuthController(
         @Valid @RequestBody verifyRequest: AuthRequest.VerifyCode
     ): AuthResponse.VerifyingCode {
         return AuthResponse.VerifyingCode(authService.verifyCode(verifyRequest))
+    }
+
+    @PostMapping("/user/signup")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun signup(
+        @Valid @RequestBody signUpRequest: UserRequest.SignUp
+    ): UserResponse.SimpleUserInfo {
+        return authService.signUp(signUpRequest)
     }
 }

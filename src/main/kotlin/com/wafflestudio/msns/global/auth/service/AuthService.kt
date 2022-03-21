@@ -1,9 +1,14 @@
 package com.wafflestudio.msns.global.auth.service
 
+import com.wafflestudio.msns.domain.user.dto.UserRequest
+import com.wafflestudio.msns.domain.user.dto.UserResponse
+import com.wafflestudio.msns.domain.user.exception.AlreadyExistUsernameException
+import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.exception.InvalidVerificationCodeException
 import com.wafflestudio.msns.global.auth.exception.JWTInvalidException
+import com.wafflestudio.msns.global.auth.exception.UnauthorizedVerificationTokenException
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationToken
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
@@ -52,16 +57,29 @@ class AuthService(
         }
     }
 
-    // fun signUp(signUpRequest: UserRequest.SignUp): AuthResponse.VerificationTokenPrincipalResponse {
-    //     val email = signUpRequest.email
-    //     val lastName = signUpRequest.lastName
-    //     val firstName = signUpRequest.firstName
-    //     val username = signUpRequest.username
-    //     val phoneNumber = signUpRequest.phoneNumber
-    //     val password = passwordEncoder.encode(signUpRequest.password)
-    //
-    //
-    // }
+    fun signUp(signUpRequest: UserRequest.SignUp): UserResponse.SimpleUserInfo {
+        val email = signUpRequest.email
+        val lastName = signUpRequest.lastName
+        val firstName = signUpRequest.firstName
+        val username = signUpRequest.username
+        val phoneNumber = signUpRequest.phoneNumber
+        val password = passwordEncoder.encode(signUpRequest.password)
+
+        checkVerifiedEmail(email)
+        existUsername(username)
+
+        val newUser = User(
+            email = email,
+            username = username,
+            password = password,
+            lastName = lastName,
+            firstName = firstName,
+            phoneNumber = phoneNumber,
+        )
+        userRepository.save(newUser)
+
+        return UserResponse.SimpleUserInfo(newUser)
+    }
 
     fun verifyJWT(email: String, jwt: String): VerificationToken {
         if (!jwtTokenProvider.validateToken(jwt))
@@ -79,27 +97,35 @@ class AuthService(
         return verificationToken
     }
 
-    // private fun checkVerificationCode(email: String, inputCode: String) : Boolean {
-    //     val verificationCode = verificationTokenRepository.findByEmail(email)!!.authenticationCode
-    //     if (!passwordEncoder.matches(inputCode, verificationCode))
-    //         throw InvalidVerificationCodeException("This code is invalid.")
-    //     return true
-    // }
-
     fun verifyCode(verifyRequest: AuthRequest.VerifyCode): Boolean {
         val email = verifyRequest.email
         val code = verifyRequest.code
 
-        val verificationToken = verificationTokenRepository.findByEmail(email)
+        val verificationToken = verificationTokenRepository.findByEmail(email)!!
 
-        if (code != verificationToken!!.authenticationCode)
+        if (code != verificationToken.authenticationCode)
             throw InvalidVerificationCodeException("Invalid code.")
+        verificationToken.verification = true
+        verificationTokenRepository.save(verificationToken)
 
         return true
     }
 
     private fun createRandomCode(): String {
         return (100000..999999).random().toString()
+    }
+
+    private fun existUsername(username: String): Boolean {
+        if (userRepository.existsByUsername(username))
+            throw AlreadyExistUsernameException("This username already exists.")
+        return true
+    }
+
+    private fun checkVerifiedEmail(email: String): Boolean {
+        val verified = verificationTokenRepository.findByEmail(email)!!
+        if (!verified.verification)
+            throw UnauthorizedVerificationTokenException("Unauthorized email.")
+        return true
     }
 
     private fun generateToken(email: String, code: String): String {
