@@ -15,7 +15,7 @@ import javax.validation.constraints.NotBlank
 @Table(
     name = "user",
     uniqueConstraints = arrayOf(
-        UniqueConstraint(columnNames = arrayOf("username", "email"))
+        UniqueConstraint(columnNames = arrayOf("username", "email", "phoneNumber"))
     )
 )
 class User(
