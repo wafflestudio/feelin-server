@@ -6,7 +6,9 @@ import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.stereotype.Service
 
+@Service
 class VerificationTokenPrincipalDetailService(
     private val userRepository: UserRepository,
     private val verificationTokenRepository: VerificationTokenRepository,

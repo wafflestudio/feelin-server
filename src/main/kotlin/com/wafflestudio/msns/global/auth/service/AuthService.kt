@@ -68,6 +68,10 @@ class AuthService(
         checkVerifiedEmail(email)
         existUsername(username)
 
+        val verification = verificationTokenRepository.findByEmail(email)
+        verification!!.password = password
+        verificationTokenRepository.save(verification)
+
         val newUser = User(
             email = email,
             username = username,
@@ -137,7 +141,13 @@ class AuthService(
             it.authenticationCode = code
             verificationTokenRepository.save(it)
         } ?: run {
-            verificationTokenRepository.save(VerificationToken(email, passwordEncoder.encode(jwt), code))
+            verificationTokenRepository.save(
+                VerificationToken(
+                    email = email,
+                    token = passwordEncoder.encode(jwt),
+                    authenticationCode = code
+                )
+            )
         }
 
         return jwt
