@@ -6,6 +6,7 @@ import com.wafflestudio.msns.domain.user.exception.AlreadyExistUsernameException
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
+import com.wafflestudio.msns.global.auth.exception.InvalidEmailFormException
 import com.wafflestudio.msns.global.auth.exception.InvalidVerificationCodeException
 import com.wafflestudio.msns.global.auth.exception.JWTInvalidException
 import com.wafflestudio.msns.global.auth.exception.UnauthorizedVerificationTokenException
@@ -17,6 +18,7 @@ import com.wafflestudio.msns.global.mail.service.MailContentBuilder
 import com.wafflestudio.msns.global.mail.service.MailService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.regex.Pattern
 
 @Service
 class AuthService(
@@ -29,6 +31,9 @@ class AuthService(
 ) {
     fun signUpEmail(emailRequest: AuthRequest.JoinEmail): Boolean {
         val email = emailRequest.email
+        if (!isEmailValid(email))
+            throw InvalidEmailFormException("Invalid Email Form")
+
         userRepository.findByEmail(email)
             ?: return run {
                 val code = createRandomCode()
@@ -151,5 +156,16 @@ class AuthService(
         }
 
         return jwt
+    }
+
+    private fun isEmailValid(email: String): Boolean {
+        return Pattern.compile(
+            "^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]|[\\w-]{2,}))@" +
+                "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?" +
+                "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\." +
+                "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?" +
+                "[0-9]{1,2}|25[0-5]|2[0-4][0-9]))|" +
+                "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$"
+        ).matcher(email).matches()
     }
 }
