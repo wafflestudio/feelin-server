@@ -8,6 +8,10 @@ class AuthResponse {
         val existUser: Boolean,
     )
 
+    data class VerifyingCode(
+        val verification: Boolean,
+    )
+
     data class VerificationTokenPrincipalResponse(
         val user: UserResponse.SimpleUserInfo?,
         val token: String,
