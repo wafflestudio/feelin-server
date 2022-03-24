@@ -1,0 +1,105 @@
+package com.wafflestudio.msns
+
+import com.wafflestudio.msns.domain.album.model.Album
+import com.wafflestudio.msns.domain.album.repository.AlbumRepository
+import com.wafflestudio.msns.domain.artist.model.Artist
+import com.wafflestudio.msns.domain.artist.repository.ArtistRepository
+import com.wafflestudio.msns.domain.playlist.model.Playlist
+import com.wafflestudio.msns.domain.playlist.repository.PlaylistRepository
+import com.wafflestudio.msns.domain.post.model.Post
+import com.wafflestudio.msns.domain.post.repository.PostRepository
+import com.wafflestudio.msns.domain.track.model.Track
+import com.wafflestudio.msns.domain.track.repository.TrackRepository
+import com.wafflestudio.msns.domain.user.model.User
+import com.wafflestudio.msns.domain.user.repository.UserRepository
+import org.springframework.boot.ApplicationArguments
+import org.springframework.boot.ApplicationRunner
+import org.springframework.context.annotation.Profile
+import org.springframework.stereotype.Component
+import java.time.LocalDate
+
+@Component
+@Profile("local")
+class DataLoader (
+    private val userRepository: UserRepository,
+    private val artistRepository: ArtistRepository,
+    private val albumRepository: AlbumRepository,
+    private val trackRepository: TrackRepository,
+    private val playlistRepository: PlaylistRepository,
+    private val postRepository: PostRepository
+): ApplicationRunner {
+    override fun run(args: ApplicationArguments?) {
+
+        val artistA = Artist(
+            artistName = "Jimmy Smith",
+        )
+
+        artistRepository.save(artistA)
+
+        val albumA = Album(
+            title = "THE SERMON!",
+            description = "Blue Note 4011",
+            releaseDate = LocalDate.ofYearDay(1959, 320),
+            artist = artistA,
+        )
+
+        albumRepository.save(albumA)
+
+        val trackA = Track(
+            title = "The Sermon",
+            album = albumA,
+        )
+
+        val trackB = Track(
+            title = "J.O.S.",
+            album = albumA,
+        )
+
+        val trackC = Track(
+            title = "Flamingo",
+            album = albumA
+        )
+
+        trackRepository.save(trackA)
+        trackRepository.save(trackB)
+        trackRepository.save(trackC)
+
+        val userA = User(
+            username = "hsJeon",
+            email = "yeonsumia@snu.ac.kr",
+            password = "feel-me",
+            phoneNumber = "010-1234-5678",
+        )
+
+        userRepository.save(userA)
+
+        val playlistA = Playlist(
+            user = userA,
+            title = "Jazz",
+            tracks = mutableListOf(trackA, trackB, trackC),
+            thumbnail = "https://ibb.co/7R7kcgd"
+        )
+
+        val playlistB = Playlist(
+            user = userA,
+            title = "Jazz 2",
+            tracks = mutableListOf(trackA, trackB),
+            thumbnail = "https://ibb.co/7R7kcgd"
+        )
+
+        playlistRepository.save(playlistA)
+        playlistRepository.save(playlistB)
+
+        val postA = Post(
+            user = userA,
+            title = "Do you love Jazz Piano?",
+            content = "...",
+            playlist = playlistA
+        )
+
+        postRepository.save(postA)
+
+
+    }
+
+}

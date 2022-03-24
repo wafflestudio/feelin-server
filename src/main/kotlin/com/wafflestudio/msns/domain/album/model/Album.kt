@@ -11,6 +11,7 @@ import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 import javax.persistence.Table
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
 
 @Entity
 @Table(name = "album")
@@ -22,7 +23,7 @@ class Album(
     @field:NotBlank
     val description: String,
 
-    @field:NotBlank
+    @field:NotNull
     val releaseDate: LocalDate,
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = [])

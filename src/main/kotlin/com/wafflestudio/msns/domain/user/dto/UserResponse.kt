@@ -6,10 +6,12 @@ import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 class UserResponse {
     data class SimpleUserInfo(
         val id: Long,
+        val username: String,
         val email: String,
     ) {
         constructor(user: User) : this(
             id = user.id,
+            username = user.username,
             email = user.email,
         )
     }
