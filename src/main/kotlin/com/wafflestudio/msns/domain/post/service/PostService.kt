@@ -38,4 +38,18 @@ class PostService(
             ?: throw PlaylistNotFoundException("playlist is not found from the requested title.")
     }
 
+    fun modifyPost(putRequest: PostRequest.PutRequest, playlistTitle: String, user: User) {
+        val title = putRequest.title
+            .also { if (it.isBlank()) throw InvalidTitleException("title is blank.") }
+        val content = putRequest.content
+
+        playlistRepository.findByUser_IdAndTitle(user.id, playlistTitle)
+            ?.let { postRepository.findByUser_IdAndPlaylist(user.id, it) }
+            ?.apply {
+                this.title = title
+                this.content = content
+            }
+            ?.let { postRepository.save(it) }
+            ?: throw PlaylistNotFoundException("playlist is not found from the requested title.")
+    }
 }

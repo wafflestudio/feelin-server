@@ -20,6 +20,6 @@ class UserService(
         return userRepository.findByEmail(email)
             ?.let { user -> postRepository.findAllByUser(pageable, user) }
             ?.map { post -> PostResponse.UserPageResponse(post) }
-            ?: throw UserNotFoundException("user not found with the email and username.")
+            ?: throw UserNotFoundException("user not found with the email.")
     }
 }

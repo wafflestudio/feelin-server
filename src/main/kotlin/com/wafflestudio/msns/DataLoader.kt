@@ -12,9 +12,13 @@ import com.wafflestudio.msns.domain.track.model.Track
 import com.wafflestudio.msns.domain.track.repository.TrackRepository
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
+import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
+import com.wafflestudio.msns.global.auth.model.VerificationToken
+import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Profile
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 
@@ -26,7 +30,10 @@ class DataLoader (
     private val albumRepository: AlbumRepository,
     private val trackRepository: TrackRepository,
     private val playlistRepository: PlaylistRepository,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
+    private val passwordEncoder: PasswordEncoder,
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val verificationTokenRepository: VerificationTokenRepository
 ): ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
 
@@ -73,6 +80,16 @@ class DataLoader (
 
         userRepository.save(userA)
 
+        val jwtA = jwtTokenProvider.generateToken(userA.email, join = false)
+        val verificationTokenA = VerificationToken(
+            email = userA.email,
+            token = passwordEncoder.encode(jwtA),
+            authenticationCode = createRandomCode(),
+            password = passwordEncoder.encode("feel-me")
+        )
+
+        verificationTokenRepository.save(verificationTokenA)
+
         val playlistA = Playlist(
             user = userA,
             title = "Jazz",
@@ -102,4 +119,7 @@ class DataLoader (
 
     }
 
+    private fun createRandomCode(): String {
+        return (100000..999999).random().toString()
+    }
 }

@@ -13,10 +13,7 @@ import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 
 @Entity
-@Table(
-    name = "user",
-    uniqueConstraints = [UniqueConstraint(columnNames = arrayOf("username", "email", "phoneNumber"))]
-)
+@Table(name = "user")
 class User(
     @field:NotBlank
     val username: String,
@@ -30,6 +27,7 @@ class User(
     var password: String,
 
     @field:NotBlank
+    @Column(unique = true)
     var phoneNumber: String,
 
     @Column

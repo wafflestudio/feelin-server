@@ -15,12 +15,12 @@ class Post(
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     val user: User,
 
-    val title: String,
+    var title: String,
 
-    val content: String,
+    var content: String,
 
     @OneToOne
     @JoinColumn(name = "playlist_id", referencedColumnName = "id")
     val playlist: Playlist,
 
-) : BaseTimeEntity()
+    ) : BaseTimeEntity()
