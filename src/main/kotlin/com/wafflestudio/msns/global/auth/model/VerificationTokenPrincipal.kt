@@ -9,12 +9,13 @@ class VerificationTokenPrincipal(
     val user: User?,
     val verificationToken: VerificationToken,
 ) : UserDetails {
+
     override fun getUsername(): String {
         return verificationToken.email
     }
 
     override fun getPassword(): String {
-        return verificationToken.token
+        return verificationToken.password!!
     }
 
     override fun getAuthorities(): List<GrantedAuthority> {
