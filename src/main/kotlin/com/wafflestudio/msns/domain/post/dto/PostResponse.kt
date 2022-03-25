@@ -1,7 +1,6 @@
 package com.wafflestudio.msns.domain.post.dto
 
 import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
-import com.wafflestudio.msns.domain.playlist.model.Playlist
 import com.wafflestudio.msns.domain.post.model.Post
 import java.time.LocalDateTime
 
