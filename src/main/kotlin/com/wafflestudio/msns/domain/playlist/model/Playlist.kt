@@ -10,7 +10,7 @@ import javax.persistence.*
     name = "playlist",
     uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "title"])]
 )
-class Playlist (
+class Playlist(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     val user: User,
@@ -20,6 +20,6 @@ class Playlist (
     @ManyToMany(fetch = FetchType.LAZY)
     val tracks: MutableList<Track> = mutableListOf(),
 
-    val thumbnail: String,
+    val thumbnail: String = "",
 
-): BaseTimeEntity()
+) : BaseTimeEntity()

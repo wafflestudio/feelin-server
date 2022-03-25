@@ -26,6 +26,8 @@ class Album(
     @field:NotNull
     val releaseDate: LocalDate,
 
+    val cover: String = "",
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = [])
     val artist: Artist,
 

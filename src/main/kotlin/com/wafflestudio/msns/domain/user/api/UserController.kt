@@ -1,9 +1,7 @@
 package com.wafflestudio.msns.domain.user.api
 
 import com.wafflestudio.msns.domain.post.dto.PostResponse
-import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.service.UserService
-import com.wafflestudio.msns.global.auth.CurrentUser
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort

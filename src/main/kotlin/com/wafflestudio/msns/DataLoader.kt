@@ -24,7 +24,7 @@ import java.time.LocalDate
 
 @Component
 @Profile("local")
-class DataLoader (
+class DataLoader(
     private val userRepository: UserRepository,
     private val artistRepository: ArtistRepository,
     private val albumRepository: AlbumRepository,
@@ -34,7 +34,7 @@ class DataLoader (
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
     private val verificationTokenRepository: VerificationTokenRepository
-): ApplicationRunner {
+) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
 
         val artistA = Artist(
@@ -115,8 +115,6 @@ class DataLoader (
         )
 
         postRepository.save(postA)
-
-
     }
 
     private fun createRandomCode(): String {

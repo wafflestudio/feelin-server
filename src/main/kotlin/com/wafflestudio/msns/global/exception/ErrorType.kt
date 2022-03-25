@@ -17,7 +17,6 @@ enum class ErrorType(
     UNAUTHORIZED_EMAIL(4006),
     INVALID_EMAIL_FORM(4007),
 
-
     CONFLICT(9000),
 
     SERVER_ERROR(10000),

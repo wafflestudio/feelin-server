@@ -23,4 +23,4 @@ class Post(
     @JoinColumn(name = "playlist_id", referencedColumnName = "id")
     val playlist: Playlist,
 
-    ) : BaseTimeEntity()
+) : BaseTimeEntity()
