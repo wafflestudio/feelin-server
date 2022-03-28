@@ -2,7 +2,11 @@ package com.wafflestudio.msns.domain.playlist.model
 
 import com.wafflestudio.msns.domain.model.BaseTimeEntity
 import com.wafflestudio.msns.domain.track.model.Track
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.ManyToOne
+import javax.persistence.Table
+import javax.persistence.UniqueConstraint
+import javax.persistence.JoinColumn
 
 @Entity
 @Table(
@@ -18,4 +22,4 @@ class PlaylistTrack(
     @JoinColumn(name = "track_id", referencedColumnName = "id")
     val track: Track,
 
-    ) : BaseTimeEntity()
+) : BaseTimeEntity()
