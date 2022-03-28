@@ -5,7 +5,9 @@ import com.wafflestudio.msns.domain.album.repository.AlbumRepository
 import com.wafflestudio.msns.domain.artist.model.Artist
 import com.wafflestudio.msns.domain.artist.repository.ArtistRepository
 import com.wafflestudio.msns.domain.playlist.model.Playlist
+import com.wafflestudio.msns.domain.playlist.model.PlaylistTrack
 import com.wafflestudio.msns.domain.playlist.repository.PlaylistRepository
+import com.wafflestudio.msns.domain.playlist.repository.PlaylistTrackRepository
 import com.wafflestudio.msns.domain.post.model.Post
 import com.wafflestudio.msns.domain.post.repository.PostRepository
 import com.wafflestudio.msns.domain.track.model.Track
@@ -30,6 +32,7 @@ class DataLoader(
     private val albumRepository: AlbumRepository,
     private val trackRepository: TrackRepository,
     private val playlistRepository: PlaylistRepository,
+    private val playlistTrackRepository: PlaylistTrackRepository,
     private val postRepository: PostRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
@@ -93,19 +96,49 @@ class DataLoader(
         val playlistA = Playlist(
             user = userA,
             title = "Jazz",
-            tracks = mutableListOf(trackA, trackB, trackC),
             thumbnail = "https://ibb.co/7R7kcgd"
         )
 
         val playlistB = Playlist(
             user = userA,
             title = "Jazz 2",
-            tracks = mutableListOf(trackA, trackB),
             thumbnail = "https://ibb.co/7R7kcgd"
         )
 
         playlistRepository.save(playlistA)
         playlistRepository.save(playlistB)
+
+        val playlistTrackA1 = PlaylistTrack(
+            playlist = playlistA,
+            track = trackA
+        )
+
+        val playlistTrackA2 = PlaylistTrack(
+            playlist = playlistA,
+            track = trackB
+        )
+
+        val playlistTrackA3 = PlaylistTrack(
+            playlist = playlistA,
+            track = trackC
+        )
+
+
+        val playlistTrackB1 = PlaylistTrack(
+            playlist = playlistB,
+            track = trackA
+        )
+
+        val playlistTrackB2 = PlaylistTrack(
+            playlist = playlistB,
+            track = trackB
+        )
+
+        playlistTrackRepository.save(playlistTrackA1)
+        playlistTrackRepository.save(playlistTrackA2)
+        playlistTrackRepository.save(playlistTrackA3)
+        playlistTrackRepository.save(playlistTrackB1)
+        playlistTrackRepository.save(playlistTrackB2)
 
         val postA = Post(
             user = userA,

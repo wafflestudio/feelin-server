@@ -35,9 +35,9 @@ class PostController(
     @ResponseStatus(HttpStatus.OK)
     fun getPost(
         @RequestParam("playlist") playlistTitle: String,
-        @RequestParam("email") email: String
+        @RequestParam("user_id") id: Long
     ): PostResponse.DetailResponse {
-        return postService.getPost(playlistTitle, email)
+        return postService.getPost(playlistTitle, id)
     }
 
     @PutMapping("")

@@ -7,25 +7,21 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/user")
 class UserController(
     private val userService: UserService,
 ) {
-    @GetMapping("/posts")
+    @GetMapping("/{user_id}/posts")
     @ResponseStatus(HttpStatus.OK)
     fun getPosts(
         @PageableDefault(
             size = 30, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
-        @RequestParam("email") email: String
+        @PathVariable("user_id") id: Long
     ): Page<PostResponse.UserPageResponse> {
-        return userService.getPosts(pageable, email)
+        return userService.getPosts(pageable, id)
     }
 }

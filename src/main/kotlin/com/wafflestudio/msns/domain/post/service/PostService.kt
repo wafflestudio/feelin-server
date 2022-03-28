@@ -12,6 +12,7 @@ import com.wafflestudio.msns.domain.post.repository.PostRepository
 import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -43,8 +44,8 @@ class PostService(
             ?: throw PlaylistNotFoundException("playlist is not found from the requested title.")
     }
 
-    fun getPost(playlistTitle: String, email: String): PostResponse.DetailResponse {
-        return userRepository.findByEmail(email)
+    fun getPost(playlistTitle: String, id: Long): PostResponse.DetailResponse {
+        return userRepository.findByIdOrNull(id)
             ?.let {
                 postRepository.findByUser_IdAndPlaylist_Title(it.id, playlistTitle)
                     ?: throw PostNotFoundException("post is not found with the user and the playlist.")

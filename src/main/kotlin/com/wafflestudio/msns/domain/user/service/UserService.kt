@@ -6,6 +6,7 @@ import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,8 +16,8 @@ class UserService(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository
 ) {
-    fun getPosts(pageable: Pageable, email: String): Page<PostResponse.UserPageResponse> {
-        return userRepository.findByEmail(email)
+    fun getPosts(pageable: Pageable, id: Long): Page<PostResponse.UserPageResponse> {
+        return userRepository.findByIdOrNull(id)
             ?.let { user -> postRepository.findAllByUser(pageable, user) }
             ?.map { post -> PostResponse.UserPageResponse(post) }
             ?: throw UserNotFoundException("user is not found with the email.")
