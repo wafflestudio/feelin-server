@@ -4,6 +4,7 @@ enum class ErrorType(
     val code: Int
 ) {
     INVALID_REQUEST(0),
+    INVALID_POST_TITLE(1),
 
     NOT_ALLOWED(3000),
 
