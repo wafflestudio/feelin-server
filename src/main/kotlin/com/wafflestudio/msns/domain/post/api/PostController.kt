@@ -34,28 +34,28 @@ class PostController(
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     fun getPost(
-        @RequestParam("playlist") playlistTitle: String,
-        @RequestParam("user_id") id: Long
+        @RequestParam("playlist_id") playlistId: Long,
+        @RequestParam("user_id") userId: Long
     ): PostResponse.DetailResponse {
-        return postService.getPost(playlistTitle, id)
+        return postService.getPost(playlistId, userId)
     }
 
     @PutMapping("")
     @ResponseStatus(HttpStatus.OK)
     fun modifyPost(
         @Valid @RequestBody putRequest: PostRequest.PutRequest,
-        @RequestParam("playlist") playlistTitle: String,
+        @RequestParam("playlist_id") playlistId: Long,
         @CurrentUser user: User
     ) {
-        postService.modifyPost(putRequest, playlistTitle, user)
+        postService.modifyPost(putRequest, playlistId, user)
     }
 
     @DeleteMapping("")
     @ResponseStatus(HttpStatus.OK)
     fun deletePost(
-        @RequestParam("playlist") playlistTitle: String,
+        @RequestParam("playlist_id") playlistId: Long,
         @CurrentUser user: User
     ) {
-        postService.deletePost(playlistTitle, user)
+        postService.deletePost(playlistId, user)
     }
 }

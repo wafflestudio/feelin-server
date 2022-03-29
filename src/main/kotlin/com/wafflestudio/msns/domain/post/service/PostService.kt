@@ -44,22 +44,22 @@ class PostService(
             ?: throw PlaylistNotFoundException("playlist is not found from the requested title.")
     }
 
-    fun getPost(playlistTitle: String, id: Long): PostResponse.DetailResponse {
-        return userRepository.findByIdOrNull(id)
+    fun getPost(playlistId: Long, userId: Long): PostResponse.DetailResponse {
+        return userRepository.findByIdOrNull(userId)
             ?.let {
-                postRepository.findByUser_IdAndPlaylist_Title(it.id, playlistTitle)
+                postRepository.findByUser_IdAndPlaylist_Id(it.id, playlistId)
                     ?: throw PostNotFoundException("post is not found with the user and the playlist.")
             }
             ?.let { PostResponse.DetailResponse(it) }
             ?: throw UserNotFoundException("user is not found with the email.")
     }
 
-    fun modifyPost(putRequest: PostRequest.PutRequest, playlistTitle: String, user: User) {
+    fun modifyPost(putRequest: PostRequest.PutRequest, playlistId: Long, user: User) {
         val title = putRequest.title
             .also { if (it.isBlank()) throw InvalidTitleException("title is blank.") }
         val content = putRequest.content
 
-        postRepository.findByUser_IdAndPlaylist_Title(user.id, playlistTitle)
+        postRepository.findByUser_IdAndPlaylist_Id(user.id, playlistId)
             ?.apply {
                 this.title = title
                 this.content = content
@@ -68,8 +68,8 @@ class PostService(
             ?: throw PlaylistNotFoundException("playlist is not found from the requested title.")
     }
 
-    fun deletePost(playlistTitle: String, user: User) {
-        postRepository.findByUser_IdAndPlaylist_Title(user.id, playlistTitle)
+    fun deletePost(playlistId: Long, user: User) {
+        postRepository.findByUser_IdAndPlaylist_Id(user.id, playlistId)
             ?.let { postRepository.deleteById(it.id) }
             ?: throw PlaylistNotFoundException("playlist is not found from the requested title.")
     }

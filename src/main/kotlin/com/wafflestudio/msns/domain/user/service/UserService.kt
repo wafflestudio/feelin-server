@@ -16,8 +16,8 @@ class UserService(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository
 ) {
-    fun getPosts(pageable: Pageable, id: Long): Page<PostResponse.UserPageResponse> {
-        return userRepository.findByIdOrNull(id)
+    fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.UserPageResponse> {
+        return userRepository.findByIdOrNull(userId)
             ?.let { user -> postRepository.findAllByUser(pageable, user) }
             ?.map { post -> PostResponse.UserPageResponse(post) }
             ?: throw UserNotFoundException("user is not found with the email.")
