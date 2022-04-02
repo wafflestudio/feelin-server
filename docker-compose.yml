@@ -35,6 +35,7 @@ services:
 
     nginx:
         image: nginx
+        container_name: feelin_nginx
         ports:
             - "80:80"
             - "443:443"
