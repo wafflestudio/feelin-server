@@ -22,13 +22,14 @@ services:
         image: yeonsumia/waffle-music-sns:develop
         restart: on-failure
         container_name: feelin_app
-        build: .
         environment:
             SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/feelinDB?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
             SRPING_DATASOURCE_USERNAME: feelin
             SPRING_DATASOURCE_PASSWORD: feelin
         ports:
             - "8080:8080"
+        volumes:
+            - ./resources:/resources
         depends_on:
             - database
 
