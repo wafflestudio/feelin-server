@@ -18,6 +18,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -40,6 +43,21 @@ class SecurityConfig(
         provider.setPasswordEncoder(passwordEncoder)
         provider.setUserDetailsService(userPrincipalDetailService)
         return provider
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val corsConfiguration = CorsConfiguration()
+
+        corsConfiguration.addAllowedOrigin("http://localhost:3000")
+        corsConfiguration.addAllowedHeader("*")
+        corsConfiguration.addAllowedMethod("*")
+        corsConfiguration.allowCredentials = true
+
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", corsConfiguration)
+
+        return source
     }
 
     override fun configure(http: HttpSecurity) {
