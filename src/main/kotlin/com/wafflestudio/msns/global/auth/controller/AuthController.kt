@@ -56,4 +56,7 @@ class AuthController(
         val auth: Authentication = SecurityContextHolder.getContext().authentication
         SecurityContextLogoutHandler().logout(request, response, auth)
     }
+
+    // TODO : sign-out 작업 (service 단으로)
+    // TODO : Refresh token 발급 API
 }
