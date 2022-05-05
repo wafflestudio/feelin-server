@@ -8,7 +8,6 @@ import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.exception.InvalidEmailFormException
 import com.wafflestudio.msns.global.auth.exception.InvalidVerificationCodeException
-import com.wafflestudio.msns.global.auth.exception.JWTInvalidException
 import com.wafflestudio.msns.global.auth.exception.UnauthorizedVerificationTokenException
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationToken
@@ -90,22 +89,6 @@ class AuthService(
         return UserResponse.SimpleUserInfo(newUser)
     }
 
-    fun verifyJWT(email: String, jwt: String): VerificationToken {
-        if (!jwtTokenProvider.validateToken(jwt))
-            throw JWTInvalidException("Token is invalid.")
-        jwtTokenProvider.getEmailFromJwt(jwt)
-            .let {
-                if (it != email)
-                    throw JWTInvalidException("JWT does not correspond to the email.")
-            }
-        val verificationToken = verificationTokenRepository.findByEmail(email)!!
-            .also {
-                if (!passwordEncoder.matches(jwt, it.token))
-                    throw JWTInvalidException("JWT does not correspond to any join request.")
-            }
-        return verificationToken
-    }
-
     fun verifyCode(verifyRequest: AuthRequest.VerifyCode): Boolean {
         val email = verifyRequest.email
         val code = verifyRequest.code
@@ -138,7 +121,7 @@ class AuthService(
     }
 
     private fun generateToken(email: String, code: String): String {
-        val jwt = jwtTokenProvider.generateToken(email, join = true)
+        val jwt = jwtTokenProvider.generateToken(email, isRefresh = true)
         val existingToken = verificationTokenRepository.findByEmail(email)
 
         existingToken?.let {

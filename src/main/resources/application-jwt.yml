@@ -1,0 +1,6 @@
+spring:
+    jwt:
+        jwt-access-secret-key: feelinisworldwidemusicsns
+        jwt-refresh-secret-key: snscisumediwdlrowsinileef
+        jwt-access-expiration-in-ms: 36000000
+        jwt-refresh-expiration-in-ms: 1209600000

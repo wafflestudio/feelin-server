@@ -83,7 +83,7 @@ class DataLoader(
 
         userRepository.save(userA)
 
-        val jwtA = jwtTokenProvider.generateToken(userA.email, join = false)
+        val jwtA = jwtTokenProvider.generateToken(userA.email, isRefresh = false)
         val verificationTokenA = VerificationToken(
             email = userA.email,
             token = passwordEncoder.encode(jwtA),

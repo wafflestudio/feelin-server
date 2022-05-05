@@ -26,25 +26,38 @@ class JwtTokenProvider(
     val tokenPrefix = "Bearer "
     val headerString = "Authentication"
 
-    @Value("feelin-admin")
-    private val jwtSecretKey: String? = null
+    @Value("\${spring.jwt.jwt-access-secret-key}")
+    private val jwtAccessSecretKey: String? = null
 
-    @Value("36000000")
-    private val jwtExpirationInMs: Long? = null
+    @Value("\${sprint.jwt.jwt-refresh-secret-key}")
+    private val jwtRefreshSecretKey: String? = null
 
-    @Value("86400000")
-    private val jwtJoinExpirationInMs: Long? = null
+    @Value("\${spring.jwt.jwt-access-expiration-in-ms}")
+    private val jwtAccessExpirationInMs: Long? = null
 
-    fun generateToken(email: String, join: Boolean = false): String {
+    @Value("\${spring.jwt.jwt-refresh-expiration-in-ms}")
+    private val jwtRefreshExpirationInMs: Long? = null
+
+    fun generateToken(email: String, isRefresh: Boolean = false): String {
         val claims: MutableMap<String, Any> = hashMapOf("email" to email)
         val now = Date()
-        val expiryDate = Date(now.time + (if (!join) jwtExpirationInMs!! else jwtJoinExpirationInMs!!))
-        return tokenPrefix + Jwts.builder()
-            .setClaims(claims)
-            .setIssuedAt(now)
-            .setExpiration(expiryDate)
-            .signWith(SignatureAlgorithm.HS256, jwtSecretKey)
-            .compact()
+        val expiryDate = Date(now.time + (if (!isRefresh) jwtAccessExpirationInMs!! else jwtRefreshExpirationInMs!!))
+
+        return if (!isRefresh) {
+            tokenPrefix + Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS256, jwtAccessSecretKey)
+                .compact()
+        } else {
+            tokenPrefix + Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS256, jwtRefreshSecretKey)
+                .compact()
+        }
     }
 
     fun generateToken(authentication: Authentication): String {
@@ -52,7 +65,7 @@ class JwtTokenProvider(
         return generateToken(verificationTokenPrincipal.verificationToken.email)
     }
 
-    fun validateToken(authToken: String?): Boolean {
+    fun validateToken(authToken: String?, isRefresh: Boolean): Boolean {
         if (authToken.isNullOrEmpty()) {
             logger.error("Token is not provided")
             return false
@@ -63,8 +76,13 @@ class JwtTokenProvider(
         }
         val authTokenWithoutPrefix = removePrefix(authToken)
         try {
-            Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(authTokenWithoutPrefix)
-            return true
+            return if (!isRefresh) {
+                Jwts.parser().setSigningKey(jwtAccessSecretKey).parseClaimsJws(authTokenWithoutPrefix)
+                true
+            } else {
+                Jwts.parser().setSigningKey(jwtRefreshSecretKey).parseClaimsJws(authTokenWithoutPrefix)
+                true
+            }
         } catch (ex: SignatureException) {
             logger.error("Invalid JWT signature")
         } catch (ex: MalformedJwtException) {
@@ -87,7 +105,7 @@ class JwtTokenProvider(
         var tokenWithoutPrefix = token
         tokenWithoutPrefix = removePrefix(tokenWithoutPrefix)
         val claims = Jwts.parser()
-            .setSigningKey(jwtSecretKey)
+            .setSigningKey(jwtAccessSecretKey)
             .parseClaimsJws(tokenWithoutPrefix)
             .body
 
@@ -98,7 +116,7 @@ class JwtTokenProvider(
         var tokenWithoutPrefix = token
         tokenWithoutPrefix = removePrefix(tokenWithoutPrefix)
         val claims = Jwts.parser()
-            .setSigningKey(jwtSecretKey)
+            .setSigningKey(jwtAccessSecretKey)
             .parseClaimsJws(tokenWithoutPrefix)
             .body
 
