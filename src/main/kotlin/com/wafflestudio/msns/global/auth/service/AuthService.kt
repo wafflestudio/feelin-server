@@ -15,6 +15,7 @@ import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 import com.wafflestudio.msns.global.mail.dto.MailDto
 import com.wafflestudio.msns.global.mail.service.MailContentBuilder
 import com.wafflestudio.msns.global.mail.service.MailService
+import org.springframework.http.ResponseCookie
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.regex.Pattern
@@ -87,6 +88,19 @@ class AuthService(
         userRepository.save(newUser)
 
         return UserResponse.SimpleUserInfo(newUser)
+    }
+
+    fun recreateRefresh(refreshToken: String): String {
+        // FIXME : domain 설정 추가
+        val cookie = ResponseCookie.from("access-cookie", jwtTokenProvider.removePrefix(refreshToken))
+            .domain("feelin.com")
+            .path("/")
+            .maxAge(1209600000)
+            .secure(true)
+            .httpOnly(true)
+            .build()
+
+        return cookie.toString()
     }
 
     fun verifyCode(verifyRequest: AuthRequest.VerifyCode): Boolean {

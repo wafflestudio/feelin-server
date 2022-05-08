@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
+import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -47,6 +48,7 @@ class AuthController(
         return authService.signUp(signUpRequest)
     }
 
+    // FIXME : 쿠키 삭제로 변경
     @PostMapping("/user/signout")
     @ResponseStatus(HttpStatus.OK)
     fun signout(
@@ -57,6 +59,13 @@ class AuthController(
         SecurityContextLogoutHandler().logout(request, response, auth)
     }
 
-    // TODO : sign-out 작업 (service 단으로)
-    // TODO : Refresh token 발급 API
+    @PostMapping("/user/refresh")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun recreateRefresh(
+        @CookieValue(name = "access-cookie") cookie: String,
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ) {
+        response.addHeader("Authentication", authService.recreateRefresh(cookie))
+    }
 }
