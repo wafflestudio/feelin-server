@@ -6,9 +6,6 @@ import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
 import com.wafflestudio.msns.global.auth.service.AuthService
 import org.springframework.http.HttpStatus
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
 import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -49,14 +46,13 @@ class AuthController(
     }
 
     // FIXME : 쿠키 삭제로 변경
-    @PostMapping("/user/signout")
+    @PostMapping("/user/sign-out")
     @ResponseStatus(HttpStatus.OK)
-    fun signout(
+    fun signOut(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ) {
-        val auth: Authentication = SecurityContextHolder.getContext().authentication
-        SecurityContextLogoutHandler().logout(request, response, auth)
+        authService.signOut(request, response)
     }
 
     @PostMapping("/user/refresh")

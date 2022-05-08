@@ -19,6 +19,8 @@ import org.springframework.http.ResponseCookie
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.regex.Pattern
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 @Service
 class AuthService(
@@ -115,6 +117,17 @@ class AuthService(
         verificationTokenRepository.save(verificationToken)
 
         return true
+    }
+
+    fun signOut(request: HttpServletRequest, response: HttpServletResponse) {
+        val cookie = ResponseCookie.from("access-cookie", "good-bye")
+            .domain("feelin.com")
+            .path("/")
+            .maxAge(0)
+            .secure(true)
+            .httpOnly(false)
+            .build()
+        response.setHeader("set-cookie", cookie.toString())
     }
 
     private fun createRandomCode(): String {
