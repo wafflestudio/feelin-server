@@ -28,7 +28,6 @@ out/
 
 ### Application Account ###
 src/main/resources/application-mail.yml
-src/main/resources/application-jwt.yml
 
 ### NetBeans ###
 /nbproject/private/
