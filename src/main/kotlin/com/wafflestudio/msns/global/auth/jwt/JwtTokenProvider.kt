@@ -29,7 +29,7 @@ class JwtTokenProvider(
     @Value("\${spring.jwt.jwt-access-secret-key}")
     private val jwtAccessSecretKey: String? = null
 
-    @Value("\${sprint.jwt.jwt-refresh-secret-key}")
+    @Value("\${spring.jwt.jwt-refresh-secret-key}")
     private val jwtRefreshSecretKey: String? = null
 
     @Value("\${spring.jwt.jwt-access-expiration-in-ms}")
