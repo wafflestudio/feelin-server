@@ -28,6 +28,7 @@ out/
 
 ### Application Account ###
 src/main/resources/application-mail.yml
+src/main/resources/application-ssl.yml
 
 ### NetBeans ###
 /nbproject/private/
