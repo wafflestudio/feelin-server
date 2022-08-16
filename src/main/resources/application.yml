@@ -1,7 +1,9 @@
 spring:
   profiles:
-    active: local
-    include: mail
+    active: prod
+    group:
+        local: mail
+        prod: mail, ssl
 ---
 spring:
   config:
