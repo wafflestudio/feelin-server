@@ -44,3 +44,6 @@ services:
             - ./nginx/certificate:/etc/letsencrypt/live/api-feelin.kro.kr
         depends_on:
             - application
+
+volumes:
+    database:
