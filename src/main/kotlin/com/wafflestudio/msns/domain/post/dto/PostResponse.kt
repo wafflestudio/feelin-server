@@ -24,14 +24,14 @@ class PostResponse {
         val title: String,
         val content: String,
         val createdAt: LocalDateTime?,
-        val playlist: PlaylistResponse.PostDetailResponse
+        val playlist: PlaylistResponse.DetailResponse
     ) {
         constructor(post: Post) : this(
             id = post.id,
             title = post.title,
             content = post.content,
             createdAt = post.createdAt,
-            playlist = PlaylistResponse.PostDetailResponse(post.playlist)
+            playlist = PlaylistResponse.DetailResponse(post.playlist)
         )
     }
 }

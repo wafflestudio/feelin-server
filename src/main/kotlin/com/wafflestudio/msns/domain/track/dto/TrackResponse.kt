@@ -4,7 +4,7 @@ import com.wafflestudio.msns.domain.album.dto.AlbumResponse
 import com.wafflestudio.msns.domain.playlist.model.PlaylistTrack
 
 class TrackResponse {
-    data class PostDetailResponse(
+    data class DetailResponse(
         val id: Long,
         val title: String,
         val album: AlbumResponse.SimpleResponse
