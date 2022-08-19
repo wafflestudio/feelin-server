@@ -22,5 +22,4 @@ class PlaylistResponse {
         val message: String,
         val playlist: DetailResponse
     )
-
 }
