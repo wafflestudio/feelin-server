@@ -17,7 +17,7 @@ services:
             - mysql-data:/var/lib/mysql
 
     application:
-        image: yeonsumia/waffle-music-sns:develop
+        image: yeonsumia/waffle-music-sns:main
         restart: on-failure
         container_name: feelin_app
         environment:
