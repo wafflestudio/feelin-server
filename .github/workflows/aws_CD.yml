@@ -16,6 +16,9 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v2
 
+        - name: Grant execute permission for gradlew
+          run: chmod +x ./gradlew
+
         - name: Build with Gradle
           run: ./gradlew build -x test -x ktlintCheck
 
@@ -52,6 +55,9 @@ jobs:
       needs: dockerhub-upload-image
       runs-on: ubuntu-latest
       steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+
         - name: Make directory for zip
           run: mkdir deploy
 
@@ -73,6 +79,9 @@ jobs:
       runs-on: ubuntu-latest
       environment: dev
       steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+
         - name: Configure AWS credentials
           uses: aws-actions/configure-aws-credentials@v1
           with:
