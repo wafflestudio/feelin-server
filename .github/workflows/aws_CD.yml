@@ -5,8 +5,8 @@ on:
     branches: [ main ]
 
 defaults:
-    run:
-        working-directory: .
+  run:
+    working-directory: .
 
 jobs:
   dockerhub-upload-image:
