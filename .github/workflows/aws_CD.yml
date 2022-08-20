@@ -13,6 +13,9 @@ jobs:
       name: push
       runs-on: ubuntu-latest
       steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+
         - name: Docker meta
           id: docker_meta
           uses: crazy-max/ghaction-docker-meta@v1
@@ -46,9 +49,6 @@ jobs:
       needs: dockerhub-upload-image
       runs-on: ubuntu-latest
       steps:
-        - name: Checkout
-          uses: actions/checkout@v2
-
         - name: Make directory for zip
           run: mkdir deploy
 
