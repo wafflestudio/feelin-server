@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 @Component
-@Profile("local", "prod")
+@Profile("local", "dev")
 class DataLoader(
     private val userRepository: UserRepository,
     private val artistRepository: ArtistRepository,
@@ -75,11 +75,11 @@ class DataLoader(
         trackRepository.save(trackC)
 
         val userA = User(
-            email = "yeonsumia@feelin.com",
-            password = "feel-me",
-            username = "yeonsumia",
-            firstName = "hs",
-            lastName = "Jeon",
+            email = "admin@feelin.com",
+            password = "feelin-admin",
+            username = "admin",
+            firstName = "Doe",
+            lastName = "John",
             phoneNumber = "010-1234-5678",
         )
 
