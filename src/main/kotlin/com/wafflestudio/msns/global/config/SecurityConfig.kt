@@ -7,6 +7,7 @@ import com.wafflestudio.msns.global.auth.jwt.JwtAuthenticationEntryPoint
 import com.wafflestudio.msns.global.auth.jwt.JwtAuthenticationFilter
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.service.VerificationTokenPrincipalDetailService
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -78,6 +79,7 @@ class SecurityConfig(
             )
             .addFilter(JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider))
             .authorizeRequests()
+            .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
             .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
             .antMatchers(HttpMethod.GET, "/ping").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/user").permitAll()
