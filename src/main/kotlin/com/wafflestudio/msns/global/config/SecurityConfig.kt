@@ -55,7 +55,6 @@ class SecurityConfig(
         corsConfiguration.addAllowedOrigin("http://ec2-54-180-105-114.ap-northeast-2.compute.amazonaws.com")
         corsConfiguration.addAllowedHeader("*")
         corsConfiguration.addAllowedMethod("*")
-        corsConfiguration.allowCredentials = true
 
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", corsConfiguration)
