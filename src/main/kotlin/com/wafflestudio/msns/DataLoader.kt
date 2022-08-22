@@ -76,7 +76,7 @@ class DataLoader(
 
         val userA = User(
             email = "admin@feelin.com",
-            password = "feelin-admin",
+            password = passwordEncoder.encode("feelin-admin"),
             username = "admin",
             firstName = "Doe",
             lastName = "John",
