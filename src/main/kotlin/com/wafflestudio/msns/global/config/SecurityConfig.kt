@@ -51,12 +51,10 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val corsConfiguration = CorsConfiguration()
 
-        corsConfiguration.addAllowedOrigin("*")
+        corsConfiguration.addAllowedOrigin("http://localhost:3000")
+        corsConfiguration.addAllowedOrigin("http://ec2-54-180-105-114.ap-northeast-2.compute.amazonaws.com")
         corsConfiguration.addAllowedHeader("*")
-        corsConfiguration.addAllowedMethod("GET")
-        corsConfiguration.addAllowedMethod("POST")
-        corsConfiguration.addAllowedMethod("DELETE")
-        corsConfiguration.addAllowedMethod("PUT")
+        corsConfiguration.addAllowedMethod("*")
 
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", corsConfiguration)
