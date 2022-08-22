@@ -90,7 +90,7 @@ class DataLoader(
             email = userA.email,
             token = passwordEncoder.encode(jwtA),
             authenticationCode = createRandomCode(),
-            password = passwordEncoder.encode("feel-me")
+            password = passwordEncoder.encode("feelin-admin")
         )
 
         verificationTokenRepository.save(verificationTokenA)
