@@ -86,7 +86,6 @@ class SecurityConfig(
             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
             .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
             .antMatchers(HttpMethod.GET, "/ping").permitAll()
-            .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/user").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/user/signup").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/user/verify-code").permitAll()
