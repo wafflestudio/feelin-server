@@ -51,6 +51,7 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val corsConfiguration = CorsConfiguration()
 
+        corsConfiguration.allowCredentials = true
         corsConfiguration.addAllowedOrigin("http://localhost:3000")
         corsConfiguration.addAllowedOrigin("http://ec2-54-180-105-114.ap-northeast-2.compute.amazonaws.com")
         corsConfiguration.addAllowedHeader("*")
@@ -85,6 +86,7 @@ class SecurityConfig(
             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
             .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
             .antMatchers(HttpMethod.GET, "/ping").permitAll()
+            .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/user").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/user/signup").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/user/verify-code").permitAll()
