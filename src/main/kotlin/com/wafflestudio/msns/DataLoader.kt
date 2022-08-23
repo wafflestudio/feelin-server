@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 @Component
-@Profile("dev")
+@Profile("local", "dev")
 class DataLoader(
     private val userRepository: UserRepository,
     private val artistRepository: ArtistRepository,
