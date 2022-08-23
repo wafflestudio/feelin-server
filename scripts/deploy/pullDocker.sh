@@ -8,7 +8,7 @@ then
     # docker login
     docker login -u $DOCKERHUB_USERNAME --password-stdin < ~/deploy/password.txt
     # pull docker image
-    docker image pull yeonsumia/waffle-music-sns:develop
+    docker image pull yeonsumia/waffle-music-sns:main
 else
     echo "[Deploy] : Another application is using port"
     echo "[Deploy] : Stopping application using port"
