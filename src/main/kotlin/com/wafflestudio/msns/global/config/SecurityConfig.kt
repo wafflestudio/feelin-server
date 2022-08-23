@@ -57,7 +57,6 @@ class SecurityConfig(
         corsConfiguration.addAllowedHeader("*")
         corsConfiguration.addAllowedMethod("POST")
         corsConfiguration.addAllowedMethod("GET")
-        corsConfiguration.addAllowedMethod("OPTIONS")
         corsConfiguration.addAllowedMethod("DELETE")
         corsConfiguration.addAllowedMethod("PUT")
 
