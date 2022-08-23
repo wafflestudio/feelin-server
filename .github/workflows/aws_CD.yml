@@ -117,7 +117,7 @@ jobs:
           run: |
             aws deploy create-deployment-group \
               --application-name waffle-music-sns \
-              --ec2-tag-filters Key=Name,Type=KEY_AND_VALUE,Value=waffle-music-sns \
+              --ec2-tag-filters Key=Name,Type=KEY_AND_VALUE,Value=FeelinUser \
               --deployment-style '{"deploymentType":"IN_PLACE","deploymentOption": "WITHOUT_TRAFFIC_CONTROL"}' \
               --deployment-group-name dev \
               --service-role-arn ${{ secrets.AWS_SERVICE_ROLE_ARN }}
