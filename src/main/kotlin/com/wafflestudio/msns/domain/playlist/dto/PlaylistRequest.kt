@@ -6,5 +6,5 @@ class PlaylistRequest {
     data class PreviewRequest(
         val id: UUID,
         val thumbnail: String
-        )
+    )
 }
