@@ -1,11 +1,11 @@
 package com.wafflestudio.msns.domain.post.service
 
 import com.wafflestudio.msns.domain.playlist.exception.PlaylistNotFoundException
+import com.wafflestudio.msns.domain.playlist.model.Playlist
 import com.wafflestudio.msns.domain.playlist.repository.PlaylistRepository
 import com.wafflestudio.msns.domain.post.dto.PostRequest
 import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.post.exception.InvalidTitleException
-import com.wafflestudio.msns.domain.post.exception.PostAlreadyExistsException
 import com.wafflestudio.msns.domain.post.exception.PostNotFoundException
 import com.wafflestudio.msns.domain.post.model.Post
 import com.wafflestudio.msns.domain.post.repository.PostRepository
@@ -27,21 +27,22 @@ class PostService(
         val title = createRequest.title
             .also { if (it.isBlank()) throw InvalidTitleException("title is blank.") }
         val content = createRequest.content
-        playlistRepository.findByUser_IdAndTitle(user.id, createRequest.playlistTitle)
-            ?.also {
-                postRepository.findByUser_IdAndPlaylist_Title(user.id, createRequest.playlistTitle)
-                    ?.run { throw PostAlreadyExistsException("post already exists with the playlist.") }
-            }
-            ?.let { playlist ->
-                Post(
+        val playlist = playlistRepository.findByStreamId(createRequest.playlistPreview.id)
+            ?: playlistRepository.save(
+                Playlist(
                     user = user,
-                    title = title,
-                    content = content,
-                    playlist = playlist
+                    streamId = createRequest.playlistPreview.id,
+                    thumbnail = createRequest.playlistPreview.thumbnail
                 )
-            }
-            ?.let { postRepository.save(it) }
-            ?: throw PlaylistNotFoundException("playlist is not found from the requested title.")
+            )
+        postRepository.save(
+            Post(
+                user = user,
+                title = title,
+                content = content,
+                playlist = playlist
+            )
+        )
     }
 
     fun getPost(playlistId: Long, userId: Long): PostResponse.DetailResponse {

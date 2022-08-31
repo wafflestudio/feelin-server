@@ -7,9 +7,9 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface PostRepository : JpaRepository<Post, Long?> {
-    fun findByUser_IdAndPlaylist_Id(userId: Long, playlistId: Long): Post?
+    fun findPostById(id: Long): Post?
 
-    fun findByUser_IdAndPlaylist_Title(userId: Long, playlistTitle: String): Post?
+    fun findByUser_IdAndPlaylist_Id(userId: Long, playlistId: Long): Post?
 
     fun findAllByUser(pageable: Pageable, user: User): Page<Post>
 }

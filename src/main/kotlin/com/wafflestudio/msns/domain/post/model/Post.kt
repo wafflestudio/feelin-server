@@ -12,10 +12,7 @@ import javax.persistence.JoinColumn
 import javax.persistence.OneToOne
 
 @Entity
-@Table(
-    name = "post",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "playlist_id"])]
-)
+@Table(name = "post")
 class Post(
     @ManyToOne(fetch = FetchType.LAZY, cascade = [])
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -25,7 +22,7 @@ class Post(
 
     var content: String,
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [])
     @JoinColumn(name = "playlist_id", referencedColumnName = "id")
     val playlist: Playlist,
 
