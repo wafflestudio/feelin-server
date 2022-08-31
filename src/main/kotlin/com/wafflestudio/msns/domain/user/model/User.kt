@@ -1,11 +1,9 @@
 package com.wafflestudio.msns.domain.user.model
 
-import com.wafflestudio.msns.domain.model.BaseEntity
-import com.wafflestudio.msns.domain.playlist.model.Playlist
+import com.wafflestudio.msns.domain.model.BaseTimeEntity
 import com.wafflestudio.msns.domain.post.model.Post
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType
 import javax.persistence.OneToMany
 import javax.persistence.Table
 import javax.validation.constraints.Email
@@ -35,10 +33,7 @@ class User(
     @Column
     var lastName: String? = null,
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [])
+    @OneToMany(mappedBy = "user")
     val posts: MutableList<Post> = mutableListOf(),
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [])
-    val playlists: MutableList<Playlist> = mutableListOf(),
-
-) : BaseEntity()
+) : BaseTimeEntity()
