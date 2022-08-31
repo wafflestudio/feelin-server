@@ -7,5 +7,10 @@ then
     # Recreate anonymous volumes instead of retrieving data from the previous containers (--renew-anon-volumes)
     sudo docker-compose -f ~/deploy/docker-compose.yml up -d --renew-anon-volumes
     # build images and run containers
-    echo "[Deploy] : Running new Application"
+    echo "[Deploy] : Running new Application (dev)"
+fi
+if [ "$DEPLOYMENT_GROUP_NAME" == "prod" ]
+then
+    sudo docker-compose -f ~/deploy/docker-compose.yml up --no-deps -d application
+    echo "[Deploy] : Running new Application (prod)"
 fi

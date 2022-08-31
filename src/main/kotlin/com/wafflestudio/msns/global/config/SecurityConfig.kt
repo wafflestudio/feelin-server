@@ -7,6 +7,7 @@ import com.wafflestudio.msns.global.auth.jwt.JwtAuthenticationEntryPoint
 import com.wafflestudio.msns.global.auth.jwt.JwtAuthenticationFilter
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.service.VerificationTokenPrincipalDetailService
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -20,6 +21,7 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.CorsUtils
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
@@ -49,10 +51,11 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val corsConfiguration = CorsConfiguration()
 
+        corsConfiguration.allowCredentials = true
         corsConfiguration.addAllowedOrigin("http://localhost:3000")
+        corsConfiguration.addAllowedOrigin("http://ec2-54-180-105-114.ap-northeast-2.compute.amazonaws.com")
         corsConfiguration.addAllowedHeader("*")
         corsConfiguration.addAllowedMethod("*")
-        corsConfiguration.allowCredentials = true
 
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", corsConfiguration)
@@ -76,6 +79,8 @@ class SecurityConfig(
             )
             .addFilter(JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider))
             .authorizeRequests()
+            .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+            .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
             .antMatchers(HttpMethod.GET, "/ping").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/user").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/user/signup").permitAll()

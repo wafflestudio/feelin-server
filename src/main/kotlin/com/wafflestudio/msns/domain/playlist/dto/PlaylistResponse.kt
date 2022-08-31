@@ -4,7 +4,7 @@ import com.wafflestudio.msns.domain.playlist.model.Playlist
 import java.util.UUID
 
 class PlaylistResponse {
-    data class PostDetailResponse(
+    data class DetailResponse(
         val id: Long,
         val streamId: UUID,
         val thumbnail: String
@@ -15,4 +15,9 @@ class PlaylistResponse {
             thumbnail = playlist.thumbnail
         )
     }
+
+    data class APIResponse(
+        val message: String,
+        val playlist: DetailResponse
+    )
 }

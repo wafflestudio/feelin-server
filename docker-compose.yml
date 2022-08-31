@@ -10,22 +10,16 @@ services:
             - MYSQL_ROOT_PASSWORD=feelin
             - MYSQL_USER=feelin
             - MYSQL_PASSWORD=feelin
-
         command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
-
         ports:
             - "3306:3306"
         volumes:
-            - ./database/feelinDB:/var/lib/mysql
+            - mysql-data:/var/lib/mysql
 
     application:
-        image: yeonsumia/waffle-music-sns:develop
+        image: yeonsumia/waffle-music-sns:main
         restart: on-failure
         container_name: feelin_app
-        environment:
-            SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/feelinDB?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
-            SRPING_DATASOURCE_USERNAME: feelin
-            SPRING_DATASOURCE_PASSWORD: feelin
         ports:
             - "8080:8080"
         volumes:
@@ -44,3 +38,6 @@ services:
             - ./nginx/certificate:/etc/letsencrypt/live/api-feelin.kro.kr
         depends_on:
             - application
+
+volumes:
+    mysql-data:

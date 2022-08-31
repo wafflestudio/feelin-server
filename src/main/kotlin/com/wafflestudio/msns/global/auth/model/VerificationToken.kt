@@ -8,7 +8,7 @@ import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 
 @Entity
-@Table(name = "verfiy_token")
+@Table(name = "verify_token")
 class VerificationToken(
     @Column(unique = true)
     @field:NotBlank

@@ -22,7 +22,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 @Component
-@Profile("local")
+@Profile("local", "dev")
 class DataLoader(
     private val userRepository: UserRepository,
     private val artistRepository: ArtistRepository,
@@ -51,9 +51,11 @@ class DataLoader(
         albumRepository.save(albumA)
 
         val userA = User(
-            username = "hsJeon",
-            email = "yeonsumia@snu.ac.kr",
-            password = "feel-me",
+            email = "admin@feelin.com",
+            password = passwordEncoder.encode("feelin-admin"),
+            username = "admin",
+            firstName = "Doe",
+            lastName = "John",
             phoneNumber = "010-1234-5678",
         )
 
@@ -64,7 +66,8 @@ class DataLoader(
             email = userA.email,
             token = passwordEncoder.encode(jwtA),
             authenticationCode = createRandomCode(),
-            password = passwordEncoder.encode("feel-me")
+            password = passwordEncoder.encode("feelin-admin"),
+            verification = true
         )
 
         verificationTokenRepository.save(verificationTokenA)
