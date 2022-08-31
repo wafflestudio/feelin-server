@@ -6,10 +6,8 @@ import com.wafflestudio.msns.domain.user.model.User
 import javax.persistence.Entity
 import javax.persistence.ManyToOne
 import javax.persistence.Table
-import javax.persistence.UniqueConstraint
 import javax.persistence.FetchType
 import javax.persistence.JoinColumn
-import javax.persistence.OneToOne
 
 @Entity
 @Table(name = "post")
