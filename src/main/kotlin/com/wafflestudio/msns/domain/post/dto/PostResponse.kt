@@ -19,6 +19,22 @@ class PostResponse {
         )
     }
 
+    data class PreviewResponse(
+        val id: Long,
+        val title: String,
+        val content: String,
+        val createdAt: LocalDateTime?,
+        val playlist: PlaylistResponse.PreviewResponse
+    ) {
+        constructor(post: Post) : this(
+            id = post.id,
+            title = post.title,
+            content = post.content,
+            createdAt = post.createdAt,
+            playlist = PlaylistResponse.PreviewResponse(post.playlist)
+        )
+    }
+
     data class DetailResponse(
         val id: Long,
         val title: String,
@@ -26,12 +42,12 @@ class PostResponse {
         val createdAt: LocalDateTime?,
         val playlist: PlaylistResponse.DetailResponse
     ) {
-        constructor(post: Post) : this(
+        constructor(post: Post, playlist: PlaylistResponse.DetailResponse) : this(
             id = post.id,
             title = post.title,
             content = post.content,
             createdAt = post.createdAt,
-            playlist = PlaylistResponse.DetailResponse(post.playlist)
+            playlist = playlist
         )
     }
 }

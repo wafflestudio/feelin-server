@@ -1,18 +1,20 @@
 package com.wafflestudio.msns.domain.post.service
 
+import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
 import com.wafflestudio.msns.domain.playlist.exception.PlaylistNotFoundException
 import com.wafflestudio.msns.domain.playlist.model.Playlist
 import com.wafflestudio.msns.domain.playlist.repository.PlaylistRepository
+import com.wafflestudio.msns.domain.playlist.service.WebClientService
 import com.wafflestudio.msns.domain.post.dto.PostRequest
 import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.post.exception.InvalidTitleException
 import com.wafflestudio.msns.domain.post.exception.PostNotFoundException
 import com.wafflestudio.msns.domain.post.model.Post
 import com.wafflestudio.msns.domain.post.repository.PostRepository
-import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.model.User
-import com.wafflestudio.msns.domain.user.repository.UserRepository
-import org.springframework.data.repository.findByIdOrNull
+import org.modelmapper.ModelMapper
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional
 class PostService(
     private val postRepository: PostRepository,
     private val playlistRepository: PlaylistRepository,
-    private val userRepository: UserRepository
+    private val webClientService: WebClientService,
+    private val modelMapper: ModelMapper
 ) {
     fun writePost(createRequest: PostRequest.CreateRequest, user: User) {
         val title = createRequest.title
@@ -45,15 +48,19 @@ class PostService(
         )
     }
 
-    fun getPost(playlistId: Long, userId: Long): PostResponse.DetailResponse {
-        return userRepository.findByIdOrNull(userId)
-            ?.let {
-                postRepository.findByUser_IdAndPlaylist_Id(it.id, playlistId)
-                    ?: throw PostNotFoundException("post is not found with the user and the playlist.")
+    fun getPosts(pageable: Pageable, user: User): Page<PostResponse.PreviewResponse> =
+        postRepository.findUserPosts(pageable, user).map { post -> PostResponse.PreviewResponse(post) }
+
+    fun getPostById(postId: Long): PostResponse.DetailResponse =
+        postRepository.findPostById(postId)
+            ?.let { post ->
+                webClientService.getPlaylist(post.playlist.streamId)
+                    .let {
+                        modelMapper.map(it.block(), PlaylistResponse.DetailResponse::class.java)
+                            .let { playlist -> PostResponse.DetailResponse(post, playlist) }
+                    }
             }
-            ?.let { PostResponse.DetailResponse(it) }
-            ?: throw UserNotFoundException("user is not found with the email.")
-    }
+            ?: throw PostNotFoundException("post is not found with the id.")
 
     fun modifyPost(putRequest: PostRequest.PutRequest, playlistId: Long, user: User) {
         val title = putRequest.title

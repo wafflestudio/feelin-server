@@ -1,11 +1,14 @@
 package com.wafflestudio.msns.domain.track.dto
 
 import com.wafflestudio.msns.domain.album.dto.AlbumResponse
+import com.wafflestudio.msns.domain.artist.dto.ArtistResponse
+import java.util.UUID
 
 class TrackResponse {
-    data class DetailResponse(
-        val id: Long,
+    data class APIDto(
+        val id: UUID,
         val title: String,
-        val album: AlbumResponse.SimpleResponse
+        val artists: List<ArtistResponse.APIDto>,
+        val album: AlbumResponse.APIDto
     )
 }
