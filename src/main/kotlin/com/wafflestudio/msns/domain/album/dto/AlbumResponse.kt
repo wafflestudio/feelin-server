@@ -1,17 +1,11 @@
 package com.wafflestudio.msns.domain.album.dto
 
-import com.wafflestudio.msns.domain.album.model.Album
+import java.util.UUID
 
 class AlbumResponse {
-    data class SimpleResponse(
-        val id: Long,
+    data class APIDto(
+        val id: UUID,
         val title: String,
-        val albumCover: String
-    ) {
-        constructor(album: Album) : this(
-            id = album.id,
-            title = album.title,
-            albumCover = album.cover
-        )
-    }
+        val thumbnail: String
+    )
 }
