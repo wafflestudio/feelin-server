@@ -25,7 +25,5 @@ class UserController(
             size = 30, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
         @PathVariable("user_id") userId: Long
-    ): Page<PostResponse.UserPageResponse> {
-        return userService.getPosts(pageable, userId)
-    }
+    ): Page<PostResponse.UserPageResponse> = userService.getPosts(pageable, userId)
 }

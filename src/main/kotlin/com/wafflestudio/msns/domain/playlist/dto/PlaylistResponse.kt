@@ -1,10 +1,11 @@
 package com.wafflestudio.msns.domain.playlist.dto
 
 import com.wafflestudio.msns.domain.playlist.model.Playlist
+import com.wafflestudio.msns.domain.track.dto.TrackResponse
 import java.util.UUID
 
 class PlaylistResponse {
-    data class DetailResponse(
+    data class PreviewResponse(
         val id: Long,
         val streamId: UUID,
         val thumbnail: String
@@ -16,8 +17,15 @@ class PlaylistResponse {
         )
     }
 
-    data class APIResponse(
-        val message: String,
-        val playlist: DetailResponse
+    data class PreviewDto(
+        val id: UUID,
+        val thumbnail: String
+    )
+
+    data class DetailResponse(
+        val id: UUID,
+        val title: String,
+        val tracks: List<TrackResponse.APIDto>,
+        val preview: PreviewDto
     )
 }
