@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
@@ -19,6 +20,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.CorsUtils
@@ -33,7 +35,7 @@ class SecurityConfig(
     private val jwtTokenProvider: JwtTokenProvider,
     private val userPrincipalDetailService: VerificationTokenPrincipalDetailService,
     private val objectMapper: ObjectMapper,
-    private val passwordEncoder: PasswordEncoder,
+    private val passwordEncoder: PasswordEncoder
 ) : WebSecurityConfigurerAdapter() {
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth.authenticationProvider(daoAuthenticationProvider())
@@ -87,6 +89,9 @@ class SecurityConfig(
             .antMatchers(HttpMethod.POST, "/api/v1/auth/user/verify-code").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/user/signin").permitAll()
             .anyRequest().authenticated()
-            .and().logout()
+            .and()
+            .logout()
+            .logoutUrl("/api/v1/auth/user/signout")
+            .logoutSuccessHandler(HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
     }
 }

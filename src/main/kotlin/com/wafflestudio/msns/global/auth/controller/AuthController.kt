@@ -46,14 +46,4 @@ class AuthController(
     ): UserResponse.SimpleUserInfo {
         return authService.signUp(signUpRequest)
     }
-
-    @PostMapping("/user/signout")
-    @ResponseStatus(HttpStatus.OK)
-    fun signout(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-    ) {
-        val auth: Authentication = SecurityContextHolder.getContext().authentication
-        SecurityContextLogoutHandler().logout(request, response, auth)
-    }
 }
