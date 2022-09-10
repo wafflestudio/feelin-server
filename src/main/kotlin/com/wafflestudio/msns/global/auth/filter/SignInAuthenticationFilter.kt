@@ -1,6 +1,7 @@
 package com.wafflestudio.msns.global.auth.filter
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
 import com.wafflestudio.msns.global.auth.dto.LoginRequest
@@ -59,19 +60,14 @@ class SignInAuthenticationFilter(
     }
 
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
-        var loginEmail: String = ""
-
         val parsedRequest: LoginRequest = parseRequest(request)
         val account = parsedRequest.account
         val password = parsedRequest.password
 
-        if (userRepository.findByUsername(account!!) == null && userRepository.findByPhoneNumber(account) == null) {
-            loginEmail = account
-        } else if (userRepository.findByUsername(account) == null && userRepository.findByEmail(account) == null) {
-            loginEmail = userRepository.findByPhoneNumber(account)!!.email
-        } else if (userRepository.findByPhoneNumber(account) == null && userRepository.findByEmail(account) == null) {
-            loginEmail = userRepository.findByUsername(account)!!.email
-        }
+        val loginEmail = userRepository.findByEmail(account)?.email
+            ?: userRepository.findByUsername(account)?.email
+                ?: userRepository.findByPhoneNumber(account)?.email
+                    ?: throw UserNotFoundException("user is not found with the account information.")
 
         val authRequest: Authentication =
             UsernamePasswordAuthenticationToken(loginEmail, password)
