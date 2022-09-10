@@ -3,5 +3,5 @@ package com.wafflestudio.msns.domain.user.exception
 import com.wafflestudio.msns.global.exception.ConflictException
 import com.wafflestudio.msns.global.exception.ErrorType
 
-class AlreadyExistUsernameException(detail: String = "") :
-    ConflictException(ErrorType.ALREADY_EXISTS_USERNAME, detail)
+class AlreadyExistUserException(detail: String = "") :
+    ConflictException(ErrorType.ALREADY_EXISTS_USER, detail)

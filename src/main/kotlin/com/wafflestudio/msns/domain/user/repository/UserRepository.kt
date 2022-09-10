@@ -8,4 +8,5 @@ interface UserRepository : JpaRepository<User, Long?> {
     fun findByUsername(username: String): User?
     fun findByPhoneNumber(phoneNumber: String): User?
     fun existsByUsername(username: String): Boolean
+    fun existsByPhoneNumber(phoneNumber: String): Boolean
 }

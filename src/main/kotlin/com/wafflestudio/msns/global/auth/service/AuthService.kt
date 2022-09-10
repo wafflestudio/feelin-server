@@ -2,7 +2,7 @@ package com.wafflestudio.msns.global.auth.service
 
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
-import com.wafflestudio.msns.domain.user.exception.AlreadyExistUsernameException
+import com.wafflestudio.msns.domain.user.exception.AlreadyExistUserException
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
@@ -66,8 +66,8 @@ class AuthService(
         val phoneNumber = signUpRequest.phoneNumber
         val password = passwordEncoder.encode(signUpRequest.password)
 
-        if (userRepository.existsByUsername(username))
-            throw AlreadyExistUsernameException("This username already exists.")
+        if (existUser(username, phoneNumber))
+            throw AlreadyExistUserException("User already exists using this username/phoneNumber.")
 
         verificationTokenRepository.findByEmail(email)
             ?.also { if (!it.verification) throw UnauthorizedVerificationTokenException("email is unauthorized.") }
@@ -102,6 +102,9 @@ class AuthService(
             ?.let { true }
             ?: false
     }
+
+    private fun existUser(username: String, phoneNumber: String): Boolean =
+        userRepository.existsByUsername(username) || userRepository.existsByPhoneNumber(phoneNumber)
 
     private fun createRandomCode(): String {
         return (100000..999999).random().toString()
