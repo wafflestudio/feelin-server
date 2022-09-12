@@ -2,7 +2,7 @@ package com.wafflestudio.msns.domain.user.model
 
 import com.wafflestudio.msns.domain.model.BaseTimeEntity
 import com.wafflestudio.msns.domain.post.model.Post
-import java.util.*
+import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.OneToMany

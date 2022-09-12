@@ -66,8 +66,8 @@ class SignInAuthenticationFilter(
 
         val loginEmail = userRepository.findByEmail(account)?.email
             ?: userRepository.findByUsername(account)?.email
-                ?: userRepository.findByPhoneNumber(account)?.email
-                    ?: throw UserNotFoundException("user is not found with the account information.")
+            ?: userRepository.findByPhoneNumber(account)?.email
+            ?: throw UserNotFoundException("user is not found with the account information.")
 
         val authRequest: Authentication =
             UsernamePasswordAuthenticationToken(loginEmail, password)
