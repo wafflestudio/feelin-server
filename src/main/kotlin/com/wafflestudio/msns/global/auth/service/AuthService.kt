@@ -15,6 +15,7 @@ import com.wafflestudio.msns.global.mail.service.MailContentBuilder
 import com.wafflestudio.msns.global.mail.service.MailService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.UUID
 import java.util.regex.Pattern
 
 @Service
@@ -58,7 +59,7 @@ class AuthService(
         }
     }
 
-    fun signUp(signUpRequest: UserRequest.SignUp): UserResponse.SimpleUserInfo {
+    fun signUp(streamId: UUID, signUpRequest: UserRequest.SignUp): UserResponse.SimpleUserInfo {
         val email = signUpRequest.email
         val lastName = signUpRequest.lastName
         val firstName = signUpRequest.firstName
@@ -81,7 +82,8 @@ class AuthService(
             password = password,
             lastName = lastName,
             firstName = firstName,
-            phoneNumber = phoneNumber
+            phoneNumber = phoneNumber,
+            streamId = streamId
         )
         userRepository.save(newUser)
 

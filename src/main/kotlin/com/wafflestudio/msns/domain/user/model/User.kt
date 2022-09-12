@@ -2,6 +2,7 @@ package com.wafflestudio.msns.domain.user.model
 
 import com.wafflestudio.msns.domain.model.BaseTimeEntity
 import com.wafflestudio.msns.domain.post.model.Post
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.OneToMany
@@ -32,6 +33,9 @@ class User(
 
     @Column
     var lastName: String? = null,
+
+    @Column(columnDefinition = "BINARY(16)")
+    val streamId: UUID,
 
     @OneToMany(mappedBy = "user")
     val posts: MutableList<Post> = mutableListOf(),

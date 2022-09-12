@@ -57,6 +57,7 @@ class DataLoader(
             firstName = "Doe",
             lastName = "John",
             phoneNumber = "010-1234-5678",
+            streamId = UUID.randomUUID()
         )
 
         userRepository.save(userA)

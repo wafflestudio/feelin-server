@@ -1,6 +1,7 @@
 package com.wafflestudio.msns.domain.user.dto
 
 import com.wafflestudio.msns.domain.user.model.User
+import java.util.UUID
 
 class UserResponse {
     data class SimpleUserInfo(
@@ -16,4 +17,9 @@ class UserResponse {
             phoneNumber = user.phoneNumber,
         )
     }
+
+    data class PostAPIDto(
+        val id: UUID,
+        val username: String
+    )
 }

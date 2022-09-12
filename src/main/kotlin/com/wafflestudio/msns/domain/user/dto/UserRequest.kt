@@ -1,5 +1,6 @@
 package com.wafflestudio.msns.domain.user.dto
 
+import java.util.UUID
 import javax.validation.constraints.NotBlank
 
 class UserRequest {
@@ -21,5 +22,13 @@ class UserRequest {
 
         @field:NotBlank
         val phoneNumber: String,
+    )
+
+    data class PostAPIDto(
+        @field:NotBlank
+        val id: UUID,
+
+        @field:NotBlank
+        val username: String
     )
 }

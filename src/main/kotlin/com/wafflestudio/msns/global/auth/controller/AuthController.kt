@@ -1,27 +1,25 @@
 package com.wafflestudio.msns.global.auth.controller
 
+import com.wafflestudio.msns.domain.playlist.service.WebClientService
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
 import com.wafflestudio.msns.global.auth.service.AuthService
 import org.springframework.http.HttpStatus
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import java.util.*
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/v1/auth")
 class AuthController(
     private val authService: AuthService,
+    private val webClientService: WebClientService
 ) {
     @PostMapping("/user")
     @ResponseStatus(HttpStatus.OK)
@@ -43,7 +41,8 @@ class AuthController(
     @ResponseStatus(HttpStatus.CREATED)
     fun signup(
         @Valid @RequestBody signUpRequest: UserRequest.SignUp
-    ): UserResponse.SimpleUserInfo {
-        return authService.signUp(signUpRequest)
-    }
+    ): UserResponse.SimpleUserInfo =
+        UUID.randomUUID()
+            .let { userId -> webClientService.createUser(userId, signUpRequest.username).block()!! }
+            .let { authService.signUp(it.id, signUpRequest) }
 }
