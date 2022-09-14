@@ -15,6 +15,6 @@ interface PostRepository : JpaRepository<Post, Long?> {
 
     fun findAllByUser(pageable: Pageable, user: User): Page<Post>
 
-    @Query("SELECT p FROM Post p WHERE p.user = :user")
-    fun findUserPosts(pageable: Pageable, @Param("user") user: User): Page<Post>
+    @Query("SELECT p FROM Post p WHERE p.user.id = :userId")
+    fun findUserPosts(pageable: Pageable, @Param("userId") userId: Long): Page<Post>
 }
