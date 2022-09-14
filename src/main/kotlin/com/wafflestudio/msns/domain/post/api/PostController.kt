@@ -40,7 +40,7 @@ class PostController(
         @PageableDefault(
             size = 30, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
-        @RequestParam("userId", required=false, defaultValue = "-1") userId: Long,
+        @RequestParam("userId", required = false, defaultValue = "-1") userId: Long,
         @CurrentUser user: User
     ): Page<PostResponse.PreviewResponse> = postService.getPosts(pageable, if (userId < 0) user.id else userId)
 

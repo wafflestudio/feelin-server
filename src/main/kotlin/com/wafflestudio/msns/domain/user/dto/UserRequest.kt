@@ -22,6 +22,9 @@ class UserRequest {
 
         @field:NotBlank
         val phoneNumber: String,
+
+        @field:NotBlank
+        val birth: String
     )
 
     data class PostAPIDto(

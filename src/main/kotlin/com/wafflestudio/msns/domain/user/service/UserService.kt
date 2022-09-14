@@ -2,7 +2,9 @@ package com.wafflestudio.msns.domain.user.service
 
 import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.post.repository.PostRepository
+import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
+import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -16,6 +18,8 @@ class UserService(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository
 ) {
+    fun getUser(user: User): UserResponse.DetailResponse = UserResponse.DetailResponse(user)
+
     fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.UserPageResponse> {
         return userRepository.findByIdOrNull(userId)
             ?.let { user -> postRepository.findAllByUser(pageable, user) }

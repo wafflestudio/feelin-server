@@ -6,7 +6,12 @@ import com.wafflestudio.msns.domain.user.exception.AlreadyExistUserException
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
-import com.wafflestudio.msns.global.auth.exception.*
+import com.wafflestudio.msns.global.auth.exception.InvalidBirthFormException
+import com.wafflestudio.msns.global.auth.exception.InvalidEmailFormException
+import com.wafflestudio.msns.global.auth.exception.UnauthorizedVerificationTokenException
+import com.wafflestudio.msns.global.auth.exception.VerificationTokenNotFoundException
+import com.wafflestudio.msns.global.auth.exception.JWTExpiredException
+import com.wafflestudio.msns.global.auth.exception.InvalidVerificationCodeException
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationToken
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
@@ -15,6 +20,7 @@ import com.wafflestudio.msns.global.mail.service.MailContentBuilder
 import com.wafflestudio.msns.global.mail.service.MailService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.util.UUID
 import java.util.regex.Pattern
 
@@ -35,7 +41,7 @@ class AuthService(
         userRepository.findByEmail(email)
             ?: return run {
                 val code = createRandomCode()
-                generateToken(email, code, join=true)
+                generateToken(email, code, join = true)
                 val message = mailContentBuilder.messageBuild(code, "register")
                 val mail = MailDto.Email(email, "Register Feelin", message, false)
                 mailService.sendMail(mail)
@@ -50,7 +56,7 @@ class AuthService(
             ?: return signUpEmail(emailRequest)
         return run {
             val code = createRandomCode()
-            generateToken(email, code, join=false)
+            generateToken(email, code, join = false)
 
             val message = mailContentBuilder.messageBuild(code, "signIn")
             val mail = MailDto.Email(email, "SignIn Feelin", message, false)
@@ -64,6 +70,9 @@ class AuthService(
         val lastName = signUpRequest.lastName
         val firstName = signUpRequest.firstName
         val username = signUpRequest.username
+        val birth = signUpRequest.birth
+            .also { if (!isBirthValid(it)) throw InvalidBirthFormException("Invalid Birth Form") }
+            .split("-")
         val phoneNumber = signUpRequest.phoneNumber
         val password = passwordEncoder.encode(signUpRequest.password)
 
@@ -82,6 +91,7 @@ class AuthService(
             password = password,
             lastName = lastName,
             firstName = firstName,
+            birth = birth.let { date -> LocalDate.of(date[0].toInt(), date[1].toInt(), date[2].toInt()) },
             phoneNumber = phoneNumber,
             streamId = streamId
         )
@@ -123,14 +133,14 @@ class AuthService(
             }
             ?.let { verificationTokenRepository.save(it) }
             ?: run {
-            verificationTokenRepository.save(
-                VerificationToken(
-                    email = email,
-                    token = jwt,
-                    authenticationCode = code
+                verificationTokenRepository.save(
+                    VerificationToken(
+                        email = email,
+                        token = jwt,
+                        authenticationCode = code
+                    )
                 )
-            )
-        }
+            }
 
         return jwt
     }
@@ -144,5 +154,11 @@ class AuthService(
                 "[0-9]{1,2}|25[0-5]|2[0-4][0-9]))|" +
                 "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$"
         ).matcher(email).matches()
+    }
+
+    private fun isBirthValid(birth: String): Boolean {
+        return Pattern.compile(
+            "^\\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])\$"
+        ).matcher(birth).matches()
     }
 }

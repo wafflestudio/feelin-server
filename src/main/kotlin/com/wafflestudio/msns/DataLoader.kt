@@ -56,6 +56,7 @@ class DataLoader(
             username = "admin",
             firstName = "Doe",
             lastName = "John",
+            birth = LocalDate.of(2000, 1, 1),
             phoneNumber = "010-1234-5678",
             streamId = UUID.randomUUID()
         )
