@@ -120,10 +120,7 @@ class AuthService(
     fun refreshToken(refreshToken: String): String {
         if (!jwtTokenProvider.validateToken(refreshToken)) throw JWTExpiredException("token is expired.")
 
-        val email = Jwts.parser()
-            .setSigningKey(jwtTokenProvider.jwtSecretKey)
-            .parseClaimsJws(jwtTokenProvider.removePrefix(refreshToken))
-            .body["email"].toString()
+        val email = jwtTokenProvider.getEmailFromJwt(refreshToken)
 
         return verificationTokenRepository.findByRefreshToken(refreshToken)
             ?.also {
