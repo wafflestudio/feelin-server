@@ -15,7 +15,9 @@ class VerificationToken(
     @field:Email
     val email: String,
 
-    var token: String,
+    var accessToken: String,
+
+    var refreshToken: String,
 
     var password: String? = null,
 

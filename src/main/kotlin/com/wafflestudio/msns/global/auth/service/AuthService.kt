@@ -12,12 +12,15 @@ import com.wafflestudio.msns.global.auth.exception.UnauthorizedVerificationToken
 import com.wafflestudio.msns.global.auth.exception.VerificationTokenNotFoundException
 import com.wafflestudio.msns.global.auth.exception.JWTExpiredException
 import com.wafflestudio.msns.global.auth.exception.InvalidVerificationCodeException
+import com.wafflestudio.msns.global.auth.exception.ForbiddenVerificationTokenException
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationToken
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
+import com.wafflestudio.msns.global.enum.JWT
 import com.wafflestudio.msns.global.mail.dto.MailDto
 import com.wafflestudio.msns.global.mail.service.MailContentBuilder
 import com.wafflestudio.msns.global.mail.service.MailService
+import io.jsonwebtoken.Jwts
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -41,7 +44,7 @@ class AuthService(
         userRepository.findByEmail(email)
             ?: return run {
                 val code = createRandomCode()
-                generateToken(email, code, join = true)
+                generateToken(email, code, JWT.JOIN)
                 val message = mailContentBuilder.messageBuild(code, "register")
                 val mail = MailDto.Email(email, "Register Feelin", message, false)
                 mailService.sendMail(mail)
@@ -56,7 +59,7 @@ class AuthService(
             ?: return signUpEmail(emailRequest)
         return run {
             val code = createRandomCode()
-            generateToken(email, code, join = false)
+            generateToken(email, code, JWT.JOIN)
 
             val message = mailContentBuilder.messageBuild(code, "signIn")
             val mail = MailDto.Email(email, "SignIn Feelin", message, false)
@@ -81,8 +84,7 @@ class AuthService(
 
         verificationTokenRepository.findByEmail(email)
             ?.also { if (!it.verification) throw UnauthorizedVerificationTokenException("email is unauthorized.") }
-            ?.also { it.password = password }
-            ?.let { verificationTokenRepository.save(it) }
+            ?.apply { this.password = password }
             ?: throw VerificationTokenNotFoundException("verification token is not created.")
 
         val newUser = User(
@@ -107,12 +109,33 @@ class AuthService(
         val code = verifyRequest.code
 
         return verificationTokenRepository.findByEmail(email)
-            ?.also { if (!checkValidJWT(it.token)) throw JWTExpiredException("jwt token is expired.") }
+            ?.also { if (!checkValidJWT(it.accessToken)) throw JWTExpiredException("jwt token is expired.") }
             ?.also { if (code != it.authenticationCode) throw InvalidVerificationCodeException("Invalid code.") }
             ?.apply { this.verification = true }
             ?.let { verificationTokenRepository.save(it) }
             ?.let { true }
             ?: false
+    }
+
+    fun refreshToken(refreshToken: String): String {
+        if (!jwtTokenProvider.validateToken(refreshToken)) throw JWTExpiredException("token is expired.")
+
+        val email = Jwts.parser()
+            .setSigningKey(jwtTokenProvider.jwtSecretKey)
+            .parseClaimsJws(jwtTokenProvider.removePrefix(refreshToken))
+            .body["email"].toString()
+
+        return verificationTokenRepository.findByRefreshToken(refreshToken)
+            ?.also {
+                if (jwtTokenProvider.validateToken(it.accessToken)) {
+                    it.verification = false
+                    throw ForbiddenVerificationTokenException("Unauthorized access.")
+                }
+            }
+            ?.apply { this.accessToken = jwtTokenProvider.generateToken(email, JWT.SIGN_IN) }
+            ?.let { verificationTokenRepository.save(it) }
+            ?.accessToken
+            ?: throw VerificationTokenNotFoundException("verification token is not found with the refresh token.")
     }
 
     private fun existUser(username: String, phoneNumber: String): Boolean =
@@ -122,13 +145,14 @@ class AuthService(
         return (100000..999999).random().toString()
     }
 
-    private fun generateToken(email: String, code: String, join: Boolean): String {
-        val jwt = jwtTokenProvider.generateToken(email, join = join)
+    private fun generateToken(email: String, code: String, type: JWT): String {
+        val accessJWT = jwtTokenProvider.generateToken(email, type)
+        val refreshJWT = jwtTokenProvider.generateToken(email, JWT.REFRESH)
         val existingToken = verificationTokenRepository.findByEmail(email)
 
         existingToken
             ?.apply {
-                this.token = jwt
+                this.accessToken = accessJWT
                 this.authenticationCode = code
             }
             ?.let { verificationTokenRepository.save(it) }
@@ -136,13 +160,14 @@ class AuthService(
                 verificationTokenRepository.save(
                     VerificationToken(
                         email = email,
-                        token = jwt,
+                        accessToken = accessJWT,
+                        refreshToken = refreshJWT,
                         authenticationCode = code
                     )
                 )
             }
 
-        return jwt
+        return accessJWT
     }
 
     private fun isEmailValid(email: String): Boolean {

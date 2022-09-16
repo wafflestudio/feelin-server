@@ -30,10 +30,10 @@ class User(
     var phoneNumber: String,
 
     @Column
-    var firstName: String = "",
+    var firstName: String,
 
     @Column
-    var lastName: String = "",
+    var lastName: String,
 
     @Column
     val birth: LocalDate,

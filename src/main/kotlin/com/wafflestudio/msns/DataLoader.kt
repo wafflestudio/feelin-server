@@ -13,6 +13,7 @@ import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationToken
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
+import com.wafflestudio.msns.global.enum.JWT
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Profile
@@ -63,10 +64,12 @@ class DataLoader(
 
         userRepository.save(userA)
 
-        val jwtA = jwtTokenProvider.generateToken(userA.email, join = false)
+        val jwtA = jwtTokenProvider.generateToken(userA.email, JWT.SIGN_IN)
+        val jwtB = jwtTokenProvider.generateToken(userA.email, JWT.REFRESH)
         val verificationTokenA = VerificationToken(
             email = userA.email,
-            token = passwordEncoder.encode(jwtA),
+            accessToken = jwtA,
+            refreshToken = jwtB,
             authenticationCode = createRandomCode(),
             password = passwordEncoder.encode("feelin-admin"),
             verification = true
