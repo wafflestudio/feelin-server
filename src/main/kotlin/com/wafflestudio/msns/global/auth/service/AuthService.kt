@@ -38,10 +38,10 @@ class AuthService(
 ) {
     fun signUpEmail(emailRequest: AuthRequest.JoinEmail): Boolean {
         val email = emailRequest.email
-        if (!isEmailValid(email))
-            throw InvalidEmailFormException("Invalid Email Form")
+        if (!isEmailValid(email)) throw InvalidEmailFormException("Invalid Email Form")
 
-        userRepository.findByEmail(email)
+        return userRepository.findByEmail(email)
+            ?.let { true }
             ?: return run {
                 val code = createRandomCode()
                 generateToken(email, code, JWT.JOIN)
@@ -50,22 +50,6 @@ class AuthService(
                 mailService.sendMail(mail)
                 false
             }
-        return signInEmail(emailRequest)
-    }
-
-    fun signInEmail(emailRequest: AuthRequest.JoinEmail): Boolean {
-        val email = emailRequest.email
-        userRepository.findByEmail(email)
-            ?: return signUpEmail(emailRequest)
-        return run {
-            val code = createRandomCode()
-            generateToken(email, code, JWT.JOIN)
-
-            val message = mailContentBuilder.messageBuild(code, "signIn")
-            val mail = MailDto.Email(email, "SignIn Feelin", message, false)
-            mailService.sendMail(mail)
-            true
-        }
     }
 
     fun signUp(streamId: UUID, signUpRequest: UserRequest.SignUp): UserResponse.SimpleUserInfo {
@@ -144,7 +128,6 @@ class AuthService(
 
     private fun generateToken(email: String, code: String, type: JWT): String {
         val accessJWT = jwtTokenProvider.generateToken(email, type)
-        val refreshJWT = jwtTokenProvider.generateToken(email, JWT.REFRESH)
         val existingToken = verificationTokenRepository.findByEmail(email)
 
         existingToken
@@ -158,7 +141,7 @@ class AuthService(
                     VerificationToken(
                         email = email,
                         accessToken = accessJWT,
-                        refreshToken = refreshJWT,
+                        refreshToken = "",
                         authenticationCode = code
                     )
                 )

@@ -30,7 +30,7 @@ class JwtTokenProvider(
     @Value("feelin-admin")
     val jwtSecretKey: String = ""
 
-    @Value("60000") // 1 min
+    @Value("3600000") // 1 hour
     private val jwtExpirationInMs: Long = 0
 
     @Value("1210000000") // 2 weeks

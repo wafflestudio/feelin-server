@@ -28,7 +28,7 @@ class SignInAuthenticationFilter(
     private val verificationTokenRepository: VerificationTokenRepository
 ) : UsernamePasswordAuthenticationFilter(authenticationManager) {
     init {
-        setRequiresAuthenticationRequestMatcher(AntPathRequestMatcher("/api/v1/auth/user/signin", "POST"))
+        setRequiresAuthenticationRequestMatcher(AntPathRequestMatcher("/api/v1/auth/signin", "POST"))
     }
 
     override fun successfulAuthentication(

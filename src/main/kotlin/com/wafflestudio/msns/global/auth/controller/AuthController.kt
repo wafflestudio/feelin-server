@@ -22,7 +22,7 @@ class AuthController(
     private val authService: AuthService,
     private val webClientService: WebClientService
 ) {
-    @PostMapping("/user")
+    @PostMapping("")
     @ResponseStatus(HttpStatus.OK)
     fun signUpEmail(
         @Valid @RequestBody emailRequest: AuthRequest.JoinEmail
@@ -30,7 +30,7 @@ class AuthController(
         return AuthResponse.ExistUser(authService.signUpEmail(emailRequest))
     }
 
-    @PostMapping("/user/verify-code")
+    @PostMapping("/verify-code")
     @ResponseStatus(HttpStatus.OK)
     fun verifyCode(
         @Valid @RequestBody verifyRequest: AuthRequest.VerifyCode
@@ -38,7 +38,7 @@ class AuthController(
         return AuthResponse.VerifyingCode(authService.verifyCode(verifyRequest))
     }
 
-    @PostMapping("/user/signup")
+    @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
     fun signup(
         @Valid @RequestBody signUpRequest: UserRequest.SignUp
@@ -47,9 +47,9 @@ class AuthController(
             .let { userId -> webClientService.createUser(userId, signUpRequest.username).block()!! }
             .let { authService.signUp(it.id, signUpRequest) }
 
-    @PostMapping("/user/signin/refresh")
+    @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.OK)
     fun refreshToken(
-        @RequestHeader("Refresh-Token") refreshToken: String,
+        @RequestHeader("Authentication") refreshToken: String,
     ): AuthResponse.NewAccessToken = AuthResponse.NewAccessToken(authService.refreshToken(refreshToken))
 }
