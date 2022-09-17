@@ -11,7 +11,13 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
 @RestController
@@ -29,7 +35,8 @@ class UserController(
 
     @GetMapping("/{user_id}/profile")
     @ResponseStatus(HttpStatus.OK)
-    fun getUserProfile(@PathVariable("user_id") userId: Long): UserResponse.ProfileResponse = userService.getProfile(userId)
+    fun getUserProfile(@PathVariable("user_id") userId: Long): UserResponse.ProfileResponse =
+        userService.getProfile(userId)
 
     @PutMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
