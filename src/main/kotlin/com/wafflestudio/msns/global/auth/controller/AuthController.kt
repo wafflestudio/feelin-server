@@ -35,7 +35,8 @@ class AuthController(
     @ResponseStatus(HttpStatus.OK)
     fun checkDuplicateUsername(
         @Valid @RequestBody usernameRequest: AuthRequest.Username
-    ): AuthResponse.ExistUsername = AuthResponse.ExistUsername(authService.checkDuplicateUsername(usernameRequest.username))
+    ): AuthResponse.ExistUsername =
+        AuthResponse.ExistUsername(authService.checkDuplicateUsername(usernameRequest.username))
 
     @PostMapping("/verify-code")
     @ResponseStatus(HttpStatus.OK)

@@ -1,6 +1,5 @@
 package com.wafflestudio.msns.global.auth.jwt
 
-import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 import com.wafflestudio.msns.global.auth.service.AuthService
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.context.SecurityContextHolder

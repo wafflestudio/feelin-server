@@ -6,10 +6,15 @@ import com.wafflestudio.msns.domain.user.exception.AlreadyExistUserException
 import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
-import com.wafflestudio.msns.global.*
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
-import com.wafflestudio.msns.global.auth.exception.*
+import com.wafflestudio.msns.global.auth.exception.ForbiddenVerificationTokenException
+import com.wafflestudio.msns.global.auth.exception.InvalidBirthFormException
+import com.wafflestudio.msns.global.auth.exception.InvalidEmailFormException
+import com.wafflestudio.msns.global.auth.exception.InvalidVerificationCodeException
+import com.wafflestudio.msns.global.auth.exception.JWTExpiredException
+import com.wafflestudio.msns.global.auth.exception.UnauthorizedVerificationTokenException
+import com.wafflestudio.msns.global.auth.exception.VerificationTokenNotFoundException
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationToken
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
@@ -23,9 +28,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 import java.util.regex.Pattern
-
 
 @Service
 class AuthService(
