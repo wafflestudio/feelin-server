@@ -1,11 +1,14 @@
 package com.wafflestudio.msns.global.auth.filter
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.wafflestudio.msns.domain.user.dto.UserResponse
+import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.repository.UserRepository
-import com.wafflestudio.msns.global.auth.dto.AuthResponse
 import com.wafflestudio.msns.global.auth.dto.LoginRequest
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationTokenPrincipal
+import com.wafflestudio.msns.global.auth.service.AuthService
+import com.wafflestudio.msns.global.enum.JWT
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -22,9 +25,10 @@ class SignInAuthenticationFilter(
     private val jwtTokenProvider: JwtTokenProvider,
     private val objectMapper: ObjectMapper,
     private val userRepository: UserRepository,
+    private val authService: AuthService
 ) : UsernamePasswordAuthenticationFilter(authenticationManager) {
     init {
-        setRequiresAuthenticationRequestMatcher(AntPathRequestMatcher("/api/v1/auth/user/signin", "POST"))
+        setRequiresAuthenticationRequestMatcher(AntPathRequestMatcher("/api/v1/auth/signin", "POST"))
     }
 
     override fun successfulAuthentication(
@@ -33,8 +37,10 @@ class SignInAuthenticationFilter(
         chain: FilterChain,
         authResult: Authentication,
     ) {
-        val jwt = jwtTokenProvider.generateToken(authResult)
-        response.addHeader("Authentication", jwt)
+        val accessJWT = jwtTokenProvider.generateToken(authResult, JWT.SIGN_IN)
+        val refreshJWT = jwtTokenProvider.generateToken(authResult, JWT.REFRESH)
+        response.addHeader("Access-Token", accessJWT)
+        response.addHeader("Refresh-Token", refreshJWT)
         response.status = HttpServletResponse.SC_OK
         response.contentType = "application/json"
         response.characterEncoding = "utf-8"
@@ -43,10 +49,12 @@ class SignInAuthenticationFilter(
 
         val principal = authResult.principal as VerificationTokenPrincipal
         val userJsonString =
-            objectMapper.writeValueAsString(AuthResponse.VerificationTokenPrincipalResponse(principal, jwt))
+            objectMapper.writeValueAsString(principal.user?.let { UserResponse.SimpleUserInfo(it) })
 
         body.print(userJsonString)
         body.flush()
+
+        authService.updateTokens(principal.username, accessJWT, refreshJWT)
     }
 
     override fun unsuccessfulAuthentication(
@@ -59,19 +67,14 @@ class SignInAuthenticationFilter(
     }
 
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
-        var loginEmail: String = ""
-
         val parsedRequest: LoginRequest = parseRequest(request)
         val account = parsedRequest.account
         val password = parsedRequest.password
 
-        if (userRepository.findByUsername(account!!) == null && userRepository.findByPhoneNumber(account) == null) {
-            loginEmail = account
-        } else if (userRepository.findByUsername(account) == null && userRepository.findByEmail(account) == null) {
-            loginEmail = userRepository.findByPhoneNumber(account)!!.email
-        } else if (userRepository.findByPhoneNumber(account) == null && userRepository.findByEmail(account) == null) {
-            loginEmail = userRepository.findByUsername(account)!!.email
-        }
+        val loginEmail = userRepository.findByEmail(account)?.email
+            ?: userRepository.findByUsername(account)?.email
+            ?: userRepository.findByPhoneNumber(account)?.email
+            ?: throw UserNotFoundException("user is not found with the account information.")
 
         val authRequest: Authentication =
             UsernamePasswordAuthenticationToken(loginEmail, password)

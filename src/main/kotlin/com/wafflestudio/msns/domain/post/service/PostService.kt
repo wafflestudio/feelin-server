@@ -48,8 +48,8 @@ class PostService(
         )
     }
 
-    fun getPosts(pageable: Pageable, user: User): Page<PostResponse.PreviewResponse> =
-        postRepository.findUserPosts(pageable, user).map { post -> PostResponse.PreviewResponse(post) }
+    fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.PreviewResponse> =
+        postRepository.findUserPosts(pageable, userId).map { post -> PostResponse.PreviewResponse(post) }
 
     fun getPostById(postId: Long): PostResponse.DetailResponse =
         postRepository.findPostById(postId)

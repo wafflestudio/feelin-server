@@ -5,6 +5,7 @@ import com.wafflestudio.msns.global.auth.exception.VerificationTokenNotFoundExce
 import com.wafflestudio.msns.global.auth.model.AuthenticationToken
 import com.wafflestudio.msns.global.auth.model.VerificationTokenPrincipal
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
+import com.wafflestudio.msns.global.enum.JWT
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.MalformedJwtException
@@ -27,18 +28,28 @@ class JwtTokenProvider(
     val headerString = "Authentication"
 
     @Value("feelin-admin")
-    private val jwtSecretKey: String? = null
+    val jwtSecretKey: String = ""
 
-    @Value("36000000")
-    private val jwtExpirationInMs: Long? = null
+    @Value("3600000") // 1 hour
+    private val jwtExpirationInMs: Long = 0
 
-    @Value("86400000")
-    private val jwtJoinExpirationInMs: Long? = null
+    @Value("1210000000") // 2 weeks
+    private val jwtRefreshExpirationInMs: Long = 0
 
-    fun generateToken(email: String, join: Boolean = false): String {
+    @Value("3600000") // 1 hour
+    private val jwtJoinExpirationInMs: Long = 0
+
+    fun generateToken(email: String, type: JWT): String {
         val claims: MutableMap<String, Any> = hashMapOf("email" to email)
         val now = Date()
-        val expiryDate = Date(now.time + (if (!join) jwtExpirationInMs!! else jwtJoinExpirationInMs!!))
+        val expiryDate = Date(
+            now.time + when (type) {
+                JWT.JOIN -> jwtExpirationInMs
+                JWT.SIGN_UP -> jwtJoinExpirationInMs
+                JWT.SIGN_IN -> jwtExpirationInMs
+                JWT.REFRESH -> jwtRefreshExpirationInMs
+            }
+        )
         return tokenPrefix + Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(now)
@@ -47,9 +58,9 @@ class JwtTokenProvider(
             .compact()
     }
 
-    fun generateToken(authentication: Authentication): String {
+    fun generateToken(authentication: Authentication, type: JWT): String {
         val verificationTokenPrincipal = authentication.principal as VerificationTokenPrincipal
-        return generateToken(verificationTokenPrincipal.verificationToken.email)
+        return generateToken(verificationTokenPrincipal.verificationToken.email, type)
     }
 
     fun validateToken(authToken: String?): Boolean {

@@ -9,4 +9,8 @@ class AuthRequest {
         val email: String,
         val code: String,
     )
+
+    data class Username(
+        val username: String
+    )
 }
