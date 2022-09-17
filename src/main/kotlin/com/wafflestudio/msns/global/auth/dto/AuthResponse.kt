@@ -9,7 +9,12 @@ class AuthResponse {
         val verification: Boolean,
     )
 
-    data class NewAccessToken(
-        val accessToken: String
+    data class NewToken(
+        val accessToken: String,
+        val refreshToken: String
+    )
+
+    data class ExistUsername(
+        val existUsername: Boolean,
     )
 }

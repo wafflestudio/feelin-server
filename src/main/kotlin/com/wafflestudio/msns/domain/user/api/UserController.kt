@@ -1,6 +1,7 @@
 package com.wafflestudio.msns.domain.user.api
 
 import com.wafflestudio.msns.domain.post.dto.PostResponse
+import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.service.UserService
@@ -10,11 +11,8 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -23,7 +21,22 @@ class UserController(
 ) {
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
-    fun getUser(@CurrentUser user: User): UserResponse.DetailResponse = userService.getUser(user)
+    fun getMyself(@CurrentUser user: User): UserResponse.DetailResponse = userService.getMyself(user)
+
+    @GetMapping("/profile")
+    @ResponseStatus(HttpStatus.OK)
+    fun getMyProfile(@CurrentUser user: User): UserResponse.ProfileResponse = userService.getProfile(user.id)
+
+    @GetMapping("/{user_id}/profile")
+    @ResponseStatus(HttpStatus.OK)
+    fun getUserProfile(@PathVariable("user_id") userId: Long): UserResponse.ProfileResponse = userService.getProfile(userId)
+
+    @PutMapping("/profile")
+    @ResponseStatus(HttpStatus.OK)
+    fun putProfile(
+        @CurrentUser user: User,
+        @Valid @RequestBody putRequest: UserRequest.PutProfile
+    ): UserResponse.ProfileResponse = userService.putProfile(user, putRequest)
 
     @GetMapping("/{user_id}/posts")
     @ResponseStatus(HttpStatus.OK)

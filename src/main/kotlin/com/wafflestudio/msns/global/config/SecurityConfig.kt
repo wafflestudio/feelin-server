@@ -7,6 +7,7 @@ import com.wafflestudio.msns.global.auth.jwt.JwtAuthenticationEntryPoint
 import com.wafflestudio.msns.global.auth.jwt.JwtAuthenticationFilter
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
+import com.wafflestudio.msns.global.auth.service.AuthService
 import com.wafflestudio.msns.global.auth.service.VerificationTokenPrincipalDetailService
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest
 import org.springframework.context.annotation.Bean
@@ -33,6 +34,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 class SecurityConfig(
     private val userRepository: UserRepository,
     private val verificationTokenRepository: VerificationTokenRepository,
+    private val authService: AuthService,
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
     private val jwtTokenProvider: JwtTokenProvider,
     private val userPrincipalDetailService: VerificationTokenPrincipalDetailService,
@@ -78,10 +80,10 @@ class SecurityConfig(
             .and()
             .addFilter(
                 SignInAuthenticationFilter(
-                    authenticationManager(), jwtTokenProvider, objectMapper, userRepository, verificationTokenRepository
+                    authenticationManager(), jwtTokenProvider, objectMapper, userRepository, authService
                 )
             )
-            .addFilter(JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider, verificationTokenRepository))
+            .addFilter(JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider, authService))
             .authorizeRequests()
             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
             .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
@@ -91,6 +93,7 @@ class SecurityConfig(
             .antMatchers(HttpMethod.POST, "/api/v1/auth/verify-code").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/signin").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/auth/refresh").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/v1/auth/username").permitAll()
             .anyRequest().authenticated()
             .and()
             .logout()

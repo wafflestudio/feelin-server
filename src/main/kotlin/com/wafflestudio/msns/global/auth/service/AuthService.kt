@@ -3,16 +3,13 @@ package com.wafflestudio.msns.global.auth.service
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.exception.AlreadyExistUserException
+import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
+import com.wafflestudio.msns.global.*
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
-import com.wafflestudio.msns.global.auth.exception.InvalidBirthFormException
-import com.wafflestudio.msns.global.auth.exception.InvalidEmailFormException
-import com.wafflestudio.msns.global.auth.exception.UnauthorizedVerificationTokenException
-import com.wafflestudio.msns.global.auth.exception.VerificationTokenNotFoundException
-import com.wafflestudio.msns.global.auth.exception.JWTExpiredException
-import com.wafflestudio.msns.global.auth.exception.InvalidVerificationCodeException
-import com.wafflestudio.msns.global.auth.exception.ForbiddenVerificationTokenException
+import com.wafflestudio.msns.global.auth.dto.AuthResponse
+import com.wafflestudio.msns.global.auth.exception.*
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationToken
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
@@ -20,12 +17,15 @@ import com.wafflestudio.msns.global.enum.JWT
 import com.wafflestudio.msns.global.mail.dto.MailDto
 import com.wafflestudio.msns.global.mail.service.MailContentBuilder
 import com.wafflestudio.msns.global.mail.service.MailService
-import io.jsonwebtoken.Jwts
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 import java.util.regex.Pattern
+
 
 @Service
 class AuthService(
@@ -34,7 +34,7 @@ class AuthService(
     private val verificationTokenRepository: VerificationTokenRepository,
     private val mailContentBuilder: MailContentBuilder,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtTokenProvider: JwtTokenProvider,
+    private val jwtTokenProvider: JwtTokenProvider
 ) {
     fun signUpEmail(emailRequest: AuthRequest.JoinEmail): Boolean {
         val email = emailRequest.email
@@ -52,7 +52,7 @@ class AuthService(
             }
     }
 
-    fun signUp(streamId: UUID, signUpRequest: UserRequest.SignUp): UserResponse.SimpleUserInfo {
+    fun signUp(streamId: UUID, signUpRequest: UserRequest.SignUp): ResponseEntity<UserResponse.SimpleUserInfo> {
         val email = signUpRequest.email
         val lastName = signUpRequest.lastName
         val firstName = signUpRequest.firstName
@@ -81,10 +81,25 @@ class AuthService(
             phoneNumber = phoneNumber,
             streamId = streamId
         )
-        userRepository.save(newUser)
 
-        return UserResponse.SimpleUserInfo(newUser)
+        val accessJWT = jwtTokenProvider.generateToken(email, JWT.SIGN_IN)
+        val refreshJWT = jwtTokenProvider.generateToken(email, JWT.REFRESH)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.set("Access-Token", accessJWT)
+        responseHeaders.set("Refresh-Token", refreshJWT)
+
+        return userRepository.save(newUser)
+            .also { updateTokens(it.email, accessJWT, refreshJWT) }
+            .let {
+                ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .headers(responseHeaders)
+                    .body(UserResponse.SimpleUserInfo(it))
+            }
     }
+
+    fun checkDuplicateUsername(username: String): Boolean = userRepository.findByUsername(username) != null
 
     fun checkValidJWT(jwt: String): Boolean = jwtTokenProvider.validateToken(jwt)
 
@@ -101,7 +116,7 @@ class AuthService(
             ?: false
     }
 
-    fun refreshToken(refreshToken: String): String {
+    fun refreshToken(refreshToken: String): AuthResponse.NewToken {
         if (!jwtTokenProvider.validateToken(refreshToken)) throw JWTExpiredException("token is expired.")
 
         val email = jwtTokenProvider.getEmailFromJwt(refreshToken)
@@ -113,11 +128,28 @@ class AuthService(
                     throw ForbiddenVerificationTokenException("Unauthorized access.")
                 }
             }
-            ?.apply { this.accessToken = jwtTokenProvider.generateToken(email, JWT.SIGN_IN) }
+            ?.apply {
+                this.accessToken = jwtTokenProvider.generateToken(email, JWT.SIGN_IN)
+                this.refreshToken = jwtTokenProvider.generateToken(email, JWT.REFRESH)
+            }
             ?.let { verificationTokenRepository.save(it) }
-            ?.accessToken
+            ?.let { AuthResponse.NewToken(it.accessToken, it.refreshToken) }
             ?: throw VerificationTokenNotFoundException("verification token is not found with the refresh token.")
     }
+
+    fun updateTokens(email: String, accessToken: String, refreshToken: String) {
+        verificationTokenRepository.findByEmail(email)
+            ?.apply {
+                this.accessToken = accessToken
+                this.refreshToken = refreshToken
+                this.verification = true
+            }
+            ?.let { verificationTokenRepository.save(it) }
+            ?: throw UserNotFoundException("user is not found.")
+    }
+
+    fun checkAuthorizedByAccessToken(accessToken: String): Boolean =
+        verificationTokenRepository.findByAccessToken(accessToken)?.verification == true
 
     private fun existUser(username: String, phoneNumber: String): Boolean =
         userRepository.existsByUsername(username) || userRepository.existsByPhoneNumber(phoneNumber)

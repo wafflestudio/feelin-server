@@ -7,7 +7,7 @@ import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.LoginRequest
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationTokenPrincipal
-import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
+import com.wafflestudio.msns.global.auth.service.AuthService
 import com.wafflestudio.msns.global.enum.JWT
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -25,7 +25,7 @@ class SignInAuthenticationFilter(
     private val jwtTokenProvider: JwtTokenProvider,
     private val objectMapper: ObjectMapper,
     private val userRepository: UserRepository,
-    private val verificationTokenRepository: VerificationTokenRepository
+    private val authService: AuthService
 ) : UsernamePasswordAuthenticationFilter(authenticationManager) {
     init {
         setRequiresAuthenticationRequestMatcher(AntPathRequestMatcher("/api/v1/auth/signin", "POST"))
@@ -39,7 +39,7 @@ class SignInAuthenticationFilter(
     ) {
         val accessJWT = jwtTokenProvider.generateToken(authResult, JWT.SIGN_IN)
         val refreshJWT = jwtTokenProvider.generateToken(authResult, JWT.REFRESH)
-        response.addHeader("Acess-Token", accessJWT)
+        response.addHeader("Access-Token", accessJWT)
         response.addHeader("Refresh-Token", refreshJWT)
         response.status = HttpServletResponse.SC_OK
         response.contentType = "application/json"
@@ -54,14 +54,7 @@ class SignInAuthenticationFilter(
         body.print(userJsonString)
         body.flush()
 
-        verificationTokenRepository.findByEmail(principal.username)
-            ?.apply {
-                this.accessToken = accessJWT
-                this.refreshToken = refreshJWT
-                this.verification = true
-            }
-            ?.let { verificationTokenRepository.save(it) }
-            ?: throw UserNotFoundException("user is not found.")
+        authService.updateTokens(principal.username, accessJWT, refreshJWT)
     }
 
     override fun unsuccessfulAuthentication(

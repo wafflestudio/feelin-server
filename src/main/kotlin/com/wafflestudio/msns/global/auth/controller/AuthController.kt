@@ -7,6 +7,7 @@ import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
 import com.wafflestudio.msns.global.auth.service.AuthService
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -30,6 +31,12 @@ class AuthController(
         return AuthResponse.ExistUser(authService.signUpEmail(emailRequest))
     }
 
+    @PostMapping("/username")
+    @ResponseStatus(HttpStatus.OK)
+    fun checkDuplicateUsername(
+        @Valid @RequestBody usernameRequest: AuthRequest.Username
+    ): AuthResponse.ExistUsername = AuthResponse.ExistUsername(authService.checkDuplicateUsername(usernameRequest.username))
+
     @PostMapping("/verify-code")
     @ResponseStatus(HttpStatus.OK)
     fun verifyCode(
@@ -39,10 +46,9 @@ class AuthController(
     }
 
     @PostMapping("/signup")
-    @ResponseStatus(HttpStatus.CREATED)
     fun signup(
         @Valid @RequestBody signUpRequest: UserRequest.SignUp
-    ): UserResponse.SimpleUserInfo =
+    ): ResponseEntity<UserResponse.SimpleUserInfo> =
         UUID.randomUUID()
             .let { userId -> webClientService.createUser(userId, signUpRequest.username).block()!! }
             .let { authService.signUp(it.id, signUpRequest) }
@@ -51,5 +57,5 @@ class AuthController(
     @ResponseStatus(HttpStatus.OK)
     fun refreshToken(
         @RequestHeader("Authentication") refreshToken: String,
-    ): AuthResponse.NewAccessToken = AuthResponse.NewAccessToken(authService.refreshToken(refreshToken))
+    ): AuthResponse.NewToken = authService.refreshToken(refreshToken)
 }

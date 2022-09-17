@@ -39,6 +39,22 @@ class UserResponse {
         )
     }
 
+    data class ProfileResponse(
+        val id: Long,
+        val username: String,
+        val image: String,
+        val introduction: String,
+        val countPosts: Int
+    ) {
+        constructor(user: User) : this(
+            id = user.id,
+            username = user.username,
+            image = user.image,
+            introduction = user.introduction,
+            countPosts = user.posts.size
+        )
+    }
+
     data class PostAPIDto(
         val id: UUID,
         val username: String

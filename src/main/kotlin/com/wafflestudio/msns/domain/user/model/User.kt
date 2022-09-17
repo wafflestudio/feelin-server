@@ -15,7 +15,8 @@ import javax.validation.constraints.NotBlank
 @Table(name = "user")
 class User(
     @field:NotBlank
-    val username: String,
+    @Column(unique = true)
+    var username: String,
 
     @field:NotBlank
     @field:Email
@@ -37,6 +38,12 @@ class User(
 
     @Column
     val birth: LocalDate,
+
+    @Column
+    var image: String = "",
+
+    @Column
+    var introduction: String = "",
 
     @Column(columnDefinition = "BINARY(16)")
     val streamId: UUID,
