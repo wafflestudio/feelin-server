@@ -55,6 +55,18 @@ class UserResponse {
         )
     }
 
+    data class PostResponse(
+        val id: Long,
+        val username: String,
+        val image: String
+    ) {
+        constructor(user: User) : this(
+            id = user.id,
+            username = user.username,
+            image = user.image
+        )
+    }
+
     data class PostAPIDto(
         val id: UUID,
         val username: String

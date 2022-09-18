@@ -51,12 +51,12 @@ class PostService(
     fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.PreviewResponse> =
         postRepository.findUserPosts(pageable, userId).map { post -> PostResponse.PreviewResponse(post) }
 
-    fun getPostById(postId: Long): PostResponse.DetailResponse =
+    suspend fun getPostById(postId: Long): PostResponse.DetailResponse =
         postRepository.findPostById(postId)
             ?.let { post ->
                 webClientService.getPlaylist(post.playlist.streamId)
                     .let {
-                        modelMapper.map(it.block(), PlaylistResponse.DetailResponse::class.java)
+                        modelMapper.map(it, PlaylistResponse.DetailResponse::class.java)
                             .let { playlist -> PostResponse.DetailResponse(post, playlist) }
                     }
             }
