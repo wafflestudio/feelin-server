@@ -1,10 +1,14 @@
 package com.wafflestudio.msns.domain.playlist.service
 
 import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
+import com.wafflestudio.msns.domain.playlist.exception.InternalServerException
+import com.wafflestudio.msns.domain.playlist.exception.PlaylistNotFoundException
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.awaitBody
+import org.springframework.web.reactive.function.client.awaitExchange
 import reactor.core.publisher.Mono
 import java.util.UUID
 
@@ -12,12 +16,15 @@ import java.util.UUID
 class WebClientService(
     private val webClient: WebClient
 ) {
-    fun getPlaylist(playlistId: UUID): Mono<PlaylistResponse.DetailResponse> =
+    suspend fun getPlaylist(playlistId: UUID): PlaylistResponse.DetailResponse =
         webClient
             .get()
             .uri("/playlists/$playlistId")
-            .retrieve() // HttpStatus.OK
-            .bodyToMono(PlaylistResponse.DetailResponse::class.java)
+            .awaitExchange { res ->
+                if (res.statusCode().is2xxSuccessful) res.awaitBody()
+                else if (res.statusCode().is4xxClientError) throw PlaylistNotFoundException("playlist is not found.")
+                else throw InternalServerException("Internal Server Error.")
+            }
 
     fun createUser(userId: UUID, username: String): Mono<UserResponse.PostAPIDto> =
         webClient

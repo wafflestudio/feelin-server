@@ -2,6 +2,7 @@ package com.wafflestudio.msns.domain.post.dto
 
 import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
 import com.wafflestudio.msns.domain.post.model.Post
+import com.wafflestudio.msns.domain.user.dto.UserResponse
 import java.time.LocalDateTime
 
 class PostResponse {
@@ -39,6 +40,7 @@ class PostResponse {
         val id: Long,
         val title: String,
         val content: String,
+        val user: UserResponse.PostResponse,
         val createdAt: LocalDateTime?,
         val playlist: PlaylistResponse.DetailResponse
     ) {
@@ -46,6 +48,7 @@ class PostResponse {
             id = post.id,
             title = post.title,
             content = post.content,
+            user = UserResponse.PostResponse(post.user),
             createdAt = post.createdAt,
             playlist = playlist
         )

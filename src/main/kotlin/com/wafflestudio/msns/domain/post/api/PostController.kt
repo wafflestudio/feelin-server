@@ -46,7 +46,7 @@ class PostController(
 
     @GetMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
-    fun getPost(
+    suspend fun getPost(
         @PathVariable("postId") postId: Long
     ): PostResponse.DetailResponse = postService.getPostById(postId)
 

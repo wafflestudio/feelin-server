@@ -58,6 +58,9 @@ dependencies {
     implementation("commons-io:commons-io:2.6")
 
     implementation("org.modelmapper:modelmapper:2.4.4")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.0")
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
