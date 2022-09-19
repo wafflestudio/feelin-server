@@ -7,6 +7,7 @@ import com.wafflestudio.msns.domain.playlist.repository.PlaylistRepository
 import com.wafflestudio.msns.domain.playlist.service.WebClientService
 import com.wafflestudio.msns.domain.post.dto.PostRequest
 import com.wafflestudio.msns.domain.post.dto.PostResponse
+import com.wafflestudio.msns.domain.post.exception.ForbiddenDeletePostException
 import com.wafflestudio.msns.domain.post.exception.InvalidTitleException
 import com.wafflestudio.msns.domain.post.exception.PostNotFoundException
 import com.wafflestudio.msns.domain.post.model.Post
@@ -76,9 +77,10 @@ class PostService(
             ?: throw PlaylistNotFoundException("playlist is not found from the requested title.")
     }
 
-    fun deletePost(playlistId: Long, user: User) {
-        postRepository.findByUser_IdAndPlaylist_Id(user.id, playlistId)
+    fun deletePost(postId: Long, user: User) {
+        postRepository.findPostById(postId)
+            ?.also { if (it.user.id != user.id) throw ForbiddenDeletePostException("user cannot delete other's post.") }
             ?.let { postRepository.deleteById(it.id) }
-            ?: throw PlaylistNotFoundException("playlist is not found from the requested title.")
+            ?: throw PostNotFoundException("post is not found with the id.")
     }
 }
