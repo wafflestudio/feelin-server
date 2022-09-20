@@ -107,20 +107,20 @@ jobs:
             aws-secret-access-key: ${{ secrets.AWS_IAM_MANAGER_SECRET_ACCESS_KEY }}
             aws-region: ${{ secrets.AWS_REGION }}
 
-        - name: Remove exist Deployment group
-          run: |
-            aws deploy delete-deployment-group \
-              --application-name waffle-music-sns \
-              --deployment-group-name dev
+#         - name: Remove exist Deployment group
+#           run: |
+#             aws deploy delete-deployment-group \
+#               --application-name waffle-music-sns \
+#               --deployment-group-name dev
 
-        - name: Create new Deployment group
-          run: |
-            aws deploy create-deployment-group \
-              --application-name waffle-music-sns \
-              --ec2-tag-filters Key=Name,Type=KEY_AND_VALUE,Value=FeelinUser \
-              --deployment-style '{"deploymentType":"IN_PLACE","deploymentOption": "WITHOUT_TRAFFIC_CONTROL"}' \
-              --deployment-group-name dev \
-              --service-role-arn ${{ secrets.AWS_SERVICE_ROLE_ARN }}
+#         - name: Create new Deployment group
+#           run: |
+#             aws deploy create-deployment-group \
+#               --application-name waffle-music-sns \
+#               --ec2-tag-filters Key=Name,Type=KEY_AND_VALUE,Value=FeelinUser \
+#               --deployment-style '{"deploymentType":"IN_PLACE","deploymentOption": "WITHOUT_TRAFFIC_CONTROL"}' \
+#               --deployment-group-name dev \
+#               --service-role-arn ${{ secrets.AWS_SERVICE_ROLE_ARN }}
 
         - name: Deploy to EC2
           run: |
