@@ -58,10 +58,10 @@ class PostController(
         @CurrentUser user: User
     ) = postService.modifyPost(putRequest, playlistId, user)
 
-    @DeleteMapping("")
+    @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     fun deletePost(
-        @RequestParam("playlist_id") playlistId: Long,
+        @PathVariable("postId") postId: Long,
         @CurrentUser user: User
-    ) = postService.deletePost(playlistId, user)
+    ) = postService.deletePost(postId, user)
 }

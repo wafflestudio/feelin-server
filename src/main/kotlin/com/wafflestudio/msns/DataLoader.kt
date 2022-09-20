@@ -62,10 +62,25 @@ class DataLoader(
             streamId = UUID.randomUUID()
         )
 
+        val userB = User(
+            email = "user@feelin.com",
+            password = passwordEncoder.encode("feelin-user"),
+            username = "user",
+            firstName = "Doe",
+            lastName = "John",
+            birth = LocalDate.of(2000, 1, 1),
+            phoneNumber = "010-0000-0000",
+            streamId = UUID.randomUUID()
+        )
+
         userRepository.save(userA)
+        userRepository.save(userB)
 
         val jwtA = jwtTokenProvider.generateToken(userA.email, JWT.SIGN_IN)
         val jwtB = jwtTokenProvider.generateToken(userA.email, JWT.REFRESH)
+        val jwtC = jwtTokenProvider.generateToken(userB.email, JWT.SIGN_IN)
+        val jwtD = jwtTokenProvider.generateToken(userB.email, JWT.REFRESH)
+
         val verificationTokenA = VerificationToken(
             email = userA.email,
             accessToken = jwtA,
@@ -75,7 +90,17 @@ class DataLoader(
             verification = true
         )
 
+        val verificationTokenB = VerificationToken(
+            email = userB.email,
+            accessToken = jwtC,
+            refreshToken = jwtD,
+            authenticationCode = createRandomCode(),
+            password = passwordEncoder.encode("feelin-user"),
+            verification = true
+        )
+
         verificationTokenRepository.save(verificationTokenA)
+        verificationTokenRepository.save(verificationTokenB)
 
         val playlistA = Playlist(
             user = userA,

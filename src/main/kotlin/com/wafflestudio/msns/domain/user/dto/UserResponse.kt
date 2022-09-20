@@ -71,4 +71,16 @@ class UserResponse {
         val id: UUID,
         val username: String
     )
+
+    data class LikeResponse(
+        val id: Long,
+        val username: String,
+        val image: String
+    ) {
+        constructor(user: User) : this(
+            id = user.id,
+            username = user.username,
+            image = user.image
+        )
+    }
 }

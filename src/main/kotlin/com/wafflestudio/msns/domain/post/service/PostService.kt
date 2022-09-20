@@ -7,11 +7,13 @@ import com.wafflestudio.msns.domain.playlist.repository.PlaylistRepository
 import com.wafflestudio.msns.domain.playlist.service.WebClientService
 import com.wafflestudio.msns.domain.post.dto.PostRequest
 import com.wafflestudio.msns.domain.post.dto.PostResponse
+import com.wafflestudio.msns.domain.post.exception.ForbiddenDeletePostException
 import com.wafflestudio.msns.domain.post.exception.InvalidTitleException
 import com.wafflestudio.msns.domain.post.exception.PostNotFoundException
 import com.wafflestudio.msns.domain.post.model.Post
 import com.wafflestudio.msns.domain.post.repository.PostRepository
 import com.wafflestudio.msns.domain.user.model.User
+import com.wafflestudio.msns.domain.user.repository.LikeRepository
 import org.modelmapper.ModelMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional
 class PostService(
     private val postRepository: PostRepository,
     private val playlistRepository: PlaylistRepository,
+    private val likeRepository: LikeRepository,
     private val webClientService: WebClientService,
     private val modelMapper: ModelMapper
 ) {
@@ -76,9 +79,11 @@ class PostService(
             ?: throw PlaylistNotFoundException("playlist is not found from the requested title.")
     }
 
-    fun deletePost(playlistId: Long, user: User) {
-        postRepository.findByUser_IdAndPlaylist_Id(user.id, playlistId)
-            ?.let { postRepository.deleteById(it.id) }
-            ?: throw PlaylistNotFoundException("playlist is not found from the requested title.")
+    fun deletePost(postId: Long, user: User) {
+        postRepository.findPostById(postId)
+            ?.also { if (it.user.id != user.id) throw ForbiddenDeletePostException("user cannot delete other's post.") }
+            ?.let { likeRepository.deleteAllByPost_Id(postId) }
+            ?.let { postRepository.deleteById(postId) }
+            ?: throw PostNotFoundException("post is not found with the id.")
     }
 }
