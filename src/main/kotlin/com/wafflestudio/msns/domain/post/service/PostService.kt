@@ -13,6 +13,7 @@ import com.wafflestudio.msns.domain.post.exception.PostNotFoundException
 import com.wafflestudio.msns.domain.post.model.Post
 import com.wafflestudio.msns.domain.post.repository.PostRepository
 import com.wafflestudio.msns.domain.user.model.User
+import com.wafflestudio.msns.domain.user.repository.LikeRepository
 import org.modelmapper.ModelMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional
 class PostService(
     private val postRepository: PostRepository,
     private val playlistRepository: PlaylistRepository,
+    private val likeRepository: LikeRepository,
     private val webClientService: WebClientService,
     private val modelMapper: ModelMapper
 ) {
@@ -80,7 +82,8 @@ class PostService(
     fun deletePost(postId: Long, user: User) {
         postRepository.findPostById(postId)
             ?.also { if (it.user.id != user.id) throw ForbiddenDeletePostException("user cannot delete other's post.") }
-            ?.let { postRepository.deleteById(it.id) }
+            ?.let { likeRepository.deleteAllByPost_Id(postId) }
+            ?.let { postRepository.deleteById(postId) }
             ?: throw PostNotFoundException("post is not found with the id.")
     }
 }

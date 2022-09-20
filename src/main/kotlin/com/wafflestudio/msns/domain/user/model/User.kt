@@ -51,4 +51,7 @@ class User(
     @OneToMany(mappedBy = "user")
     val posts: MutableList<Post> = mutableListOf(),
 
+    @OneToMany(mappedBy = "user")
+    val likes: MutableList<Like> = mutableListOf(),
+
 ) : BaseTimeEntity()
