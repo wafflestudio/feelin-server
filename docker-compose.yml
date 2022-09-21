@@ -4,6 +4,7 @@ services:
     database:
         platform: linux/x86_64
         image: mysql:8.0.27
+        restart: always
         container_name: feelin_db
         environment:
             - MYSQL_DATABASE=feelinDB
@@ -18,7 +19,7 @@ services:
 
     application:
         image: yeonsumia/waffle-music-sns:main
-        restart: on-failure
+        restart: always
         container_name: feelin_app
         ports:
             - "8080:8080"
