@@ -1,1 +1,1 @@
-set $service_url http://13.125.202.87:8080;
+set $service_url http://54.180.78.83:8080;
