@@ -25,10 +25,9 @@ services:
             - "8080:8080"
         volumes:
             - ./resources:/resources
-            - ./script:/script
         depends_on:
             - database
-        entrypoint: ./script/wait-for-it.sh database:3306
+        entrypoint: scripts/wait-for-it.sh
 
     nginx:
         image: nginx
