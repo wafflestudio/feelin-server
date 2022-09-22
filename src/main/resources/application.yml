@@ -28,7 +28,7 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:mysql://database:3306/feelinDB?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://database:3306/feelinDB?serverTimezone=Asia/Seoul&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
     username: feelin
     password: feelin
     driver-class-name: com.mysql.cj.jdbc.Driver
