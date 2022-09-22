@@ -27,6 +27,7 @@ services:
             - ./resources:/resources
         depends_on:
             - database
+        entrypoint: ./wait-for-it.sh database:3306
 
     nginx:
         image: nginx
