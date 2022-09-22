@@ -7,4 +7,4 @@ COPY ${JAR_FILE} app.jar
 COPY ./scripts/deploy/wait-for-it.sh scripts/wait-for-it.sh
 RUN chmod +x scripts/wait-for-it.sh
 # Execute app.jar when running docker
-ENTRYPOINT ["java", "-jar", "app.jar",  "--spring.profiles.active=dev", "--spring.config.additional-location=resources/application-mail.yml"]
+ENTRYPOINT ["scripts/wait-for-it.sh", "database:3306", "--", "java", "-jar", "app.jar",  "--spring.profiles.active=dev", "--spring.config.additional-location=resources/application-mail.yml"]
