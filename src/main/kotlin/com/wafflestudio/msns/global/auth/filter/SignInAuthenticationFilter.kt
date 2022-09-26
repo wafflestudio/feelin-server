@@ -2,7 +2,6 @@ package com.wafflestudio.msns.global.auth.filter
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.msns.domain.user.dto.UserResponse
-import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.LoginRequest
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
@@ -54,7 +53,7 @@ class SignInAuthenticationFilter(
         body.print(userJsonString)
         body.flush()
 
-        authService.updateTokens(principal.username, accessJWT, refreshJWT)
+        authService.updateTokens(principal.verificationToken, accessJWT, refreshJWT)
     }
 
     override fun unsuccessfulAuthentication(
@@ -71,13 +70,8 @@ class SignInAuthenticationFilter(
         val account = parsedRequest.account
         val password = parsedRequest.password
 
-        val loginEmail = userRepository.findByEmail(account)?.email
-            ?: userRepository.findByUsername(account)?.email
-            ?: userRepository.findByPhoneNumber(account)?.email
-            ?: throw UserNotFoundException("user is not found with the account information.")
-
         val authRequest: Authentication =
-            UsernamePasswordAuthenticationToken(loginEmail, password)
+            UsernamePasswordAuthenticationToken(account, password)
         return authenticationManager.authenticate(authRequest)
     }
 

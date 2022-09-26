@@ -1,5 +1,6 @@
 package com.wafflestudio.msns.global.auth.service
 
+import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.model.VerificationTokenPrincipal
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
@@ -13,10 +14,11 @@ class VerificationTokenPrincipalDetailService(
     private val userRepository: UserRepository,
     private val verificationTokenRepository: VerificationTokenRepository,
 ) : UserDetailsService {
-    override fun loadUserByUsername(email: String): UserDetails {
-        val user = userRepository.findByEmail(email)
-        val verificationToken = verificationTokenRepository.findByEmail(email)
-            ?: throw UsernameNotFoundException("User with email '$email' not found.")
-        return VerificationTokenPrincipal(user, verificationToken)
+    override fun loadUserByUsername(account: String): UserDetails {
+        val user = userRepository.findSignInUser(account)
+            ?: throw UserNotFoundException("user is not found with the account information.")
+        return verificationTokenRepository.findByEmail(user.email)
+            ?.let { verificationToken -> VerificationTokenPrincipal(user, verificationToken) }
+            ?: throw UsernameNotFoundException("User with email '${user.email}' not found.")
     }
 }
