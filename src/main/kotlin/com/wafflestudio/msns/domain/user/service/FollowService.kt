@@ -1,5 +1,6 @@
 package com.wafflestudio.msns.domain.user.service
 
+import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.exception.AlreadyExistFollowException
 import com.wafflestudio.msns.domain.user.exception.ForbiddenFollowException
 import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
@@ -8,6 +9,8 @@ import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.FollowRepository
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -33,4 +36,8 @@ class FollowService(
             }
             ?: throw UserNotFoundException("The user you want to follow is not found.")
     }
+
+    fun getFollowings(pageable: Pageable, fromUserId: Long): Page<UserResponse.FollowingListResponse> =
+        followRepository.findAllWithFromUserId(pageable, fromUserId)
+
 }
