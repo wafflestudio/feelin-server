@@ -22,7 +22,7 @@ class FollowService(
     fun makeFollow(fromUser: User, toUserId: Long) {
         userRepository.findByIdOrNull(toUserId)
             ?.also { if (toUserId == fromUser.id) throw ForbiddenFollowException("You cannot follow yourself.") }
-            ?.let{ toUser ->
+            ?.let { toUser ->
                 try {
                     followRepository.save(
                         Follow(
@@ -37,7 +37,9 @@ class FollowService(
             ?: throw UserNotFoundException("The user you want to follow is not found.")
     }
 
-    fun getFollowings(pageable: Pageable, fromUserId: Long): Page<UserResponse.FollowingListResponse> =
+    fun getFollowings(pageable: Pageable, fromUserId: Long): Page<UserResponse.FollowListResponse> =
         followRepository.findAllWithFromUserId(pageable, fromUserId)
 
+    fun getFollowers(pageable: Pageable, toUserId: Long): Page<UserResponse.FollowListResponse> =
+        followRepository.findAllWithToUserId(pageable, toUserId)
 }

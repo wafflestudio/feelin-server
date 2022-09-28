@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 
 interface FollowRepository : JpaRepository<Follow, Long?> {
-    @Query(nativeQuery=true)
-    fun findAllWithFromUserId(pageable: Pageable, fromUserId: Long): Page<UserResponse.FollowingListResponse>
+    @Query(nativeQuery = true)
+    fun findAllWithFromUserId(pageable: Pageable, fromUserId: Long): Page<UserResponse.FollowListResponse>
+
+    @Query(nativeQuery = true)
+    fun findAllWithToUserId(pageable: Pageable, toUserId: Long): Page<UserResponse.FollowListResponse>
 }

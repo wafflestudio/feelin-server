@@ -8,22 +8,31 @@ import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
+import javax.persistence.NamedNativeQueries
 import javax.persistence.NamedNativeQuery
 import javax.persistence.SqlResultSetMapping
 import javax.persistence.Table
 import javax.persistence.UniqueConstraint
 
-@NamedNativeQuery(
-    name = "Follow.findAllWithFromUserId",
-    query = "SELECT u.id AS id, u.username AS username, u.image AS image " +
-        "FROM Follow f INNER JOIN user u ON f.to_user_id = u.id WHERE f.from_user_id = :fromUserId",
-    resultSetMapping = "FollowingListResponse"
+@NamedNativeQueries(
+    NamedNativeQuery(
+        name = "Follow.findAllWithFromUserId",
+        query = "SELECT u.id AS id, u.username AS username, u.image AS image " +
+            "FROM Follow f INNER JOIN user u ON f.to_user_id = u.id WHERE f.from_user_id = :fromUserId",
+        resultSetMapping = "FollowListResponse"
+    ),
+    NamedNativeQuery(
+        name = "Follow.findAllWithToUserId",
+        query = "SELECT u.id AS id, u.username AS username, u.image AS image " +
+            "FROM Follow f INNER JOIN user u ON f.from_user_id = u.id WHERE f.to_user_id = :toUserId",
+        resultSetMapping = "FollowListResponse"
+    )
 )
 @SqlResultSetMapping(
-    name = "FollowingListResponse",
+    name = "FollowListResponse",
     classes = [
         ConstructorResult(
-            targetClass = UserResponse.FollowingListResponse::class,
+            targetClass = UserResponse.FollowListResponse::class,
             columns = arrayOf(
                 ColumnResult(name = "id", type = Long::class),
                 ColumnResult(name = "username", type = String::class),

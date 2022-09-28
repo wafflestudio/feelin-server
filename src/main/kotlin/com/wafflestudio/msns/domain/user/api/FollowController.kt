@@ -32,5 +32,12 @@ class FollowController(
     fun getFollowings(
         @PathVariable("user_id") userId: Long,
         @PageableDefault(size = 30) pageable: Pageable
-    ): Page<UserResponse.FollowingListResponse> = followService.getFollowings(pageable, userId)
+    ): Page<UserResponse.FollowListResponse> = followService.getFollowings(pageable, userId)
+
+    @GetMapping("/followers/{user_id}")
+    @ResponseStatus(HttpStatus.OK)
+    fun getFollowers(
+        @PathVariable("user_id") userId: Long,
+        @PageableDefault(size = 30) pageable: Pageable
+    ): Page<UserResponse.FollowListResponse> = followService.getFollowers(pageable, userId)
 }
