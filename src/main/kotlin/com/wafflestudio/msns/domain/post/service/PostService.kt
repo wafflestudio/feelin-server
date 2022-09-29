@@ -52,7 +52,7 @@ class PostService(
     }
 
     fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.PreviewResponse> =
-        postRepository.findUserPosts(pageable, userId).map { post -> PostResponse.PreviewResponse(post) }
+        postRepository.findAllWithUserId(pageable, userId)
 
     suspend fun getPostById(postId: Long): PostResponse.DetailResponse =
         postRepository.findPostById(postId)
