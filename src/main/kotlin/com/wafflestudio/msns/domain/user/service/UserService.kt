@@ -39,10 +39,6 @@ class UserService(
             .let { userRepository.save(it) }
             .let { UserResponse.ProfileResponse(it) }
 
-    fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.UserPageResponse> {
-        return userRepository.findByIdOrNull(userId)
-            ?.let { user -> postRepository.findAllByUser(pageable, user) }
-            ?.map { post -> PostResponse.UserPageResponse(post) }
-            ?: throw UserNotFoundException("user is not found with the userId.")
-    }
+    fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.UserPageResponse> =
+        postRepository.findUserPosts(pageable, userId).map { post -> PostResponse.UserPageResponse(post) }
 }
