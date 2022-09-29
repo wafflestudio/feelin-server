@@ -83,4 +83,10 @@ class UserResponse {
             image = user.image
         )
     }
+
+    data class FollowListResponse(
+        val id: Long,
+        val username: String,
+        val image: String
+    )
 }

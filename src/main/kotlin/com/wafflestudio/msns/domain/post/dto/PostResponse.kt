@@ -4,6 +4,7 @@ import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
 import com.wafflestudio.msns.domain.post.model.Post
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import java.time.LocalDateTime
+import java.util.UUID
 
 class PostResponse {
     data class UserPageResponse(
@@ -25,14 +26,33 @@ class PostResponse {
         val title: String,
         val content: String,
         val createdAt: LocalDateTime?,
-        val playlist: PlaylistResponse.PreviewResponse
+        val playlist: PlaylistResponse.PreviewResponse,
+        val likes: Int
     ) {
         constructor(post: Post) : this(
             id = post.id,
             title = post.title,
             content = post.content,
             createdAt = post.createdAt,
-            playlist = PlaylistResponse.PreviewResponse(post.playlist)
+            playlist = PlaylistResponse.PreviewResponse(post.playlist),
+            likes = post.likes.size
+        )
+        constructor(
+            post_id: Long,
+            title: String,
+            content: String,
+            createdAt: LocalDateTime?,
+            playlist_id: Long,
+            streamId: UUID,
+            thumbnail: String,
+            likes: Int
+        ) : this(
+            id = post_id,
+            title = title,
+            content = content,
+            createdAt = createdAt,
+            playlist = PlaylistResponse.PreviewResponse(playlist_id, streamId, thumbnail),
+            likes = likes
         )
     }
 
@@ -42,7 +62,8 @@ class PostResponse {
         val content: String,
         val user: UserResponse.PostResponse,
         val createdAt: LocalDateTime?,
-        val playlist: PlaylistResponse.DetailResponse
+        val playlist: PlaylistResponse.DetailResponse,
+        val likes: Int,
     ) {
         constructor(post: Post, playlist: PlaylistResponse.DetailResponse) : this(
             id = post.id,
@@ -50,7 +71,8 @@ class PostResponse {
             content = post.content,
             user = UserResponse.PostResponse(post.user),
             createdAt = post.createdAt,
-            playlist = playlist
+            playlist = playlist,
+            likes = post.likes.size
         )
     }
 }

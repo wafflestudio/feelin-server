@@ -22,12 +22,12 @@ class UserService(
 ) {
     fun getMyself(user: User): UserResponse.DetailResponse = UserResponse.DetailResponse(user)
 
-    fun getProfile(userId: Long): UserResponse.ProfileResponse =
+    fun getMyProfile(userId: Long): UserResponse.ProfileResponse =
         userRepository.findByIdOrNull(userId)
             ?.let { user -> UserResponse.ProfileResponse(user) }
             ?: throw UserNotFoundException("user is not found with the userId.")
 
-    fun putProfile(user: User, putRequest: UserRequest.PutProfile): UserResponse.ProfileResponse =
+    fun putMyProfile(user: User, putRequest: UserRequest.PutProfile): UserResponse.ProfileResponse =
         user.apply {
             this.username = putRequest.username.also {
                 if ((userRepository.findByUsername(it)?.id ?: user.id) != user.id)
@@ -39,10 +39,6 @@ class UserService(
             .let { userRepository.save(it) }
             .let { UserResponse.ProfileResponse(it) }
 
-    fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.UserPageResponse> {
-        return userRepository.findByIdOrNull(userId)
-            ?.let { user -> postRepository.findAllByUser(pageable, user) }
-            ?.map { post -> PostResponse.UserPageResponse(post) }
-            ?: throw UserNotFoundException("user is not found with the userId.")
-    }
+    fun getMyPosts(pageable: Pageable, myId: Long): Page<PostResponse.UserPageResponse> =
+        postRepository.findAllWithMyId(pageable, myId)
 }

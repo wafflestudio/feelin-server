@@ -3,7 +3,6 @@ package com.wafflestudio.msns.global.auth.service
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.exception.AlreadyExistUserException
-import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
@@ -70,7 +69,7 @@ class AuthService(
         if (existUser(username, phoneNumber))
             throw AlreadyExistUserException("User already exists using this username/phoneNumber.")
 
-        verificationTokenRepository.findByEmail(email)
+        val verificationToken = verificationTokenRepository.findByEmail(email)
             ?.also { if (!it.verification) throw UnauthorizedVerificationTokenException("email is unauthorized.") }
             ?.apply { this.password = password }
             ?: throw VerificationTokenNotFoundException("verification token is not created.")
@@ -94,7 +93,7 @@ class AuthService(
         responseHeaders.set("Refresh-Token", refreshJWT)
 
         return userRepository.save(newUser)
-            .also { updateTokens(it.email, accessJWT, refreshJWT) }
+            .also { updateTokens(verificationToken, accessJWT, refreshJWT) }
             .let {
                 ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -141,15 +140,14 @@ class AuthService(
             ?: throw VerificationTokenNotFoundException("verification token is not found with the refresh token.")
     }
 
-    fun updateTokens(email: String, accessToken: String, refreshToken: String) {
-        verificationTokenRepository.findByEmail(email)
-            ?.apply {
+    fun updateTokens(verificationToken: VerificationToken, accessToken: String, refreshToken: String) {
+        verificationToken
+            .apply {
                 this.accessToken = accessToken
                 this.refreshToken = refreshToken
                 this.verification = true
             }
-            ?.let { verificationTokenRepository.save(it) }
-            ?: throw UserNotFoundException("user is not found.")
+            .let { verificationTokenRepository.save(it) }
     }
 
     fun checkAuthorizedByAccessToken(accessToken: String): Boolean =

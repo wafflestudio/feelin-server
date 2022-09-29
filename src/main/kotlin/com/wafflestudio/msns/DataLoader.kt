@@ -51,7 +51,7 @@ class DataLoader(
 
         albumRepository.save(albumA)
 
-        val userA = User(
+        val admin = User(
             email = "admin@feelin.com",
             password = passwordEncoder.encode("feelin-admin"),
             username = "admin",
@@ -62,27 +62,41 @@ class DataLoader(
             streamId = UUID.randomUUID()
         )
 
-        val userB = User(
-            email = "user@feelin.com",
+        val userA = User(
+            email = "userA@feelin.com",
             password = passwordEncoder.encode("feelin-user"),
-            username = "user",
+            username = "userA",
             firstName = "Doe",
             lastName = "John",
             birth = LocalDate.of(2000, 1, 1),
-            phoneNumber = "010-0000-0000",
+            phoneNumber = "010-0000-0001",
             streamId = UUID.randomUUID()
         )
 
+        val userB = User(
+            email = "userB@feelin.com",
+            password = passwordEncoder.encode("feelin-user"),
+            username = "userB",
+            firstName = "Doe",
+            lastName = "John",
+            birth = LocalDate.of(2000, 1, 1),
+            phoneNumber = "010-0000-0002",
+            streamId = UUID.randomUUID()
+        )
+
+        userRepository.save(admin)
         userRepository.save(userA)
         userRepository.save(userB)
 
-        val jwtA = jwtTokenProvider.generateToken(userA.email, JWT.SIGN_IN)
-        val jwtB = jwtTokenProvider.generateToken(userA.email, JWT.REFRESH)
-        val jwtC = jwtTokenProvider.generateToken(userB.email, JWT.SIGN_IN)
-        val jwtD = jwtTokenProvider.generateToken(userB.email, JWT.REFRESH)
+        val jwtA = jwtTokenProvider.generateToken(admin.email, JWT.SIGN_IN)
+        val jwtB = jwtTokenProvider.generateToken(admin.email, JWT.REFRESH)
+        val jwtC = jwtTokenProvider.generateToken(userA.email, JWT.SIGN_IN)
+        val jwtD = jwtTokenProvider.generateToken(userA.email, JWT.REFRESH)
+        val jwtE = jwtTokenProvider.generateToken(userB.email, JWT.SIGN_IN)
+        val jwtF = jwtTokenProvider.generateToken(userB.email, JWT.REFRESH)
 
         val verificationTokenA = VerificationToken(
-            email = userA.email,
+            email = admin.email,
             accessToken = jwtA,
             refreshToken = jwtB,
             authenticationCode = createRandomCode(),
@@ -91,7 +105,7 @@ class DataLoader(
         )
 
         val verificationTokenB = VerificationToken(
-            email = userB.email,
+            email = userA.email,
             accessToken = jwtC,
             refreshToken = jwtD,
             authenticationCode = createRandomCode(),
@@ -99,8 +113,18 @@ class DataLoader(
             verification = true
         )
 
+        val verificationTokenC = VerificationToken(
+            email = userB.email,
+            accessToken = jwtE,
+            refreshToken = jwtF,
+            authenticationCode = createRandomCode(),
+            password = passwordEncoder.encode("feelin-user"),
+            verification = true
+        )
+
         verificationTokenRepository.save(verificationTokenA)
         verificationTokenRepository.save(verificationTokenB)
+        verificationTokenRepository.save(verificationTokenC)
 
         val playlistA = Playlist(
             user = userA,

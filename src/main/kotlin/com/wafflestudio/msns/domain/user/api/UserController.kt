@@ -31,19 +31,19 @@ class UserController(
 
     @GetMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
-    fun getMyProfile(@CurrentUser user: User): UserResponse.ProfileResponse = userService.getProfile(user.id)
+    fun getMyProfile(@CurrentUser user: User): UserResponse.ProfileResponse = userService.getMyProfile(user.id)
 
     @GetMapping("/{user_id}/profile")
     @ResponseStatus(HttpStatus.OK)
     fun getUserProfile(@PathVariable("user_id") userId: Long): UserResponse.ProfileResponse =
-        userService.getProfile(userId)
+        userService.getMyProfile(userId)
 
     @PutMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
     fun putProfile(
         @CurrentUser user: User,
         @Valid @RequestBody putRequest: UserRequest.PutProfile
-    ): UserResponse.ProfileResponse = userService.putProfile(user, putRequest)
+    ): UserResponse.ProfileResponse = userService.putMyProfile(user, putRequest)
 
     @GetMapping("/{user_id}/posts")
     @ResponseStatus(HttpStatus.OK)
@@ -52,5 +52,5 @@ class UserController(
             size = 30, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
         @PathVariable("user_id") userId: Long
-    ): Page<PostResponse.UserPageResponse> = userService.getPosts(pageable, userId)
+    ): Page<PostResponse.UserPageResponse> = userService.getMyPosts(pageable, userId)
 }
