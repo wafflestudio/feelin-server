@@ -2,8 +2,6 @@ package com.wafflestudio.msns.domain.post.repository
 
 import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.post.model.Post
-import com.wafflestudio.msns.domain.user.dto.UserResponse
-import com.wafflestudio.msns.domain.user.model.User
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
