@@ -1,11 +1,14 @@
 package com.wafflestudio.msns.global.auth.dto
 
+import javax.validation.constraints.Email
+import javax.validation.constraints.NotBlank
+
 class AuthRequest {
-    data class JoinEmail(
-        val email: String,
+    data class VerifyEmail(
+        @field:NotBlank @field:Email val email: String,
     )
 
-    data class VerifyCode(
+    data class VerifyCodeEmail(
         val email: String,
         val code: String,
     )

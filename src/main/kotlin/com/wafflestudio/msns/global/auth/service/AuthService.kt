@@ -8,8 +8,6 @@ import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
 import com.wafflestudio.msns.global.auth.exception.ForbiddenVerificationTokenException
-import com.wafflestudio.msns.global.auth.exception.InvalidBirthFormException
-import com.wafflestudio.msns.global.auth.exception.InvalidEmailFormException
 import com.wafflestudio.msns.global.auth.exception.InvalidVerificationCodeException
 import com.wafflestudio.msns.global.auth.exception.JWTExpiredException
 import com.wafflestudio.msns.global.auth.exception.UnauthorizedVerificationTokenException
@@ -27,8 +25,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.UUID
-import java.util.regex.Pattern
 
 @Service
 class AuthService(
@@ -39,9 +37,8 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider
 ) {
-    fun signUpEmail(emailRequest: AuthRequest.JoinEmail): Boolean {
+    fun verifyEmail(emailRequest: AuthRequest.VerifyEmail): Boolean {
         val email = emailRequest.email
-        if (!isEmailValid(email)) throw InvalidEmailFormException("Invalid Email Form")
 
         return userRepository.findByEmail(email)
             ?.let { true }
@@ -55,34 +52,33 @@ class AuthService(
             }
     }
 
-    fun signUp(streamId: UUID, signUpRequest: UserRequest.SignUp): ResponseEntity<UserResponse.SimpleUserInfo> {
+    fun signUp(userId: UUID, signUpRequest: UserRequest.SignUp): ResponseEntity<UserResponse.SimpleUserInfo> {
         val email = signUpRequest.email
-        val lastName = signUpRequest.lastName
-        val firstName = signUpRequest.firstName
-        val username = signUpRequest.username
-        val birth = signUpRequest.birth
-            .also { if (!isBirthValid(it)) throw InvalidBirthFormException("Invalid Birth Form") }
-            .split("-")
+        val countryCode = signUpRequest.countryCode
         val phoneNumber = signUpRequest.phoneNumber
-        val password = passwordEncoder.encode(signUpRequest.password)
 
-        if (existUser(username, phoneNumber))
+        val username = signUpRequest.username
+        val encryptedPassword = passwordEncoder.encode(signUpRequest.password)
+
+        if (existUser(username, phoneNumber)) {
             throw AlreadyExistUserException("User already exists using this username/phoneNumber.")
+        }
 
         val verificationToken = verificationTokenRepository.findByEmail(email)
-            ?.also { if (!it.verification) throw UnauthorizedVerificationTokenException("email is unauthorized.") }
+            ?.also { if (!it.isVerified) throw UnauthorizedVerificationTokenException("email unauthorized") }
             ?.apply { this.password = password }
-            ?: throw VerificationTokenNotFoundException("verification token is not created.")
+            ?.apply { this.userId = userId }
+            ?: throw VerificationTokenNotFoundException("verification token not created")
 
-        val newUser = User(
+        val user = User(
+            userId = userId,
             email = email,
+            phoneNumber = signUpRequest.phoneNumber,
+            countryCode = signUpRequest.countryCode,
             username = username,
-            password = password,
-            lastName = lastName,
-            firstName = firstName,
-            birth = birth.let { date -> LocalDate.of(date[0].toInt(), date[1].toInt(), date[2].toInt()) },
-            phoneNumber = phoneNumber,
-            streamId = streamId
+            password = encryptedPassword,
+            name = signUpRequest.name,
+            birthDate = signUpRequest.birthDate.let { date -> LocalDate.parse(date, DateTimeFormatter.ISO_DATE) },
         )
 
         val accessJWT = jwtTokenProvider.generateToken(email, JWT.SIGN_IN)
@@ -92,7 +88,7 @@ class AuthService(
         responseHeaders.set("Access-Token", accessJWT)
         responseHeaders.set("Refresh-Token", refreshJWT)
 
-        return userRepository.save(newUser)
+        return userRepository.save(user)
             .also { updateTokens(verificationToken, accessJWT, refreshJWT) }
             .let {
                 ResponseEntity
@@ -106,14 +102,11 @@ class AuthService(
 
     fun checkValidJWT(jwt: String): Boolean = jwtTokenProvider.validateToken(jwt)
 
-    fun verifyCode(verifyRequest: AuthRequest.VerifyCode): Boolean {
-        val email = verifyRequest.email
-        val code = verifyRequest.code
-
-        return verificationTokenRepository.findByEmail(email)
-            ?.also { if (!checkValidJWT(it.accessToken)) throw JWTExpiredException("jwt token is expired.") }
-            ?.also { if (code != it.authenticationCode) throw InvalidVerificationCodeException("Invalid code.") }
-            ?.apply { this.verification = true }
+    fun verifyCodeWithEmail(verifyRequest: AuthRequest.VerifyCodeEmail): Boolean {
+        return verificationTokenRepository.findByEmail(verifyRequest.email)
+            ?.also { if (!checkValidJWT(it.accessToken)) throw JWTExpiredException("jwt token expired") }
+            ?.also { if (verifyRequest.code != it.authenticationCode) throw InvalidVerificationCodeException("invalid code") }
+            ?.apply { this.isVerified = true }
             ?.let { verificationTokenRepository.save(it) }
             ?.let { true }
             ?: false
@@ -122,18 +115,18 @@ class AuthService(
     fun refreshToken(refreshToken: String): AuthResponse.NewToken {
         if (!jwtTokenProvider.validateToken(refreshToken)) throw JWTExpiredException("token is expired.")
 
-        val email = jwtTokenProvider.getEmailFromJwt(refreshToken)
+        val id = jwtTokenProvider.getIdFromJwt(refreshToken)
 
         return verificationTokenRepository.findByRefreshToken(refreshToken)
             ?.also {
                 if (jwtTokenProvider.validateToken(it.accessToken)) {
-                    it.verification = false
+                    it.isVerified = false
                     throw ForbiddenVerificationTokenException("Unauthorized access.")
                 }
             }
             ?.apply {
-                this.accessToken = jwtTokenProvider.generateToken(email, JWT.SIGN_IN)
-                this.refreshToken = jwtTokenProvider.generateToken(email, JWT.REFRESH)
+                this.accessToken = jwtTokenProvider.generateToken(id, JWT.SIGN_IN)
+                this.refreshToken = jwtTokenProvider.generateToken(id, JWT.REFRESH)
             }
             ?.let { verificationTokenRepository.save(it) }
             ?.let { AuthResponse.NewToken(it.accessToken, it.refreshToken) }
@@ -145,13 +138,13 @@ class AuthService(
             .apply {
                 this.accessToken = accessToken
                 this.refreshToken = refreshToken
-                this.verification = true
+                this.isVerified = true
             }
             .let { verificationTokenRepository.save(it) }
     }
 
     fun checkAuthorizedByAccessToken(accessToken: String): Boolean =
-        verificationTokenRepository.findByAccessToken(accessToken)?.verification == true
+        verificationTokenRepository.findByAccessToken(accessToken)?.isVerified == true
 
     private fun existUser(username: String, phoneNumber: String): Boolean =
         userRepository.existsByUsername(username) || userRepository.existsByPhoneNumber(phoneNumber)
@@ -173,6 +166,7 @@ class AuthService(
             ?: run {
                 verificationTokenRepository.save(
                     VerificationToken(
+                        userId = UUID.randomUUID(),
                         email = email,
                         accessToken = accessJWT,
                         refreshToken = "",
@@ -182,22 +176,5 @@ class AuthService(
             }
 
         return accessJWT
-    }
-
-    private fun isEmailValid(email: String): Boolean {
-        return Pattern.compile(
-            "^(([\\w-]+\\.)+[\\w-]+|([a-zA-Z]|[\\w-]{2,}))@" +
-                "((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?" +
-                "[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\." +
-                "([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\\.([0-1]?" +
-                "[0-9]{1,2}|25[0-5]|2[0-4][0-9]))|" +
-                "([a-zA-Z]+[\\w-]+\\.)+[a-zA-Z]{2,4})$"
-        ).matcher(email).matches()
-    }
-
-    private fun isBirthValid(birth: String): Boolean {
-        return Pattern.compile(
-            "^\\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])\$"
-        ).matcher(birth).matches()
     }
 }

@@ -9,11 +9,11 @@ import com.wafflestudio.msns.global.auth.service.AuthService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import java.util.UUID
 import javax.validation.Valid
 
@@ -26,9 +26,9 @@ class AuthController(
     @PostMapping("")
     @ResponseStatus(HttpStatus.OK)
     fun signUpEmail(
-        @Valid @RequestBody emailRequest: AuthRequest.JoinEmail
+        @Valid @RequestBody emailRequest: AuthRequest.VerifyEmail
     ): AuthResponse.ExistUser {
-        return AuthResponse.ExistUser(authService.signUpEmail(emailRequest))
+        return AuthResponse.ExistUser(authService.verifyEmail(emailRequest))
     }
 
     @PostMapping("/username")
@@ -41,9 +41,9 @@ class AuthController(
     @PostMapping("/verify-code")
     @ResponseStatus(HttpStatus.OK)
     fun verifyCode(
-        @Valid @RequestBody verifyRequest: AuthRequest.VerifyCode
+        @Valid @RequestBody verifyRequest: AuthRequest.VerifyCodeEmail
     ): AuthResponse.VerifyingCode {
-        return AuthResponse.VerifyingCode(authService.verifyCode(verifyRequest))
+        return AuthResponse.VerifyingCode(authService.verifyCodeWithEmail(verifyRequest))
     }
 
     @PostMapping("/signup")

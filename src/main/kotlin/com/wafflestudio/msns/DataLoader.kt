@@ -52,36 +52,36 @@ class DataLoader(
         albumRepository.save(albumA)
 
         val admin = User(
+            userId = UUID.randomUUID(),
             email = "admin@feelin.com",
+            countryCode = "82",
+            phoneNumber = "010-1234-5678",
             password = passwordEncoder.encode("feelin-admin"),
             username = "admin",
-            firstName = "Doe",
-            lastName = "John",
-            birth = LocalDate.of(2000, 1, 1),
-            phoneNumber = "010-1234-5678",
-            streamId = UUID.randomUUID()
+            name = "John Doe",
+            birthDate = LocalDate.of(2000, 1, 1),
         )
 
         val userA = User(
+            userId = UUID.randomUUID(),
             email = "userA@feelin.com",
+            countryCode = "82",
+            phoneNumber = "010-0000-0001",
             password = passwordEncoder.encode("feelin-user"),
             username = "userA",
-            firstName = "Doe",
-            lastName = "John",
-            birth = LocalDate.of(2000, 1, 1),
-            phoneNumber = "010-0000-0001",
-            streamId = UUID.randomUUID()
+            name = "John Doe",
+            birthDate = LocalDate.of(2000, 1, 1),
         )
 
         val userB = User(
+            userId = UUID.randomUUID(),
             email = "userB@feelin.com",
+            countryCode = "82",
+            phoneNumber = "010-0000-0001",
             password = passwordEncoder.encode("feelin-user"),
             username = "userB",
-            firstName = "Doe",
-            lastName = "John",
-            birth = LocalDate.of(2000, 1, 1),
-            phoneNumber = "010-0000-0002",
-            streamId = UUID.randomUUID()
+            name = "John Doe",
+            birthDate = LocalDate.of(2000, 1, 1),
         )
 
         userRepository.save(admin)
@@ -96,30 +96,33 @@ class DataLoader(
         val jwtF = jwtTokenProvider.generateToken(userB.email, JWT.REFRESH)
 
         val verificationTokenA = VerificationToken(
+            userId = admin.userId,
             email = admin.email,
             accessToken = jwtA,
             refreshToken = jwtB,
             authenticationCode = createRandomCode(),
             password = passwordEncoder.encode("feelin-admin"),
-            verification = true
+            isVerified = true
         )
 
         val verificationTokenB = VerificationToken(
+            userId = userA.userId,
             email = userA.email,
             accessToken = jwtC,
             refreshToken = jwtD,
             authenticationCode = createRandomCode(),
             password = passwordEncoder.encode("feelin-user"),
-            verification = true
+            isVerified = true
         )
 
         val verificationTokenC = VerificationToken(
+            userId = userB.userId,
             email = userB.email,
             accessToken = jwtE,
             refreshToken = jwtF,
             authenticationCode = createRandomCode(),
             password = passwordEncoder.encode("feelin-user"),
-            verification = true
+            isVerified = true
         )
 
         verificationTokenRepository.save(verificationTokenA)
