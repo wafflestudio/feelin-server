@@ -102,7 +102,7 @@ class DataLoader(
             refreshToken = jwtB,
             authenticationCode = createRandomCode(),
             password = passwordEncoder.encode("feelin-admin"),
-            isVerified = true
+            verified = true
         )
 
         val verificationTokenB = VerificationToken(
@@ -112,7 +112,7 @@ class DataLoader(
             refreshToken = jwtD,
             authenticationCode = createRandomCode(),
             password = passwordEncoder.encode("feelin-user"),
-            isVerified = true
+            verified = true
         )
 
         val verificationTokenC = VerificationToken(
@@ -122,7 +122,7 @@ class DataLoader(
             refreshToken = jwtF,
             authenticationCode = createRandomCode(),
             password = passwordEncoder.encode("feelin-user"),
-            isVerified = true
+            verified = true
         )
 
         verificationTokenRepository.save(verificationTokenA)

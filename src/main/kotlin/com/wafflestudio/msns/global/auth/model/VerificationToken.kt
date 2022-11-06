@@ -40,7 +40,7 @@ class VerificationToken(
     var authenticationCode: String,
 
     @Column(name = "is_verified")
-    var isVerified: Boolean = false,
+    var verified: Boolean = false,
 
     @Column(name = "role")
     val role: String = "user",

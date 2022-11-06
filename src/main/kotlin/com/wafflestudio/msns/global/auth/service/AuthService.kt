@@ -65,7 +65,7 @@ class AuthService(
         }
 
         val verificationToken = verificationTokenRepository.findByEmail(email)
-            ?.also { if (!it.isVerified) throw UnauthorizedVerificationTokenException("email unauthorized") }
+            ?.also { if (!it.verified) throw UnauthorizedVerificationTokenException("email unauthorized") }
             ?.apply { this.password = password }
             ?.apply { this.userId = userId }
             ?: throw VerificationTokenNotFoundException("verification token not created")
@@ -106,7 +106,7 @@ class AuthService(
         return verificationTokenRepository.findByEmail(verifyRequest.email)
             ?.also { if (!checkValidJWT(it.accessToken)) throw JWTExpiredException("jwt token expired") }
             ?.also { if (verifyRequest.code != it.authenticationCode) throw InvalidVerificationCodeException("invalid code") }
-            ?.apply { this.isVerified = true }
+            ?.apply { this.verified = true }
             ?.let { verificationTokenRepository.save(it) }
             ?.let { true }
             ?: false
@@ -120,7 +120,7 @@ class AuthService(
         return verificationTokenRepository.findByRefreshToken(refreshToken)
             ?.also {
                 if (jwtTokenProvider.validateToken(it.accessToken)) {
-                    it.isVerified = false
+                    it.verified = false
                     throw ForbiddenVerificationTokenException("Unauthorized access.")
                 }
             }
@@ -138,13 +138,13 @@ class AuthService(
             .apply {
                 this.accessToken = accessToken
                 this.refreshToken = refreshToken
-                this.isVerified = true
+                this.verified = true
             }
             .let { verificationTokenRepository.save(it) }
     }
 
     fun checkAuthorizedByAccessToken(accessToken: String): Boolean =
-        verificationTokenRepository.findByAccessToken(accessToken)?.isVerified == true
+        verificationTokenRepository.findByAccessToken(accessToken)?.verified == true
 
     private fun existUser(username: String, phoneNumber: String): Boolean =
         userRepository.existsByUsername(username) || userRepository.existsByPhoneNumber(phoneNumber)

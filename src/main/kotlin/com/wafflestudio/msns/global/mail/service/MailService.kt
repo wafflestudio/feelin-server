@@ -11,7 +11,9 @@ import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeMessage
 
 @Service
-class MailService(private val emailSender: JavaMailSender) {
+class MailService(
+    private val emailSender: JavaMailSender
+) {
     fun sendMail(email: MailDto.Email) {
         val message =
             if (email.withAttachment) createMessageWithAttachment(email)

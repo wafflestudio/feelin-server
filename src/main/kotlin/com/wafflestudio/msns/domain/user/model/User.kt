@@ -20,7 +20,7 @@ import javax.validation.constraints.NotBlank
     indexes = [Index(columnList = "username"), Index(columnList = "phone_number, country_code")]
 )
 class User(
-    @Column(name = "user_id", nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false, unique = true, columnDefinition = "BINARY(16)")
     val userId: UUID,
 
     @field:NotBlank
@@ -54,12 +54,12 @@ class User(
     var profileImageUrl: String? = null,
 
     @Column(name = "introduction")
-    var introduction: String? = null,
+    var introduction: String = "",
 
     @OneToMany(mappedBy = "user")
     val posts: MutableList<Post> = mutableListOf(),
 
     @OneToMany(mappedBy = "user")
-    val likes: MutableList<Like> = mutableListOf(),
+    val likes: MutableList<Like> = mutableListOf()
 
-    ) : BaseTimeEntity()
+) : BaseTimeEntity()
