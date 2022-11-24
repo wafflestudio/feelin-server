@@ -10,13 +10,17 @@ import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.SignatureAlgorithm
-import io.jsonwebtoken.SignatureException
 import io.jsonwebtoken.UnsupportedJwtException
+import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
+import java.security.Key
+import java.security.SignatureException
+import java.time.Duration
 import java.util.Date
+import java.util.UUID
 
 @Component
 class JwtTokenProvider(
@@ -27,17 +31,14 @@ class JwtTokenProvider(
     val tokenPrefix = "Bearer "
     val headerString = "Authentication"
 
-    @Value("feelin-admin")
+    @Value("\${spring.jwt.secret}")
     val jwtSecretKey: String = ""
 
-    @Value("3600000") // 1 hour
-    private val jwtExpirationInMs: Long = 0
+    private val jwtJoinExpirationInMs: Long = Duration.ofMinutes(10).toMillis()
 
-    @Value("1210000000") // 2 weeks
-    private val jwtRefreshExpirationInMs: Long = 0
+    private val jwtExpirationInMs: Long = Duration.ofHours(1).toMillis()
 
-    @Value("3600000") // 1 hour
-    private val jwtJoinExpirationInMs: Long = 0
+    private val jwtRefreshExpirationInMs: Long = Duration.ofDays(14).toMillis()
 
     fun generateToken(email: String, type: JWT): String {
         val claims: MutableMap<String, Any> = hashMapOf("email" to email)
@@ -50,11 +51,12 @@ class JwtTokenProvider(
                 JWT.REFRESH -> jwtRefreshExpirationInMs
             }
         )
+        val key: Key = Keys.hmacShaKeyFor(jwtSecretKey.toByteArray())
         return tokenPrefix + Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(now)
             .setExpiration(expiryDate)
-            .signWith(SignatureAlgorithm.HS256, jwtSecretKey)
+            .signWith(key, SignatureAlgorithm.HS256)
             .compact()
     }
 
@@ -74,7 +76,11 @@ class JwtTokenProvider(
         }
         val authTokenWithoutPrefix = removePrefix(authToken)
         try {
-            Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(authTokenWithoutPrefix)
+            val key: Key = Keys.hmacShaKeyFor(jwtSecretKey.toByteArray())
+            Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(authTokenWithoutPrefix)
             return true
         } catch (ex: SignatureException) {
             logger.error("Invalid JWT signature")
@@ -94,30 +100,33 @@ class JwtTokenProvider(
         return tokenWithPrefix.replace(tokenPrefix, "").trim { it <= ' ' }
     }
 
-    fun getEmailFromJwt(token: String): String {
-        var tokenWithoutPrefix = token
-        tokenWithoutPrefix = removePrefix(tokenWithoutPrefix)
-        val claims = Jwts.parser()
-            .setSigningKey(jwtSecretKey)
+    fun getIdFromJwt(token: String): String {
+        val tokenWithoutPrefix = removePrefix(token)
+        val key: Key = Keys.hmacShaKeyFor(jwtSecretKey.toByteArray())
+        val claims = Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
             .parseClaimsJws(tokenWithoutPrefix)
             .body
 
-        return claims.get("email", String::class.java)
+        return claims.get("id", String::class.java)
     }
 
     fun getAuthenticationTokenFromJwt(token: String): Authentication {
-        var tokenWithoutPrefix = token
-        tokenWithoutPrefix = removePrefix(tokenWithoutPrefix)
-        val claims = Jwts.parser()
-            .setSigningKey(jwtSecretKey)
+        val tokenWithoutPrefix = removePrefix(token)
+        val key: Key = Keys.hmacShaKeyFor(jwtSecretKey.toByteArray())
+        val claims = Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
             .parseClaimsJws(tokenWithoutPrefix)
             .body
 
-        val email = claims.get("email", String::class.java)
-        val currentUser = userRepository.findByEmail(email)
-        val currentAuthToken = verificationTokenRepository.findByEmail(email)
-            ?: throw VerificationTokenNotFoundException("$email is not valid email, check token is expired.")
-        val userPrincipal = VerificationTokenPrincipal(currentUser, currentAuthToken)
+        val id = claims.get("id", UUID::class.java)
+        val user = userRepository.findByUserId(id)
+            ?: throw VerificationTokenNotFoundException("user not found")
+        val authToken = verificationTokenRepository.findByEmail(user.email)
+            ?: throw VerificationTokenNotFoundException("verification token not found")
+        val userPrincipal = VerificationTokenPrincipal(user, authToken)
         val authorities = userPrincipal.authorities
 
         return AuthenticationToken(userPrincipal, null, authorities)

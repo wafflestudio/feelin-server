@@ -2,17 +2,17 @@ spring:
   profiles:
     active: local
     group:
-        local: mail
-        dev: mail
+      local: mail
+      dev: mail
 ---
 spring:
   config:
     activate:
       on-profile: local
   datasource:
-    url: jdbc:mysql://localhost:3306/feelinDB?serverTimezone=Asia/Seoul
+    url: jdbc:mysql://localhost:3306/feelin?serverTimezone=Asia/Seoul
     username: feelin
-    password: feelin
+    password: feelinuser
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
@@ -22,13 +22,28 @@ spring:
     hibernate:
       ddl-auto: create
     show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ~
+    password: ~
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  jwt:
+    secret: ~
+    expiration: 86400000
 ---
 spring:
   config:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:mysql://database:3306/feelinDB?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://database:3306/feelin?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
     username: feelin
     password: feelin
     driver-class-name: com.mysql.cj.jdbc.Driver

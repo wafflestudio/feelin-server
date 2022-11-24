@@ -33,7 +33,7 @@ class UserService(
                 if ((userRepository.findByUsername(it)?.id ?: user.id) != user.id)
                     throw ForbiddenUsernameException("There is another user using this name.")
             }
-            this.image = putRequest.image
+            this.profileImageUrl = putRequest.profileImageUrl
             this.introduction = putRequest.introduction
         }
             .let { userRepository.save(it) }

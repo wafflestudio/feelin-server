@@ -7,11 +7,11 @@ services:
         restart: always
         container_name: feelin_db
         environment:
-            - MYSQL_DATABASE=feelinDB
-            - MYSQL_ROOT_PASSWORD=feelin
+            - MYSQL_DATABASE=feelin
+            - MYSQL_ROOT_PASSWORD=feelinuser
             - MYSQL_USER=feelin
-            - MYSQL_PASSWORD=feelin
-        command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+            - MYSQL_PASSWORD=feelinuser
+        command: [ '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
         ports:
             - "3306:3306"
         volumes:
