@@ -105,7 +105,9 @@ class AuthService(
     fun verifyCodeWithEmail(verifyRequest: AuthRequest.VerifyCodeEmail): Boolean {
         return verificationTokenRepository.findByEmail(verifyRequest.email)
             ?.also { if (!checkValidJWT(it.accessToken)) throw JWTExpiredException("jwt token expired") }
-            ?.also { if (verifyRequest.code != it.authenticationCode) throw InvalidVerificationCodeException("invalid code") }
+            ?.also {
+                if (verifyRequest.code != it.authenticationCode) throw InvalidVerificationCodeException("invalid code")
+            }
             ?.apply { this.verified = true }
             ?.let { verificationTokenRepository.save(it) }
             ?.let { true }
