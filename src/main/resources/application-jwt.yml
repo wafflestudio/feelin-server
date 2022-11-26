@@ -1,3 +1,0 @@
-spring:
-  jwt:
-    secret: feelin-server-jwt-secret-key-2020
