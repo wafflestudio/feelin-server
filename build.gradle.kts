@@ -53,16 +53,16 @@ dependencies {
 
     implementation("org.hibernate.validator:hibernate-validator")
 
-    implementation("io.springfox:springfox-swagger2:2.9.2")
-    implementation("io.springfox:springfox-swagger-ui:2.9.2")
+    implementation("io.springfox:springfox-swagger2:3.0.0")
+    implementation("io.springfox:springfox-swagger-ui:3.0.0")
 
     implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("commons-io:commons-io:2.6")
+    implementation("commons-io:commons-io:2.11.0")
 
-    implementation("org.modelmapper:modelmapper:2.4.4")
+    implementation("org.modelmapper:modelmapper:3.1.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4")
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
