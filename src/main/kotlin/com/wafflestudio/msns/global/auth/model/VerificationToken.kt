@@ -11,7 +11,11 @@ import javax.validation.constraints.Email
 @Entity
 @Table(
     name = "verify_token",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["email"]), UniqueConstraint(columnNames = ["phone_number", "country_code"])]
+    uniqueConstraints =
+    [
+        UniqueConstraint(columnNames = ["email"]),
+        UniqueConstraint(columnNames = ["phone_number", "country_code"])
+    ]
 )
 class VerificationToken(
     @Column(name = "user_id")
@@ -45,4 +49,4 @@ class VerificationToken(
     @Column(name = "role")
     val role: String = "user",
 
-    ) : BaseTimeEntity()
+) : BaseTimeEntity()
