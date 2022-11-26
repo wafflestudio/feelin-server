@@ -12,7 +12,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/feelin?serverTimezone=Asia/Seoul
     username: feelin
-    password: feelin
+    password: feelinuser
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
@@ -30,7 +30,7 @@ spring:
   datasource:
     url: jdbc:mysql://database:3306/feelin?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
     username: feelin
-    password: feelin
+    password: feelinuser
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
