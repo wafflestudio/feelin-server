@@ -88,12 +88,12 @@ class DataLoader(
         userRepository.save(userA)
         userRepository.save(userB)
 
-        val jwtA = jwtTokenProvider.generateToken(admin.email, JWT.SIGN_IN)
-        val jwtB = jwtTokenProvider.generateToken(admin.email, JWT.REFRESH)
-        val jwtC = jwtTokenProvider.generateToken(userA.email, JWT.SIGN_IN)
-        val jwtD = jwtTokenProvider.generateToken(userA.email, JWT.REFRESH)
-        val jwtE = jwtTokenProvider.generateToken(userB.email, JWT.SIGN_IN)
-        val jwtF = jwtTokenProvider.generateToken(userB.email, JWT.REFRESH)
+        val jwtA = jwtTokenProvider.generateToken(admin.userId, JWT.SIGN_IN)
+        val jwtB = jwtTokenProvider.generateToken(admin.userId, JWT.REFRESH)
+        val jwtC = jwtTokenProvider.generateToken(userA.userId, JWT.SIGN_IN)
+        val jwtD = jwtTokenProvider.generateToken(userA.userId, JWT.REFRESH)
+        val jwtE = jwtTokenProvider.generateToken(userB.userId, JWT.SIGN_IN)
+        val jwtF = jwtTokenProvider.generateToken(userB.userId, JWT.REFRESH)
 
         val verificationTokenA = VerificationToken(
             userId = admin.userId,

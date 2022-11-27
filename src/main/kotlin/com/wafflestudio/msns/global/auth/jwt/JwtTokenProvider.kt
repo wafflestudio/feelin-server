@@ -40,8 +40,8 @@ class JwtTokenProvider(
 
     private val jwtRefreshExpirationInMs: Long = Duration.ofDays(14).toMillis()
 
-    fun generateToken(email: String, type: JWT): String {
-        val claims: MutableMap<String, Any> = hashMapOf("email" to email)
+    fun generateToken(id: UUID, type: JWT): String {
+        val claims: MutableMap<String, Any> = hashMapOf("id" to id.toString())
         val now = Date()
         val expiryDate = Date(
             now.time + when (type) {
@@ -62,7 +62,7 @@ class JwtTokenProvider(
 
     fun generateToken(authentication: Authentication, type: JWT): String {
         val verificationTokenPrincipal = authentication.principal as VerificationTokenPrincipal
-        return generateToken(verificationTokenPrincipal.verificationToken.email, type)
+        return generateToken(verificationTokenPrincipal.verificationToken.userId, type)
     }
 
     fun validateToken(authToken: String?): Boolean {
@@ -100,7 +100,7 @@ class JwtTokenProvider(
         return tokenWithPrefix.replace(tokenPrefix, "").trim { it <= ' ' }
     }
 
-    fun getIdFromJwt(token: String): String {
+    fun getIdFromJwt(token: String): UUID {
         val tokenWithoutPrefix = removePrefix(token)
         val key: Key = Keys.hmacShaKeyFor(jwtSecretKey.toByteArray())
         val claims = Jwts.parserBuilder()
@@ -109,7 +109,7 @@ class JwtTokenProvider(
             .parseClaimsJws(tokenWithoutPrefix)
             .body
 
-        return claims.get("id", String::class.java)
+        return UUID.fromString(claims.get("id", String::class.java))
     }
 
     fun getAuthenticationTokenFromJwt(token: String): Authentication {
@@ -121,7 +121,7 @@ class JwtTokenProvider(
             .parseClaimsJws(tokenWithoutPrefix)
             .body
 
-        val id = claims.get("id", UUID::class.java)
+        val id: UUID = UUID.fromString(claims.get("id", String::class.java))
         val user = userRepository.findByUserId(id)
             ?: throw VerificationTokenNotFoundException("user not found")
         val authToken = verificationTokenRepository.findByEmail(user.email)

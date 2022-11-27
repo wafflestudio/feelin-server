@@ -73,16 +73,16 @@ class AuthService(
         val user = User(
             userId = userId,
             email = email,
-            phoneNumber = signUpRequest.phoneNumber,
-            countryCode = signUpRequest.countryCode,
+            phoneNumber = phoneNumber,
+            countryCode = countryCode,
             username = username,
             password = encryptedPassword,
             name = signUpRequest.name,
             birthDate = signUpRequest.birthDate.let { date -> LocalDate.parse(date, DateTimeFormatter.ISO_DATE) },
         )
 
-        val accessJWT = jwtTokenProvider.generateToken(email, JWT.SIGN_IN)
-        val refreshJWT = jwtTokenProvider.generateToken(email, JWT.REFRESH)
+        val accessJWT = jwtTokenProvider.generateToken(userId, JWT.SIGN_IN)
+        val refreshJWT = jwtTokenProvider.generateToken(userId, JWT.REFRESH)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.set("Access-Token", accessJWT)
@@ -156,19 +156,21 @@ class AuthService(
     }
 
     private fun generateToken(email: String, code: String, type: JWT): String {
-        val accessJWT = jwtTokenProvider.generateToken(email, type)
+        val userId = UUID.randomUUID()
+        val accessJWT = jwtTokenProvider.generateToken(userId, type)
         val existingToken = verificationTokenRepository.findByEmail(email)
 
         existingToken
             ?.apply {
                 this.accessToken = accessJWT
                 this.authenticationCode = code
+                this.userId = userId
             }
             ?.let { verificationTokenRepository.save(it) }
             ?: run {
                 verificationTokenRepository.save(
                     VerificationToken(
-                        userId = UUID.randomUUID(),
+                        userId = userId,
                         email = email,
                         accessToken = accessJWT,
                         refreshToken = "",
