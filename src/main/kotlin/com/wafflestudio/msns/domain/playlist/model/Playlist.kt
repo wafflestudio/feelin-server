@@ -14,16 +14,16 @@ import javax.persistence.Column
 @Entity
 @Table(
     name = "playlist",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["streamId"])]
+    uniqueConstraints = [UniqueConstraint(columnNames = ["playlist_id"])]
 )
 class Playlist(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     val user: User,
 
-    @Column(columnDefinition = "BINARY(16)")
-    val streamId: UUID,
+    @Column(name = "playlist_id", nullable = false, unique = true, columnDefinition = "BINARY(16)")
+    val playlistId: UUID,
 
     val thumbnail: String,
 
-) : BaseTimeEntity()
+    ) : BaseTimeEntity()

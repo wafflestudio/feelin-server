@@ -33,12 +33,12 @@ class PostService(
         val title = createRequest.title
             .also { if (it.isBlank()) throw InvalidTitleException("title is blank.") }
         val content = createRequest.content
-        val playlist = playlistRepository.findByStreamId(createRequest.playlistPreview.id)
+        val playlist = playlistRepository.findByStreamId(createRequest.playlist.id)
             ?: playlistRepository.save(
                 Playlist(
                     user = user,
-                    streamId = createRequest.playlistPreview.id,
-                    thumbnail = createRequest.playlistPreview.thumbnail
+                    playlistId = createRequest.playlist.id,
+                    thumbnail = createRequest.playlist.thumbnail
                 )
             )
         postRepository.save(
@@ -57,7 +57,7 @@ class PostService(
     suspend fun getPostById(postId: Long): PostResponse.DetailResponse =
         postRepository.findPostById(postId)
             ?.let { post ->
-                webClientService.getPlaylist(post.playlist.streamId)
+                webClientService.getPlaylist(post.playlist.playlistId)
                     .let {
                         modelMapper.map(it, PlaylistResponse.DetailResponse::class.java)
                             .let { playlist -> PostResponse.DetailResponse(post, playlist) }

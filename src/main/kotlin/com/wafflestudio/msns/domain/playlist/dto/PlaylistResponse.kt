@@ -12,7 +12,7 @@ class PlaylistResponse {
     ) {
         constructor(playlist: Playlist) : this(
             id = playlist.id,
-            streamId = playlist.streamId,
+            streamId = playlist.playlistId,
             thumbnail = playlist.thumbnail
         )
     }
