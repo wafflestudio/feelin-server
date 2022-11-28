@@ -24,6 +24,9 @@ class Playlist(
     @Column(name = "playlist_id", nullable = false, unique = true, columnDefinition = "BINARY(16)")
     val playlistId: UUID,
 
+    @Column(name = "playlist_order", columnDefinition = "MEDIUMTEXT")
+    var playlistOrder: String,
+
     val thumbnail: String,
 
-    ) : BaseTimeEntity()
+) : BaseTimeEntity()

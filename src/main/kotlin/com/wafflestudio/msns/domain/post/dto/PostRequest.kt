@@ -11,6 +11,7 @@ class PostRequest {
 
     data class PutRequest(
         val title: String,
-        val content: String
+        val content: String,
+        val playlist: PlaylistRequest.PutRequest,
     )
 }

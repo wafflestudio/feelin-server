@@ -132,12 +132,14 @@ class DataLoader(
         val playlistA = Playlist(
             user = userA,
             playlistId = UUID.randomUUID(),
+            playlistOrder = "1 2 3",
             thumbnail = "https://ibb.co/7R7kcgd"
         )
 
         val playlistB = Playlist(
             user = userA,
             playlistId = UUID.randomUUID(),
+            playlistOrder = "6 5 3 2 4 1",
             thumbnail = "https://ibb.co/7R7kcgd"
         )
 

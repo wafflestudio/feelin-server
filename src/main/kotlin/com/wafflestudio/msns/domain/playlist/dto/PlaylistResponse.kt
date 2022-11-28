@@ -25,7 +25,7 @@ class PlaylistResponse {
     data class DetailResponse(
         val id: UUID,
         val title: String,
-        val tracks: List<TrackResponse.APIDto>,
+        var tracks: List<TrackResponse.APIDto>,
         val preview: PreviewDto
     )
 }
