@@ -50,13 +50,13 @@ class PostController(
         @PathVariable("postId") postId: Long
     ): PostResponse.DetailResponse = postService.getPostById(postId)
 
-    @PutMapping("")
+    @PutMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     fun modifyPost(
         @Valid @RequestBody putRequest: PostRequest.PutRequest,
-        @RequestParam("playlist_id") playlistId: Long,
+        @PathVariable("postId") postId: Long,
         @CurrentUser user: User
-    ) = postService.modifyPost(putRequest, playlistId, user)
+    ) = postService.modifyPost(putRequest, postId, user)
 
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)

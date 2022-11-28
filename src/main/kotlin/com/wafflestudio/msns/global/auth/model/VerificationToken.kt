@@ -14,11 +14,12 @@ import javax.validation.constraints.Email
     uniqueConstraints =
     [
         UniqueConstraint(columnNames = ["email"]),
+        UniqueConstraint(columnNames = ["user_id"]),
         UniqueConstraint(columnNames = ["phone_number", "country_code"])
     ]
 )
 class VerificationToken(
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false, unique = true, columnDefinition = "BINARY(16)")
     var userId: UUID,
 
     @Column(name = "email", unique = true)

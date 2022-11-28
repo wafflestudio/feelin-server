@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID
 
 interface PlaylistRepository : JpaRepository<Playlist, Long?> {
-    fun findByStreamId(streamId: UUID): Playlist?
+    fun findByPlaylistId(playlistId: UUID): Playlist?
 }

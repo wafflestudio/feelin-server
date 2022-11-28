@@ -6,11 +6,12 @@ class PostRequest {
     data class CreateRequest(
         val title: String,
         val content: String,
-        val playlistPreview: PlaylistRequest.PreviewRequest,
+        val playlist: PlaylistRequest.PreviewRequest,
     )
 
     data class PutRequest(
         val title: String,
-        val content: String
+        val content: String,
+        val playlist: PlaylistRequest.PutRequest,
     )
 }
