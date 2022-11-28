@@ -112,4 +112,9 @@ class PostService(
             ?.let { postRepository.deleteById(postId) }
             ?: throw PostNotFoundException("post is not found with the id.")
     }
+
+    fun getPostPlaylistOrder(postId: Long): PostResponse.PlaylistOrderResponse =
+        postRepository.findPostById(postId)
+            ?.let { PostResponse.PlaylistOrderResponse(it.playlist.playlistOrder) }
+            ?: throw PostNotFoundException("post is not found with the id.")
 }

@@ -75,4 +75,8 @@ class PostResponse {
             likes = post.likes.size
         )
     }
+
+    data class PlaylistOrderResponse(
+        val order: String
+    )
 }
