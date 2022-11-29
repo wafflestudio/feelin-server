@@ -13,7 +13,7 @@ class UserPrincipalDetailService(
 ) : UserDetailsService {
     override fun loadUserByUsername(account: String): UserDetails {
         return userRepository.findSignInUser(account)
-            ?.let{ UserPrincipal(it) }
-            ?: throw UsernameNotFoundException("User with the account '${account}' not found.")
+            ?.let { UserPrincipal(it) }
+            ?: throw UsernameNotFoundException("User with the account '$account' not found.")
     }
 }
