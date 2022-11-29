@@ -1,9 +1,9 @@
 package com.wafflestudio.msns.global.auth.jwt
 
+import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.repository.UserRepository
-import com.wafflestudio.msns.global.auth.exception.VerificationTokenNotFoundException
 import com.wafflestudio.msns.global.auth.model.AuthenticationToken
-import com.wafflestudio.msns.global.auth.model.VerificationTokenPrincipal
+import com.wafflestudio.msns.global.auth.model.UserPrincipal
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 import com.wafflestudio.msns.global.enum.JWT
 import io.jsonwebtoken.ExpiredJwtException
@@ -61,8 +61,8 @@ class JwtTokenProvider(
     }
 
     fun generateToken(authentication: Authentication, type: JWT): String {
-        val verificationTokenPrincipal = authentication.principal as VerificationTokenPrincipal
-        return generateToken(verificationTokenPrincipal.verificationToken.userId, type)
+        val verificationTokenPrincipal = authentication.principal as UserPrincipal
+        return generateToken(verificationTokenPrincipal.user.userId, type)
     }
 
     fun validateToken(authToken: String?): Boolean {
@@ -123,10 +123,8 @@ class JwtTokenProvider(
 
         val id: UUID = UUID.fromString(claims.get("id", String::class.java))
         val user = userRepository.findByUserId(id)
-            ?: throw VerificationTokenNotFoundException("user not found")
-        val authToken = verificationTokenRepository.findByEmail(user.email)
-            ?: throw VerificationTokenNotFoundException("verification token not found")
-        val userPrincipal = VerificationTokenPrincipal(user, authToken)
+            ?: throw UserNotFoundException("user not found with the userId")
+        val userPrincipal = UserPrincipal(user)
         val authorities = userPrincipal.authorities
 
         return AuthenticationToken(userPrincipal, null, authorities)

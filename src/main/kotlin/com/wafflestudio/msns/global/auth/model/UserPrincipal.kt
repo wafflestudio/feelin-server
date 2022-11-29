@@ -5,21 +5,20 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
-class VerificationTokenPrincipal(
-    val user: User?,
-    val verificationToken: VerificationToken,
+class UserPrincipal(
+    val user: User
 ) : UserDetails {
 
     override fun getUsername(): String {
-        return verificationToken.email
+        return user.email
     }
 
     override fun getPassword(): String {
-        return verificationToken.password!!
+        return user.password
     }
 
     override fun getAuthorities(): List<GrantedAuthority> {
-        val roles: List<String> = verificationToken.role.split(",").filter { it.isNotEmpty() }
+        val roles: List<String> = user.role.split(",").filter { it.isNotEmpty() }
         return roles.map { role: String? -> SimpleGrantedAuthority(role) }
     }
 

@@ -50,6 +50,12 @@ class PostController(
         @PathVariable("postId") postId: Long
     ): PostResponse.DetailResponse = postService.getPostById(postId)
 
+    @GetMapping("/{postId}/playlist/order")
+    @ResponseStatus(HttpStatus.OK)
+    fun getPostPlaylistOrder(
+        @PathVariable("postId") postId: Long
+    ): PostResponse.PlaylistOrderResponse = postService.getPostPlaylistOrder(postId)
+
     @PutMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     fun modifyPost(

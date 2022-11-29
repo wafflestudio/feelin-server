@@ -5,7 +5,7 @@ import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.LoginRequest
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
-import com.wafflestudio.msns.global.auth.model.VerificationTokenPrincipal
+import com.wafflestudio.msns.global.auth.model.UserPrincipal
 import com.wafflestudio.msns.global.auth.service.AuthService
 import com.wafflestudio.msns.global.enum.JWT
 import org.springframework.security.authentication.AuthenticationManager
@@ -46,14 +46,14 @@ class SignInAuthenticationFilter(
 
         val body = response.writer
 
-        val principal = authResult.principal as VerificationTokenPrincipal
+        val principal = authResult.principal as UserPrincipal
         val userJsonString =
-            objectMapper.writeValueAsString(principal.user?.let { UserResponse.SimpleUserInfo(it) })
+            objectMapper.writeValueAsString(principal.user.let { UserResponse.SimpleUserInfo(it) })
 
         body.print(userJsonString)
         body.flush()
 
-        authService.updateTokens(principal.verificationToken, accessJWT, refreshJWT)
+        authService.updateTokens(principal.user, accessJWT, refreshJWT)
     }
 
     override fun unsuccessfulAuthentication(

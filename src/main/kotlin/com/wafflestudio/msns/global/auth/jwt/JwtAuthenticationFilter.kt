@@ -19,7 +19,7 @@ class JwtAuthenticationFilter(
         chain: FilterChain
     ) {
         val token = request.getHeader(jwtTokenProvider.headerString)
-        if (jwtTokenProvider.validateToken(token) && authService.checkAuthorizedByAccessToken(token)) {
+        if (token != null && jwtTokenProvider.validateToken(token) && authService.checkAuthorizedByAccessToken(token)) {
             val authentication = jwtTokenProvider.getAuthenticationTokenFromJwt(token)
             SecurityContextHolder.getContext().authentication = authentication
         }

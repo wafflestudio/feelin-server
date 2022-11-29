@@ -8,7 +8,7 @@ import com.wafflestudio.msns.global.auth.jwt.JwtAuthenticationFilter
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 import com.wafflestudio.msns.global.auth.service.AuthService
-import com.wafflestudio.msns.global.auth.service.VerificationTokenPrincipalDetailService
+import com.wafflestudio.msns.global.auth.service.UserPrincipalDetailService
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -37,7 +37,7 @@ class SecurityConfig(
     private val authService: AuthService,
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val userPrincipalDetailService: VerificationTokenPrincipalDetailService,
+    private val userPrincipalDetailService: UserPrincipalDetailService,
     private val objectMapper: ObjectMapper,
     private val passwordEncoder: PasswordEncoder
 ) : WebSecurityConfigurerAdapter() {

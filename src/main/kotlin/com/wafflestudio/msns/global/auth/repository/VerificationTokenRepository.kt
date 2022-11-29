@@ -9,4 +9,8 @@ interface VerificationTokenRepository : JpaRepository<VerificationToken, Long?> 
     fun findByAccessToken(accessToken: String): VerificationToken?
 
     fun findByRefreshToken(refreshToken: String): VerificationToken?
+
+    fun findByPhoneNumber(phoneNumber: String): VerificationToken?
+
+    fun findOneById(user_id: Long): VerificationToken?
 }
