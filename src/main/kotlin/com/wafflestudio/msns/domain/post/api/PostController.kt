@@ -55,7 +55,7 @@ class PostController(
     fun getPostPlaylistOrder(
         @PathVariable("postId") postId: Long
     ): PostResponse.PlaylistOrderResponse = postService.getPostPlaylistOrder(postId)
-    
+
     @PutMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     fun modifyPost(

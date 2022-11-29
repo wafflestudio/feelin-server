@@ -185,7 +185,6 @@ class AuthService(
             ?.apply {
                 this.accessToken = accessJWT
                 this.authenticationCode = code
-                this.userId = userId
             }
             ?.let { verificationTokenRepository.save(it) }
             ?: run {
