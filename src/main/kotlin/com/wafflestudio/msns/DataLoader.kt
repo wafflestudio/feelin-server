@@ -96,32 +96,26 @@ class DataLoader(
         val jwtF = jwtTokenProvider.generateToken(userB.userId, JWT.REFRESH)
 
         val verificationTokenA = VerificationToken(
-            userId = admin.userId,
             email = admin.email,
             accessToken = jwtA,
             refreshToken = jwtB,
             authenticationCode = createRandomCode(),
-            password = passwordEncoder.encode("feelin-admin"),
             verified = true
         )
 
         val verificationTokenB = VerificationToken(
-            userId = userA.userId,
             email = userA.email,
             accessToken = jwtC,
             refreshToken = jwtD,
             authenticationCode = createRandomCode(),
-            password = passwordEncoder.encode("feelin-user"),
             verified = true
         )
 
         val verificationTokenC = VerificationToken(
-            userId = userB.userId,
             email = userB.email,
             accessToken = jwtE,
             refreshToken = jwtF,
             authenticationCode = createRandomCode(),
-            password = passwordEncoder.encode("feelin-user"),
             verified = true
         )
 

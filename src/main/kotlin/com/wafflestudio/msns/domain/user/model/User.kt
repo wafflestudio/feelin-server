@@ -27,22 +27,22 @@ class User(
     @Column(name = "username", unique = true)
     var username: String,
 
-    @field:NotBlank
     @field:Email
     @Column(name = "email", unique = true)
-    val email: String,
+    val email: String = "",
 
     @field:NotBlank
     @Column(name = "password")
     var password: String,
 
-    @field:NotBlank
-    @Column(name = "country_code")
-    var countryCode: String,
+    @Column(name = "role")
+    var role: String = "user",
 
-    @field:NotBlank
+    @Column(name = "country_code")
+    var countryCode: String = "",
+
     @Column(name = "phone_number")
-    var phoneNumber: String,
+    var phoneNumber: String = "",
 
     @Column(name = "name")
     var name: String,

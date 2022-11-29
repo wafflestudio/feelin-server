@@ -1,7 +1,6 @@
 package com.wafflestudio.msns.global.auth.model
 
 import com.wafflestudio.msns.domain.model.BaseTimeEntity
-import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Table
@@ -14,23 +13,16 @@ import javax.validation.constraints.Email
     uniqueConstraints =
     [
         UniqueConstraint(columnNames = ["email"]),
-        UniqueConstraint(columnNames = ["user_id"]),
-        UniqueConstraint(columnNames = ["phone_number", "country_code"])
+        UniqueConstraint(columnNames = ["phone_number"])
     ]
 )
 class VerificationToken(
-    @Column(name = "user_id", nullable = false, unique = true, columnDefinition = "BINARY(16)")
-    var userId: UUID,
-
     @Column(name = "email", unique = true)
     @field:Email
-    val email: String,
+    var email: String,
 
     @Column(name = "phone_number")
-    val phoneNumber: String? = null,
-
-    @Column(name = "country_code")
-    val countryCode: String? = null,
+    var phoneNumber: String? = null,
 
     @Column(name = "access_token")
     var accessToken: String,
@@ -38,16 +30,10 @@ class VerificationToken(
     @Column(name = "refresh_token")
     var refreshToken: String,
 
-    @Column(name = "password")
-    var password: String? = null,
-
     @Column(name = "authentication_code")
     var authenticationCode: String,
 
     @Column(name = "is_verified")
     var verified: Boolean = false,
-
-    @Column(name = "role")
-    val role: String = "user",
 
 ) : BaseTimeEntity()

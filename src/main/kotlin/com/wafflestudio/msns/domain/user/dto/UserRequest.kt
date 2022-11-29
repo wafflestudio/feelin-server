@@ -6,9 +6,9 @@ import javax.validation.constraints.NotNull
 
 class UserRequest {
     data class SignUp(
-        val email: String,
-        val phoneNumber: String,
-        val countryCode: String,
+        val email: String?,
+        val phoneNumber: String?,
+        val countryCode: String?,
         @field:NotBlank val password: String,
         @field:NotBlank val name: String,
         @field:NotBlank val username: String,
