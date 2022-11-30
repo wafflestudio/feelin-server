@@ -11,8 +11,6 @@ import org.springframework.data.repository.query.Param
 interface PostRepository : JpaRepository<Post, Long?> {
     fun findPostById(id: Long): Post?
 
-    fun findByUser_IdAndPlaylist_Id(userId: Long, playlistId: Long): Post?
-
     @Query(nativeQuery = true)
     fun findAllWithUserId(pageable: Pageable, @Param("userId") userId: Long): Page<PostResponse.PreviewResponse>
 
