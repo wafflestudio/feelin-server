@@ -20,13 +20,15 @@ import javax.persistence.OneToMany
 import javax.persistence.SqlResultSetMapping
 import javax.persistence.SqlResultSetMappings
 
+@Entity
+@Table(name = "post")
 @NamedNativeQueries(
     NamedNativeQuery(
         name = "Post.findAllWithUserId",
         query = "SELECT p.id AS post_id, p.title AS title, p.content AS content, p.created_at AS created_at, " +
             "pl.playlist_id AS playlist_id, pl.thumbnail AS thumbnail, " +
             "COUNT(l.id) AS likes " +
-            "FROM Post p " +
+            "FROM post p " +
             "INNER JOIN playlist pl ON p.playlist_id = pl.id " +
             "LEFT OUTER JOIN likes l ON p.id = l.post_id " +
             "WHERE p.user_id = :userId " +
@@ -37,7 +39,7 @@ import javax.persistence.SqlResultSetMappings
         name = "Post.findAllWithMyId",
         query = "SELECT p.id AS id, p.title AS title, p.created_at AS created_at, " +
             "pl.thumbnail AS thumbnail " +
-            "FROM Post p " +
+            "FROM post p " +
             "INNER JOIN playlist pl ON p.playlist_id = pl.id " +
             "WHERE p.user_id = :myId",
         resultSetMapping = "UserPageResponse"
@@ -76,8 +78,6 @@ import javax.persistence.SqlResultSetMappings
         ]
     )
 )
-@Entity
-@Table(name = "post")
 class Post(
     @ManyToOne(fetch = FetchType.LAZY, cascade = [])
     @JoinColumn(name = "user_id", referencedColumnName = "id")

@@ -14,17 +14,19 @@ import javax.persistence.SqlResultSetMapping
 import javax.persistence.Table
 import javax.persistence.UniqueConstraint
 
+@Entity
+@Table(name = "follow", uniqueConstraints = [UniqueConstraint(columnNames = ["to_user_id", "from_user_id"])])
 @NamedNativeQueries(
     NamedNativeQuery(
         name = "Follow.findAllWithFromUserId",
         query = "SELECT u.id AS id, u.username AS username, u.image AS image " +
-            "FROM Follow f INNER JOIN user u ON f.to_user_id = u.id WHERE f.from_user_id = :fromUserId",
+            "FROM follow f INNER JOIN user u ON f.to_user_id = u.id WHERE f.from_user_id = :fromUserId",
         resultSetMapping = "FollowListResponse"
     ),
     NamedNativeQuery(
         name = "Follow.findAllWithToUserId",
         query = "SELECT u.id AS id, u.username AS username, u.image AS image " +
-            "FROM Follow f INNER JOIN user u ON f.from_user_id = u.id WHERE f.to_user_id = :toUserId",
+            "FROM follow f INNER JOIN user u ON f.from_user_id = u.id WHERE f.to_user_id = :toUserId",
         resultSetMapping = "FollowListResponse"
     )
 )
@@ -41,8 +43,6 @@ import javax.persistence.UniqueConstraint
         )
     ]
 )
-@Entity
-@Table(name = "follow", uniqueConstraints = [UniqueConstraint(columnNames = ["to_user_id", "from_user_id"])])
 class Follow(
     @ManyToOne(fetch = FetchType.LAZY, cascade = [])
     @JoinColumn(name = "to_user_id", referencedColumnName = "id")
