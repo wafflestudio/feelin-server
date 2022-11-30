@@ -42,8 +42,7 @@ class PostResponse {
             title: String,
             content: String,
             createdAt: LocalDateTime?,
-            playlist_id: Long,
-            streamId: UUID,
+            playlist_id: UUID,
             thumbnail: String,
             likes: Int
         ) : this(
@@ -51,7 +50,7 @@ class PostResponse {
             title = title,
             content = content,
             createdAt = createdAt,
-            playlist = PlaylistResponse.PreviewResponse(playlist_id, streamId, thumbnail),
+            playlist = PlaylistResponse.PreviewResponse(playlist_id, thumbnail),
             likes = likes
         )
     }

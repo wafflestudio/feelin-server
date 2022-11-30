@@ -24,13 +24,13 @@ import javax.persistence.SqlResultSetMappings
     NamedNativeQuery(
         name = "Post.findAllWithUserId",
         query = "SELECT p.id AS post_id, p.title AS title, p.content AS content, p.created_at AS created_at, " +
-            "pl.id AS playlist_id, pl.stream_id AS stream_id, pl.thumbnail AS thumbnail, " +
+            "pl.playlist_id AS playlist_id, pl.thumbnail AS thumbnail, " +
             "COUNT(l.id) AS likes " +
             "FROM Post p " +
             "INNER JOIN playlist pl ON p.playlist_id = pl.id " +
             "LEFT OUTER JOIN likes l ON p.id = l.post_id " +
             "WHERE p.user_id = :userId " +
-            "GROUP BY p.id, p.title, p.content, p.created_at, pl.id, pl.stream_id, pl.thumbnail",
+            "GROUP BY p.id, p.title, p.content, p.created_at, pl.id, pl.thumbnail",
         resultSetMapping = "PreviewResponse"
     ),
     NamedNativeQuery(
@@ -39,7 +39,7 @@ import javax.persistence.SqlResultSetMappings
             "pl.thumbnail AS thumbnail " +
             "FROM Post p " +
             "INNER JOIN playlist pl ON p.playlist_id = pl.id " +
-            "WHERE p.user_id = :myId ",
+            "WHERE p.user_id = :myId",
         resultSetMapping = "UserPageResponse"
     )
 )
@@ -54,8 +54,7 @@ import javax.persistence.SqlResultSetMappings
                     ColumnResult(name = "title", type = String::class),
                     ColumnResult(name = "content", type = String::class),
                     ColumnResult(name = "created_at", type = LocalDateTime::class),
-                    ColumnResult(name = "playlist_id", type = Long::class),
-                    ColumnResult(name = "stream_id", type = UUID::class),
+                    ColumnResult(name = "playlist_id", type = UUID::class),
                     ColumnResult(name = "thumbnail", type = String::class),
                     ColumnResult(name = "likes", type = Int::class)
                 )

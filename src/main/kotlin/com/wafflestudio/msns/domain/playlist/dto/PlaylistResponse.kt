@@ -6,13 +6,11 @@ import java.util.UUID
 
 class PlaylistResponse {
     data class PreviewResponse(
-        val id: Long,
-        val streamId: UUID,
+        val id: UUID,
         val thumbnail: String
     ) {
         constructor(playlist: Playlist) : this(
-            id = playlist.id,
-            streamId = playlist.playlistId,
+            id = playlist.playlistId,
             thumbnail = playlist.thumbnail
         )
     }
