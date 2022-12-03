@@ -3,11 +3,15 @@ package com.wafflestudio.msns.global.auth.controller
 import com.wafflestudio.msns.domain.playlist.service.WebClientService
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
+import com.wafflestudio.msns.domain.user.model.User
+import com.wafflestudio.msns.domain.user.service.UserService
+import com.wafflestudio.msns.global.auth.CurrentUser
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
 import com.wafflestudio.msns.global.auth.service.AuthService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
@@ -21,7 +25,8 @@ import javax.validation.Valid
 @RequestMapping("/api/v1/auth")
 class AuthController(
     private val authService: AuthService,
-    private val webClientService: WebClientService
+    private val webClientService: WebClientService,
+    private val userService: UserService
 ) {
     @PostMapping("")
     @ResponseStatus(HttpStatus.OK)
@@ -30,6 +35,10 @@ class AuthController(
     ): AuthResponse.ExistUser {
         return AuthResponse.ExistUser(authService.verifyEmail(emailRequest))
     }
+
+    @DeleteMapping("")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun withdrawal(@CurrentUser user: User) = userService.withdrawUser(user)
 
     @PostMapping("/username")
     @ResponseStatus(HttpStatus.OK)

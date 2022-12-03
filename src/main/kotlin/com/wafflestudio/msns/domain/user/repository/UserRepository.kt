@@ -4,6 +4,7 @@ import com.wafflestudio.msns.domain.user.model.User
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 interface UserRepository : JpaRepository<User, Long?> {
@@ -19,4 +20,7 @@ interface UserRepository : JpaRepository<User, Long?> {
 
     @Query("SELECT u FROM User u WHERE u.email = :account OR u.username = :account OR u.phoneNumber = :account")
     fun findSignInUser(@Param("account") account: String): User?
+
+    @Transactional
+    fun deleteUserById(userId: Long)
 }
