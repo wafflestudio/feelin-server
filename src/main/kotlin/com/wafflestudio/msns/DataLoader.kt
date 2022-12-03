@@ -8,7 +8,11 @@ import com.wafflestudio.msns.domain.playlist.model.Playlist
 import com.wafflestudio.msns.domain.playlist.repository.PlaylistRepository
 import com.wafflestudio.msns.domain.post.model.Post
 import com.wafflestudio.msns.domain.post.repository.PostRepository
+import com.wafflestudio.msns.domain.user.model.Follow
+import com.wafflestudio.msns.domain.user.model.Like
 import com.wafflestudio.msns.domain.user.model.User
+import com.wafflestudio.msns.domain.user.repository.FollowRepository
+import com.wafflestudio.msns.domain.user.repository.LikeRepository
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationToken
@@ -32,7 +36,9 @@ class DataLoader(
     private val postRepository: PostRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val verificationTokenRepository: VerificationTokenRepository
+    private val verificationTokenRepository: VerificationTokenRepository,
+    private val followRepository: FollowRepository,
+    private val likeRepository: LikeRepository
 ) : ApplicationRunner {
     override fun run(args: ApplicationArguments?) {
 
@@ -124,14 +130,14 @@ class DataLoader(
         verificationTokenRepository.save(verificationTokenC)
 
         val playlistA = Playlist(
-            user = userA,
+            user = admin,
             playlistId = UUID.randomUUID(),
             playlistOrder = "1 2 3",
             thumbnail = "https://ibb.co/7R7kcgd"
         )
 
         val playlistB = Playlist(
-            user = userA,
+            user = admin,
             playlistId = UUID.randomUUID(),
             playlistOrder = "6 5 3 2 4 1",
             thumbnail = "https://ibb.co/7R7kcgd"
@@ -141,13 +147,37 @@ class DataLoader(
         playlistRepository.save(playlistB)
 
         val postA = Post(
-            user = userA,
+            user = admin,
             title = "Do you love Jazz Piano?",
             content = "...",
             playlist = playlistA
         )
 
         postRepository.save(postA)
+
+        val followA = Follow(
+            fromUser = userA,
+            toUser = admin
+        )
+        val followB = Follow(
+            fromUser = userB,
+            toUser = admin
+        )
+
+        followRepository.save(followA)
+        followRepository.save(followB)
+
+        val likeA = Like(
+            user = userA,
+            post = postA
+        )
+        val likeB = Like(
+            user = userA,
+            post = postA
+        )
+
+        likeRepository.save(likeA)
+        likeRepository.save(likeB)
     }
 
     private fun createRandomCode(): String {
