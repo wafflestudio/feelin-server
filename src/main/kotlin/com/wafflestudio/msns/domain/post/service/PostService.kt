@@ -36,21 +36,18 @@ class PostService(
         val title = createRequest.title
             .also { if (it.isBlank()) throw InvalidTitleException("title is blank.") }
         val content = createRequest.content
-        val playlist = playlistRepository.findByPlaylistId(createRequest.playlist.id)
-            ?: run {
-                val order: List<Int> = createRequest.playlist.order.split(" ").map { it.toInt() }.sorted()
-                val length: Int = createRequest.playlist.length
-                if (order != 1.rangeTo(length).toList())
-                    throw InvalidPlaylistOrderException("playlist order must be list of 1, ..., length")
-                playlistRepository.save(
-                    Playlist(
-                        user = user,
-                        playlistId = createRequest.playlist.id,
-                        playlistOrder = createRequest.playlist.order,
-                        thumbnail = createRequest.playlist.thumbnail
-                    )
-                )
-            }
+        val order: List<Int> = createRequest.playlist.order.split(" ").map { it.toInt() }.sorted()
+        val length: Int = createRequest.playlist.length
+        if (order != 1.rangeTo(length).toList())
+            throw InvalidPlaylistOrderException("playlist order must be list of 1, ..., length")
+        val playlist = playlistRepository.save(
+            Playlist(
+                user = user,
+                playlistId = createRequest.playlist.id,
+                playlistOrder = createRequest.playlist.order,
+                thumbnail = createRequest.playlist.thumbnail
+            )
+        )
         postRepository.save(
             Post(
                 user = user,
