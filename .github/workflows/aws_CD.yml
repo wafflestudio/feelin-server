@@ -11,7 +11,6 @@ defaults:
 jobs:
   deploy:
       name: deploy (dev)
-      needs: push
       runs-on: ubuntu-latest
       environment: dev
       env:
