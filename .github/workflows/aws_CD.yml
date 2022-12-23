@@ -12,12 +12,6 @@ jobs:
   dockerhub-upload-image:
       name: push
       runs-on: ubuntu-latest
-      env:
-          IMAGE_TAG: ${{ github.run_number }}
-          BUILD_NUMBER: ${{ github.run_number }}
-          ECR_REGISTRY: 405906814034.dkr.ecr.ap-northeast-2.amazonaws.com
-          ECR_REPOSITORY: feelin-dev/feelin-social-server
-
       steps:
         - name: Checkout
           uses: actions/checkout@v2
@@ -108,6 +102,11 @@ jobs:
       needs: deploy-setup
       runs-on: ubuntu-latest
       environment: dev
+      env:
+          IMAGE_TAG: ${{ github.run_number }}
+          BUILD_NUMBER: ${{ github.run_number }}
+          ECR_REGISTRY: 405906814034.dkr.ecr.ap-northeast-2.amazonaws.com
+          ECR_REPOSITORY: feelin-dev/feelin-social-server
       steps:
         - name: Configure AWS credentials
           uses: aws-actions/configure-aws-credentials@v1
