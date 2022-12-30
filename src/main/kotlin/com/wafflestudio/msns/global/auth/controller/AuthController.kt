@@ -59,9 +59,7 @@ class AuthController(
     fun signup(
         @Valid @RequestBody signUpRequest: UserRequest.SignUp
     ): ResponseEntity<UserResponse.SimpleUserInfo> =
-        UUID.randomUUID()
-            .let { userId -> webClientService.createUser(userId, signUpRequest.username).block()!! }
-            .let { authService.signUp(it.id, signUpRequest) }
+        authService.signUp(UUID.randomUUID(), signUpRequest)
 
     @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.OK)
