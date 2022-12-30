@@ -86,7 +86,7 @@ jobs:
 
   deploy-setup:
       name: ec2 setup
-      needs: dockerhub-upload-imaged
+      needs: dockerhub-upload-image
       runs-on: ubuntu-latest
       steps:
         - name: Checkout
