@@ -19,7 +19,7 @@ class WebClientConfig {
     fun webClient(): WebClient =
         WebClient
             .builder()
-            .baseUrl("http://ec2-3-38-41-181.ap-northeast-2.compute.amazonaws.com:3000/api/v1")
+            .baseUrl("https://feelin-api-dev.wafflestudio.com/api/v1")
             .clientConnector(
                 ReactorClientHttpConnector(
                     HttpClient
