@@ -3,7 +3,7 @@ spring:
     active: local
     group:
       local: mail, jwt
-      dev: dev
+      deploy: deploy
 ---
 spring:
   config:

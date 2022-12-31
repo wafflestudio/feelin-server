@@ -22,8 +22,8 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v2
 
-        - name: Create application-dev.yml
-          run: echo "${{ secrets.FEELIN_DEV_YML }}" > ./application-dev.yml
+        - name: Create application-deploy.yml
+          run: echo "${{ secrets.FEELIN_DEPLOY_YML }}" > ./application-deploy.yml
 
         - name: Configure AWS credentials
           uses: aws-actions/configure-aws-credentials@v1
