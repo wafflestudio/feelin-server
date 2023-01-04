@@ -28,14 +28,46 @@ class UserService(
     private val likeRepository: LikeRepository,
     private val playlistRepository: PlaylistRepository
 ) {
-    fun getMyself(user: User): UserResponse.DetailResponse = UserResponse.DetailResponse(user)
+    fun getMyself(user: User): UserResponse.DetailResponse =
+        UserResponse.DetailResponse(
+            user.id,
+            user.email,
+            user.username,
+            user.phoneNumber,
+            user.name,
+            user.birthDate
+        )
 
-    fun getMyProfile(userId: Long): UserResponse.ProfileResponse =
+    fun getMyProfile(user: User): UserResponse.MyProfileResponse =
+        UserResponse.MyProfileResponse(
+            user.id,
+            user.username,
+            user.name,
+            user.profileImageUrl,
+            user.introduction,
+            postRepository.countByUser_Id(user.id),
+            followRepository.countByToUser_Id(user.id),
+            followRepository.countByFromUser_Id(user.id)
+        )
+
+    fun getProfileByUserId(loginUser: User, userId: Long): UserResponse.ProfileResponse =
         userRepository.findByIdOrNull(userId)
-            ?.let { user -> UserResponse.ProfileResponse(user) }
+            ?.let { user ->
+                UserResponse.ProfileResponse(
+                    user.id,
+                    user.username,
+                    user.name,
+                    user.profileImageUrl,
+                    user.introduction,
+                    postRepository.countByUser_Id(user.id),
+                    followRepository.countByToUser_Id(user.id),
+                    followRepository.countByFromUser_Id(user.id),
+                    followRepository.existsByFromUser_IdAndToUser_Id(loginUser.id, userId)
+                )
+            }
             ?: throw UserNotFoundException("user is not found with the userId.")
 
-    fun putMyProfile(user: User, putRequest: UserRequest.PutProfile): UserResponse.ProfileResponse =
+    fun putMyProfile(user: User, putRequest: UserRequest.PutProfile): UserResponse.MyProfileResponse =
         user.apply {
             this.username = putRequest.username.also {
                 if ((userRepository.findByUsername(it)?.id ?: user.id) != user.id)
@@ -45,7 +77,18 @@ class UserService(
             this.introduction = putRequest.introduction
         }
             .let { userRepository.save(it) }
-            .let { UserResponse.ProfileResponse(it) }
+            .let {
+                UserResponse.MyProfileResponse(
+                    user.id,
+                    user.username,
+                    user.name,
+                    user.profileImageUrl,
+                    user.introduction,
+                    postRepository.countByUser_Id(user.id),
+                    followRepository.countByToUser_Id(user.id),
+                    followRepository.countByFromUser_Id(user.id)
+                )
+            }
 
     fun getMyPosts(pageable: Pageable, myId: Long): Page<PostResponse.UserPageResponse> =
         postRepository.findAllWithMyId(pageable, myId)

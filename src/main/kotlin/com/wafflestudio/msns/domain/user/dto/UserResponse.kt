@@ -26,16 +26,18 @@ class UserResponse {
         val phoneNumber: String,
         val name: String,
         val birthDate: LocalDate
-    ) {
-        constructor(user: User) : this(
-            id = user.id,
-            email = user.email,
-            username = user.username,
-            phoneNumber = user.phoneNumber,
-            name = user.name,
-            birthDate = user.birthDate
-        )
-    }
+    )
+
+    data class MyProfileResponse(
+        val id: Long,
+        val username: String,
+        val name: String,
+        val profileImageUrl: String?,
+        val introduction: String?,
+        val countPosts: Long,
+        val followers: Long,
+        val followings: Long
+    )
 
     data class ProfileResponse(
         val id: Long,
@@ -43,17 +45,11 @@ class UserResponse {
         val name: String,
         val profileImageUrl: String?,
         val introduction: String?,
-        val countPosts: Int
-    ) {
-        constructor(user: User) : this(
-            id = user.id,
-            username = user.username,
-            name = user.name,
-            profileImageUrl = user.profileImageUrl,
-            introduction = user.introduction,
-            countPosts = user.posts.size
-        )
-    }
+        val countPosts: Long,
+        val followers: Long,
+        val followings: Long,
+        val isFollowing: Boolean
+    )
 
     data class PreviewResponse(
         val id: Long,

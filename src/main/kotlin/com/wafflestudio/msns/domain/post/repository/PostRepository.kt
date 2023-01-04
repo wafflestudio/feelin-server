@@ -23,4 +23,6 @@ interface PostRepository : JpaRepository<Post, Long?>, PostRepositoryCustom {
     @Modifying
     @Query("DELETE FROM Post p WHERE p.user_id = :userId", nativeQuery = true)
     fun deleteAllUserPosts(@Param("userId") userId: Long)
+
+    fun countByUser_Id(userId: Long): Long
 }

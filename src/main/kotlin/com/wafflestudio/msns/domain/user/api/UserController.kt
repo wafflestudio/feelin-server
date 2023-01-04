@@ -31,12 +31,15 @@ class UserController(
 
     @GetMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
-    fun getMyProfile(@CurrentUser user: User): UserResponse.ProfileResponse = userService.getMyProfile(user.id)
+    fun getMyProfile(@CurrentUser user: User): UserResponse.ProfileResponse = userService.getMyProfile(user)
 
     @GetMapping("/{user_id}/profile")
     @ResponseStatus(HttpStatus.OK)
-    fun getUserProfile(@PathVariable("user_id") userId: Long): UserResponse.ProfileResponse =
-        userService.getMyProfile(userId)
+    fun getUserProfile(
+        @CurrentUser loginUser: User,
+        @PathVariable("user_id") userId: Long
+    ): UserResponse.ProfileResponse =
+        userService.getProfileByUserId(loginUser, userId)
 
     @PutMapping("/profile")
     @ResponseStatus(HttpStatus.OK)

@@ -17,4 +17,10 @@ interface FollowRepository : JpaRepository<Follow, Long?>, FollowRepositoryCusto
     @Transactional
     @Modifying
     fun deleteFollowByFromUser_IdAndToUser_Id(fromUserId: Long, toUserId: Long)
+
+    fun countByFromUser_Id(fromUserId: Long): Long
+
+    fun countByToUser_Id(toUserId: Long): Long
+
+    fun existsByFromUser_IdAndToUser_Id(fromUserId: Long, toUserId: Long): Boolean
 }
