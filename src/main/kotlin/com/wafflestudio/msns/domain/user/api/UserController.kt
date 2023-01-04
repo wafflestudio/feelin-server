@@ -31,7 +31,7 @@ class UserController(
 
     @GetMapping("/profile")
     @ResponseStatus(HttpStatus.OK)
-    fun getMyProfile(@CurrentUser user: User): UserResponse.ProfileResponse = userService.getMyProfile(user)
+    fun getMyProfile(@CurrentUser user: User): UserResponse.MyProfileResponse = userService.getMyProfile(user)
 
     @GetMapping("/{user_id}/profile")
     @ResponseStatus(HttpStatus.OK)
@@ -46,7 +46,7 @@ class UserController(
     fun putProfile(
         @CurrentUser user: User,
         @Valid @RequestBody putRequest: UserRequest.PutProfile
-    ): UserResponse.ProfileResponse = userService.putMyProfile(user, putRequest)
+    ): UserResponse.MyProfileResponse = userService.putMyProfile(user, putRequest)
 
     @GetMapping("/{user_id}/posts")
     @ResponseStatus(HttpStatus.OK)
