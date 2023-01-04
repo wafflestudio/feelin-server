@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.transaction.annotation.Transactional
 
-interface PostRepository : JpaRepository<Post, Long?> {
+interface PostRepository : JpaRepository<Post, Long?>, PostRepositoryCustom {
     fun findPostById(id: Long): Post?
 
     @Query(nativeQuery = true)

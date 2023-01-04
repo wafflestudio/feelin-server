@@ -7,9 +7,11 @@ import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.global.auth.CurrentUser
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -34,11 +36,19 @@ class PostController(
         @CurrentUser user: User
     ) = postService.writePost(createRequest, user)
 
+    @GetMapping("/feed")
+    fun getFeeds(
+        @PageableDefault(
+            size = 5, sort = ["updatedAt"], direction = Sort.Direction.DESC
+        ) pageable: Pageable,
+        @RequestParam("cursor", required = false) cursor: String?
+    ): ResponseEntity<Slice<PostResponse.FeedResponse>> = postService.getFeed(cursor, pageable)
+
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     fun getPosts(
         @PageableDefault(
-            size = 30, sort = ["createdAt"], direction = Sort.Direction.DESC
+            size = 5, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
         @RequestParam("userId", required = false, defaultValue = "-1") userId: Long,
         @CurrentUser user: User

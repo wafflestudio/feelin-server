@@ -43,6 +43,16 @@ import javax.persistence.SqlResultSetMappings
             "INNER JOIN playlist pl ON p.playlist_id = pl.id " +
             "WHERE p.user_id = :myId",
         resultSetMapping = "UserPageResponse"
+    ),
+    NamedNativeQuery(
+        name = "Post.findFeed",
+        query = "SELECT p.id AS id, p.title AS title, p.content AS content, p.created_at AS created_at, " +
+            "u.username AS username, u.profileImageUrl AS profileImageUrl," +
+            "CONCAT(LPAD(DATE_FORMAT(p.created_at, '%Y%m%d%H%i%s'), 20, '0'), LPAD()) " +
+            "FROM post p " +
+            "INNER JOIN user u ON p.user_id = u.id " +
+            "WHERE p.user_id = :myId",
+        resultSetMapping = "UserPageResponse"
     )
 )
 @SqlResultSetMappings(

@@ -20,8 +20,13 @@ import com.wafflestudio.msns.domain.user.repository.LikeRepository
 import org.modelmapper.ModelMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -40,14 +45,15 @@ class PostService(
         val length: Int = createRequest.playlist.length
         if (order != 1.rangeTo(length).toList())
             throw InvalidPlaylistOrderException("playlist order must be list of 1, ..., length")
-        val playlist = playlistRepository.save(
-            Playlist(
-                user = user,
-                playlistId = createRequest.playlist.id,
-                playlistOrder = createRequest.playlist.order,
-                thumbnail = createRequest.playlist.thumbnail
+        val playlist = playlistRepository.findByPlaylistId(createRequest.playlist.id)
+            ?: playlistRepository.save(
+                Playlist(
+                    user = user,
+                    playlistId = createRequest.playlist.id,
+                    playlistOrder = createRequest.playlist.order,
+                    thumbnail = createRequest.playlist.thumbnail
+                )
             )
-        )
         postRepository.save(
             Post(
                 user = user,
@@ -56,6 +62,27 @@ class PostService(
                 playlist = playlist
             )
         )
+    }
+
+    fun getFeed(cursor: String?, pageable: Pageable): ResponseEntity<Slice<PostResponse.FeedResponse>> {
+        val httpHeaders = HttpHeaders()
+        val httpBody: Slice<PostResponse.FeedResponse> = postRepository.getFeed(cursor, pageable)
+        val lastElement: PostResponse.FeedResponse? = httpBody.content.lastOrNull()
+        val nextCursor: String? = generateCustomCursor(lastElement?.updatedAt, lastElement?.id)
+        httpHeaders.set("cursor", nextCursor)
+        return ResponseEntity(httpBody, httpHeaders, HttpStatus.OK)
+    }
+
+    private fun generateCustomCursor(cursorEndDate: LocalDateTime?, cursorId: Long?): String? {
+        if (cursorEndDate == null && cursorId == null) return null
+
+        val customCursorEndDate = cursorEndDate.toString()
+            .replace("T".toRegex(), "")
+            .replace("-".toRegex(), "")
+            .replace(":".toRegex(), "")
+            .substring(0 until 14)
+        val customCursorId = String.format("%1$" + 10 + "s", cursorId).replace(' ', '0')
+        return customCursorEndDate + customCursorId
     }
 
     fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.PreviewResponse> =

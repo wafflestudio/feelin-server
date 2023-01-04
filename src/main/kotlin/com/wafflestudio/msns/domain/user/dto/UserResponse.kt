@@ -40,6 +40,7 @@ class UserResponse {
     data class ProfileResponse(
         val id: Long,
         val username: String,
+        val name: String,
         val profileImageUrl: String?,
         val introduction: String?,
         val countPosts: Int
@@ -47,13 +48,14 @@ class UserResponse {
         constructor(user: User) : this(
             id = user.id,
             username = user.username,
+            name = user.name,
             profileImageUrl = user.profileImageUrl,
             introduction = user.introduction,
             countPosts = user.posts.size
         )
     }
 
-    data class PostResponse(
+    data class PreviewResponse(
         val id: Long,
         val username: String,
         val profileImageUrl: String?
