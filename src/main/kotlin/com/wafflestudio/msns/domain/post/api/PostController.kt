@@ -39,16 +39,18 @@ class PostController(
     @GetMapping("/feed")
     fun getFeeds(
         @PageableDefault(
-            size = 5, sort = ["updatedAt"], direction = Sort.Direction.DESC
+            size = 20, sort = ["updatedAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
-        @RequestParam("cursor", required = false) cursor: String?
-    ): ResponseEntity<Slice<PostResponse.FeedResponse>> = postService.getFeed(cursor, pageable)
+        @RequestParam("cursor", required = false) cursor: String?,
+        @RequestParam("follow", required = false, defaultValue = false.toString()) viewFollowers: Boolean,
+        @CurrentUser user: User
+    ): ResponseEntity<Slice<PostResponse.FeedResponse>> = postService.getFeed(user, viewFollowers, cursor, pageable)
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     fun getPosts(
         @PageableDefault(
-            size = 5, sort = ["createdAt"], direction = Sort.Direction.DESC
+            size = 20, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
         @RequestParam("userId", required = false, defaultValue = "-1") userId: Long,
         @CurrentUser user: User
@@ -57,8 +59,9 @@ class PostController(
     @GetMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     suspend fun getPost(
-        @PathVariable("postId") postId: Long
-    ): PostResponse.DetailResponse = postService.getPostById(postId)
+        @PathVariable("postId") postId: Long,
+        @CurrentUser user: User
+    ): PostResponse.DetailResponse = postService.getPostById(user, postId)
 
     @GetMapping("/{postId}/playlist/order")
     @ResponseStatus(HttpStatus.OK)

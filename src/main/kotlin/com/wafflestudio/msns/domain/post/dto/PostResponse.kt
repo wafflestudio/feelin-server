@@ -61,19 +61,11 @@ class PostResponse {
         val content: String,
         val user: UserResponse.PreviewResponse,
         val createdAt: LocalDateTime?,
+        val updatedAt: LocalDateTime?,
         val playlist: PlaylistResponse.DetailResponse,
-        val likes: Int,
-    ) {
-        constructor(post: Post, playlist: PlaylistResponse.DetailResponse) : this(
-            id = post.id,
-            title = post.title,
-            content = post.content,
-            user = UserResponse.PreviewResponse(post.user),
-            createdAt = post.createdAt,
-            playlist = playlist,
-            likes = post.likes.size
-        )
-    }
+        val likes: Long,
+        val doesLike: Boolean
+    )
 
     data class PlaylistOrderResponse(
         val order: String
@@ -87,15 +79,6 @@ class PostResponse {
         val updatedAt: LocalDateTime?,
         val playlist: PlaylistResponse.PreviewResponse,
         val likes: Int,
-    ) {
-        constructor(post: Post, playlist: PlaylistResponse.PreviewResponse) : this(
-            id = post.id,
-            title = post.title,
-            content = post.content,
-            user = UserResponse.PreviewResponse(post.user),
-            updatedAt = post.updatedAt,
-            playlist = playlist,
-            likes = post.likes.size
-        )
-    }
+        val doesLike: Boolean
+    )
 }

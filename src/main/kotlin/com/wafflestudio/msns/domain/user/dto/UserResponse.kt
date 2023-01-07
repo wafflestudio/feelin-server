@@ -35,8 +35,8 @@ class UserResponse {
         val profileImageUrl: String?,
         val introduction: String?,
         val countPosts: Long,
-        val followers: Long,
-        val followings: Long
+        val countFollowers: Long,
+        val countFollowings: Long
     )
 
     data class ProfileResponse(
@@ -46,8 +46,8 @@ class UserResponse {
         val profileImageUrl: String?,
         val introduction: String?,
         val countPosts: Long,
-        val followers: Long,
-        val followings: Long,
+        val countFollowers: Long,
+        val countFollowings: Long,
         val isFollowing: Boolean
     )
 
