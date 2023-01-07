@@ -16,7 +16,6 @@ import com.wafflestudio.msns.domain.post.model.QPost.post
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.QFollow.follow
 import com.wafflestudio.msns.domain.user.model.QLike.like
-import com.wafflestudio.msns.domain.user.model.QUser.user
 import com.wafflestudio.msns.domain.user.model.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice

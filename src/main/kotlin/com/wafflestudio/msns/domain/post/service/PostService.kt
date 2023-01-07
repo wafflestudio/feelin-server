@@ -67,7 +67,12 @@ class PostService(
         )
     }
 
-    fun getFeed(user: User, viewFollowers: Boolean, cursor: String?, pageable: Pageable): ResponseEntity<Slice<PostResponse.FeedResponse>> {
+    fun getFeed(
+        user: User,
+        viewFollowers: Boolean,
+        cursor: String?,
+        pageable: Pageable
+    ): ResponseEntity<Slice<PostResponse.FeedResponse>> {
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<PostResponse.FeedResponse> = postRepository.getFeed(user, viewFollowers, cursor, pageable)
         val lastElement: PostResponse.FeedResponse? = httpBody.content.lastOrNull()
