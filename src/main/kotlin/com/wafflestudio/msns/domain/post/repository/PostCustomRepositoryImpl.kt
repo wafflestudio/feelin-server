@@ -14,7 +14,9 @@ import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
 import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.post.model.QPost.post
 import com.wafflestudio.msns.domain.user.dto.UserResponse
+import com.wafflestudio.msns.domain.user.model.QFollow.follow
 import com.wafflestudio.msns.domain.user.model.QLike.like
+import com.wafflestudio.msns.domain.user.model.QUser.user
 import com.wafflestudio.msns.domain.user.model.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -23,7 +25,12 @@ import org.springframework.data.domain.SliceImpl
 class PostCustomRepositoryImpl(
     private val queryFactory: JPAQueryFactory
 ) : PostCustomRepository {
-    override fun getFeed(user: User, cursor: String?, pageable: Pageable): Slice<PostResponse.FeedResponse> {
+    override fun getFeed(
+        loginUser: User,
+        viewFollowers: Boolean,
+        cursor: String?,
+        pageable: Pageable
+    ): Slice<PostResponse.FeedResponse> {
 
         var fetch = queryFactory
             .select(
@@ -44,13 +51,23 @@ class PostCustomRepositoryImpl(
                     post.likes.size(),
                     JPAExpressions
                         .selectFrom(like)
-                        .where(like.post.eq(post).and(like.user.eq(user)))
+                        .where(like.post.eq(post).and(like.user.eq(loginUser)))
                         .exists()
                 )
             )
             .from(post)
-            .where(ltPostUpdated(cursor))
             .limit(pageable.pageSize.toLong() + 1)
+
+        fetch = if (viewFollowers)
+            fetch
+                .join(follow)
+                .on(post.user.eq(follow.toUser))
+                .where(
+                    follow.fromUser.eq(loginUser).and(
+                        ltPostUpdated(cursor)
+                    )
+                )
+        else fetch.where(ltPostUpdated(cursor))
 
         pageable.sort.forEach {
             val pathBuilder = PathBuilder(post.type, post.metadata)
