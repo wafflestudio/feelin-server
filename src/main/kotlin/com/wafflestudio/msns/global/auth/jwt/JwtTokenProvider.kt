@@ -6,7 +6,11 @@ import com.wafflestudio.msns.global.auth.model.AuthenticationToken
 import com.wafflestudio.msns.global.auth.model.UserPrincipal
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 import com.wafflestudio.msns.global.enum.JWT
-import io.jsonwebtoken.*
+import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.MalformedJwtException
+import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.UnsupportedJwtException
 import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -15,7 +19,8 @@ import org.springframework.stereotype.Component
 import java.security.Key
 import java.security.SignatureException
 import java.time.Duration
-import java.util.*
+import java.util.Date
+import java.util.UUID
 import javax.annotation.PostConstruct
 
 @Component
