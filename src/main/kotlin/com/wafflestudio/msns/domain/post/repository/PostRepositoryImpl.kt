@@ -8,11 +8,14 @@ import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.core.types.dsl.PathBuilder
 import com.querydsl.core.types.dsl.StringExpressions
+import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
 import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.post.model.QPost.post
 import com.wafflestudio.msns.domain.user.dto.UserResponse
+import com.wafflestudio.msns.domain.user.model.QLike.like
+import com.wafflestudio.msns.domain.user.model.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
@@ -20,7 +23,7 @@ import org.springframework.data.domain.SliceImpl
 class PostRepositoryImpl(
     private val queryFactory: JPAQueryFactory
 ) : PostRepositoryCustom {
-    override fun getFeed(cursor: String?, pageable: Pageable): Slice<PostResponse.FeedResponse> {
+    override fun getFeed(user: User, cursor: String?, pageable: Pageable): Slice<PostResponse.FeedResponse> {
 
         var fetch = queryFactory
             .select(
@@ -38,7 +41,11 @@ class PostRepositoryImpl(
                         PlaylistResponse.PreviewResponse::class.java,
                         post.playlist
                     ),
-                    post.likes.size()
+                    post.likes.size(),
+                    JPAExpressions
+                        .selectFrom(like)
+                        .where(like.post.eq(post).and(like.user.eq(user)))
+                        .exists()
                 )
             )
             .from(post)

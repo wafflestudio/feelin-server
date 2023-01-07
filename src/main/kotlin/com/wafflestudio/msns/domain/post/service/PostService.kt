@@ -15,7 +15,9 @@ import com.wafflestudio.msns.domain.post.exception.PostNotFoundException
 import com.wafflestudio.msns.domain.post.model.Post
 import com.wafflestudio.msns.domain.post.repository.PostRepository
 import com.wafflestudio.msns.domain.track.dto.TrackResponse
+import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
+import com.wafflestudio.msns.domain.user.repository.FollowRepository
 import com.wafflestudio.msns.domain.user.repository.LikeRepository
 import org.modelmapper.ModelMapper
 import org.springframework.data.domain.Page
@@ -35,7 +37,8 @@ class PostService(
     private val playlistRepository: PlaylistRepository,
     private val likeRepository: LikeRepository,
     private val webClientService: WebClientService,
-    private val modelMapper: ModelMapper
+    private val modelMapper: ModelMapper,
+    private val followRepository: FollowRepository
 ) {
     fun writePost(createRequest: PostRequest.CreateRequest, user: User) {
         val title = createRequest.title
@@ -64,9 +67,9 @@ class PostService(
         )
     }
 
-    fun getFeed(cursor: String?, pageable: Pageable): ResponseEntity<Slice<PostResponse.FeedResponse>> {
+    fun getFeed(user: User, cursor: String?, pageable: Pageable): ResponseEntity<Slice<PostResponse.FeedResponse>> {
         val httpHeaders = HttpHeaders()
-        val httpBody: Slice<PostResponse.FeedResponse> = postRepository.getFeed(cursor, pageable)
+        val httpBody: Slice<PostResponse.FeedResponse> = postRepository.getFeed(user, cursor, pageable)
         val lastElement: PostResponse.FeedResponse? = httpBody.content.lastOrNull()
         val nextCursor: String? = generateCustomCursor(lastElement?.updatedAt, lastElement?.id)
         httpHeaders.set("cursor", nextCursor)
@@ -88,7 +91,7 @@ class PostService(
     fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.PreviewResponse> =
         postRepository.findAllWithUserId(pageable, userId)
 
-    suspend fun getPostById(postId: Long): PostResponse.DetailResponse =
+    suspend fun getPostById(user: User, postId: Long): PostResponse.DetailResponse =
         postRepository.findPostById(postId)
             ?.let { post ->
                 webClientService.getPlaylist(post.playlist.playlistId)
@@ -101,7 +104,19 @@ class PostService(
                                     playlistOrder.zip(playlist.tracks).sortedWith(compareBy { it.first })
                                 playlist.tracks = playlistOrderPair.map { it.second }
                             }
-                            .let { playlist -> PostResponse.DetailResponse(post, playlist) }
+                            .let { playlist ->
+                                PostResponse.DetailResponse(
+                                    postId,
+                                    post.title,
+                                    post.content,
+                                    UserResponse.PreviewResponse(post.user),
+                                    post.createdAt,
+                                    post.updatedAt,
+                                    playlist,
+                                    likeRepository.countByPost_Id(postId),
+                                    likeRepository.existsByPost_IdAndUser_Id(postId, user.id)
+                                )
+                            }
                     }
             }
             ?: throw PostNotFoundException("post is not found with the given id.")
