@@ -6,11 +6,7 @@ import com.wafflestudio.msns.global.auth.model.AuthenticationToken
 import com.wafflestudio.msns.global.auth.model.UserPrincipal
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 import com.wafflestudio.msns.global.enum.JWT
-import io.jsonwebtoken.ExpiredJwtException
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.MalformedJwtException
-import io.jsonwebtoken.SignatureAlgorithm
-import io.jsonwebtoken.UnsupportedJwtException
+import io.jsonwebtoken.*
 import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -19,26 +15,15 @@ import org.springframework.stereotype.Component
 import java.security.Key
 import java.security.SignatureException
 import java.time.Duration
-import java.util.Date
-import java.util.UUID
+import java.util.*
 
 @Component
 class JwtTokenProvider(
+    @Value("\${spring.jwt.secret}") private val jwtSecretKey: String,
     private val userRepository: UserRepository,
     private val verificationTokenRepository: VerificationTokenRepository,
 ) {
     private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
-    val tokenPrefix = "Bearer "
-    val headerString = "Authentication"
-
-    @Value("\${spring.jwt.secret}")
-    val jwtSecretKey: String = ""
-
-    private val jwtJoinExpirationInMs: Long = Duration.ofMinutes(10).toMillis()
-
-    private val jwtExpirationInMs: Long = Duration.ofHours(1).toMillis()
-
-    private val jwtRefreshExpirationInMs: Long = Duration.ofDays(14).toMillis()
 
     fun generateToken(id: UUID, type: JWT): String {
         val claims: MutableMap<String, Any> = hashMapOf("id" to id.toString())
@@ -128,5 +113,13 @@ class JwtTokenProvider(
         val authorities = userPrincipal.authorities
 
         return AuthenticationToken(userPrincipal, null, authorities)
+    }
+
+    companion object {
+        private val tokenPrefix = "Bearer "
+        private val headerString = "Authentication"
+        private val jwtJoinExpirationInMs: Long = Duration.ofMinutes(10).toMillis()
+        private val jwtExpirationInMs: Long = Duration.ofHours(1).toMillis()
+        private val jwtRefreshExpirationInMs: Long = Duration.ofDays(14).toMillis()
     }
 }
