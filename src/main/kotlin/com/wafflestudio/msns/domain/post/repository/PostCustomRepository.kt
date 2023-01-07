@@ -6,5 +6,10 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 
 interface PostCustomRepository {
-    fun getFeed(user: User, cursor: String?, pageable: Pageable): Slice<PostResponse.FeedResponse>
+    fun getFeed(
+        user: User,
+        viewFollowers: Boolean,
+        cursor: String?,
+        pageable: Pageable
+    ): Slice<PostResponse.FeedResponse>
 }
