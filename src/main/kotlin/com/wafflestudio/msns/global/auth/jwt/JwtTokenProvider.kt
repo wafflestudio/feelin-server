@@ -16,6 +16,7 @@ import java.security.Key
 import java.security.SignatureException
 import java.time.Duration
 import java.util.*
+import javax.annotation.PostConstruct
 
 @Component
 class JwtTokenProvider(
@@ -23,6 +24,11 @@ class JwtTokenProvider(
     private val userRepository: UserRepository,
     private val verificationTokenRepository: VerificationTokenRepository,
 ) {
+    @PostConstruct
+    fun init() {
+        System.out.println("jwtSecretKey: $jwtSecretKey")
+    }
+
     private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
 
     fun generateToken(id: UUID, type: JWT): String {
