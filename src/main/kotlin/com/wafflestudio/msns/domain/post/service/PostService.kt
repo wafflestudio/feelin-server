@@ -15,13 +15,20 @@ import com.wafflestudio.msns.domain.post.exception.PostNotFoundException
 import com.wafflestudio.msns.domain.post.model.Post
 import com.wafflestudio.msns.domain.post.repository.PostRepository
 import com.wafflestudio.msns.domain.track.dto.TrackResponse
+import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
+import com.wafflestudio.msns.domain.user.repository.FollowRepository
 import com.wafflestudio.msns.domain.user.repository.LikeRepository
 import org.modelmapper.ModelMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -30,7 +37,8 @@ class PostService(
     private val playlistRepository: PlaylistRepository,
     private val likeRepository: LikeRepository,
     private val webClientService: WebClientService,
-    private val modelMapper: ModelMapper
+    private val modelMapper: ModelMapper,
+    private val followRepository: FollowRepository
 ) {
     fun writePost(createRequest: PostRequest.CreateRequest, user: User) {
         val title = createRequest.title
@@ -40,14 +48,15 @@ class PostService(
         val length: Int = createRequest.playlist.length
         if (order != 1.rangeTo(length).toList())
             throw InvalidPlaylistOrderException("playlist order must be list of 1, ..., length")
-        val playlist = playlistRepository.save(
-            Playlist(
-                user = user,
-                playlistId = createRequest.playlist.id,
-                playlistOrder = createRequest.playlist.order,
-                thumbnail = createRequest.playlist.thumbnail
+        val playlist = playlistRepository.findByPlaylistId(createRequest.playlist.id)
+            ?: playlistRepository.save(
+                Playlist(
+                    user = user,
+                    playlistId = createRequest.playlist.id,
+                    playlistOrder = createRequest.playlist.order,
+                    thumbnail = createRequest.playlist.thumbnail
+                )
             )
-        )
         postRepository.save(
             Post(
                 user = user,
@@ -58,10 +67,31 @@ class PostService(
         )
     }
 
+    fun getFeed(user: User, cursor: String?, pageable: Pageable): ResponseEntity<Slice<PostResponse.FeedResponse>> {
+        val httpHeaders = HttpHeaders()
+        val httpBody: Slice<PostResponse.FeedResponse> = postRepository.getFeed(user, cursor, pageable)
+        val lastElement: PostResponse.FeedResponse? = httpBody.content.lastOrNull()
+        val nextCursor: String? = generateCustomCursor(lastElement?.updatedAt, lastElement?.id)
+        httpHeaders.set("cursor", nextCursor)
+        return ResponseEntity(httpBody, httpHeaders, HttpStatus.OK)
+    }
+
+    private fun generateCustomCursor(cursorEndDate: LocalDateTime?, cursorId: Long?): String? {
+        if (cursorEndDate == null && cursorId == null) return null
+
+        val customCursorEndDate = cursorEndDate.toString()
+            .replace("T".toRegex(), "")
+            .replace("-".toRegex(), "")
+            .replace(":".toRegex(), "")
+            .substring(0 until 14)
+        val customCursorId = String.format("%1$" + 10 + "s", cursorId).replace(' ', '0')
+        return customCursorEndDate + customCursorId
+    }
+
     fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.PreviewResponse> =
         postRepository.findAllWithUserId(pageable, userId)
 
-    suspend fun getPostById(postId: Long): PostResponse.DetailResponse =
+    suspend fun getPostById(user: User, postId: Long): PostResponse.DetailResponse =
         postRepository.findPostById(postId)
             ?.let { post ->
                 webClientService.getPlaylist(post.playlist.playlistId)
@@ -74,7 +104,19 @@ class PostService(
                                     playlistOrder.zip(playlist.tracks).sortedWith(compareBy { it.first })
                                 playlist.tracks = playlistOrderPair.map { it.second }
                             }
-                            .let { playlist -> PostResponse.DetailResponse(post, playlist) }
+                            .let { playlist ->
+                                PostResponse.DetailResponse(
+                                    postId,
+                                    post.title,
+                                    post.content,
+                                    UserResponse.PreviewResponse(post.user),
+                                    post.createdAt,
+                                    post.updatedAt,
+                                    playlist,
+                                    likeRepository.countByPost_Id(postId),
+                                    likeRepository.existsByPost_IdAndUser_Id(postId, user.id)
+                                )
+                            }
                     }
             }
             ?: throw PostNotFoundException("post is not found with the given id.")

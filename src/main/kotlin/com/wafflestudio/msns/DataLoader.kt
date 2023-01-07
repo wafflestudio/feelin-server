@@ -172,7 +172,7 @@ class DataLoader(
             post = postA
         )
         val likeB = Like(
-            user = userA,
+            user = userB,
             post = postA
         )
 

@@ -31,4 +31,8 @@ interface LikeRepository : JpaRepository<Like, Long?> {
         nativeQuery = true
     )
     fun deleteMappingByUserIdOfPost(@Param("userId") userId: Long)
+
+    fun countByPost_Id(postId: Long): Long
+
+    fun existsByPost_IdAndUser_Id(postId: Long, userId: Long): Boolean
 }

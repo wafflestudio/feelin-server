@@ -59,23 +59,26 @@ class PostResponse {
         val id: Long,
         val title: String,
         val content: String,
-        val user: UserResponse.PostResponse,
+        val user: UserResponse.PreviewResponse,
         val createdAt: LocalDateTime?,
+        val updatedAt: LocalDateTime?,
         val playlist: PlaylistResponse.DetailResponse,
-        val likes: Int,
-    ) {
-        constructor(post: Post, playlist: PlaylistResponse.DetailResponse) : this(
-            id = post.id,
-            title = post.title,
-            content = post.content,
-            user = UserResponse.PostResponse(post.user),
-            createdAt = post.createdAt,
-            playlist = playlist,
-            likes = post.likes.size
-        )
-    }
+        val likes: Long,
+        val doesLike: Boolean
+    )
 
     data class PlaylistOrderResponse(
         val order: String
+    )
+
+    data class FeedResponse(
+        val id: Long,
+        val title: String,
+        val content: String,
+        val user: UserResponse.PreviewResponse,
+        val updatedAt: LocalDateTime?,
+        val playlist: PlaylistResponse.PreviewResponse,
+        val likes: Int,
+        val doesLike: Boolean
     )
 }

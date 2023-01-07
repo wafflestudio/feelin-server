@@ -38,8 +38,11 @@ class FollowService(
     }
 
     fun getFollowings(pageable: Pageable, fromUserId: Long): Page<UserResponse.FollowListResponse> =
-        followRepository.findAllWithFromUserId(pageable, fromUserId)
+        followRepository.getFollowingsByFromUserId(pageable, fromUserId)
 
     fun getFollowers(pageable: Pageable, toUserId: Long): Page<UserResponse.FollowListResponse> =
-        followRepository.findAllWithToUserId(pageable, toUserId)
+        followRepository.getFollowingsByToUserId(pageable, toUserId)
+
+    fun deleteFollow(fromUser: User, toUserId: Long) =
+        followRepository.deleteFollowByFromUser_IdAndToUser_Id(fromUser.id, toUserId)
 }
