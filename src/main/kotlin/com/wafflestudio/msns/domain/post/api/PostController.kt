@@ -39,7 +39,7 @@ class PostController(
     @GetMapping("/feed")
     fun getFeeds(
         @PageableDefault(
-            size = 5, sort = ["updatedAt"], direction = Sort.Direction.DESC
+            size = 20, sort = ["updatedAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
         @RequestParam("cursor", required = false) cursor: String?,
         @CurrentUser user: User
@@ -49,7 +49,7 @@ class PostController(
     @ResponseStatus(HttpStatus.OK)
     fun getPosts(
         @PageableDefault(
-            size = 5, sort = ["createdAt"], direction = Sort.Direction.DESC
+            size = 20, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
         @RequestParam("userId", required = false, defaultValue = "-1") userId: Long,
         @CurrentUser user: User

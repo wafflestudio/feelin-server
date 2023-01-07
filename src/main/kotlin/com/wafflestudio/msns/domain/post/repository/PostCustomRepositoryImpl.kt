@@ -20,9 +20,9 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
 
-class PostRepositoryImpl(
+class PostCustomRepositoryImpl(
     private val queryFactory: JPAQueryFactory
-) : PostRepositoryCustom {
+) : PostCustomRepository {
     override fun getFeed(user: User, cursor: String?, pageable: Pageable): Slice<PostResponse.FeedResponse> {
 
         var fetch = queryFactory
