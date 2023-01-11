@@ -1,6 +1,5 @@
 package com.wafflestudio.msns.global.auth.controller
 
-import com.wafflestudio.msns.domain.playlist.service.WebClientService
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
@@ -25,16 +24,19 @@ import javax.validation.Valid
 @RequestMapping("/api/v1/auth")
 class AuthController(
     private val authService: AuthService,
-    private val webClientService: WebClientService,
     private val userService: UserService
 ) {
-    @PostMapping("")
+    @PostMapping("/email")
     @ResponseStatus(HttpStatus.OK)
-    fun signUpEmail(
+    fun newEmailCheck(
         @Valid @RequestBody emailRequest: AuthRequest.VerifyEmail
-    ): AuthResponse.ExistUser {
-        return AuthResponse.ExistUser(authService.verifyEmail(emailRequest))
-    }
+    ): AuthResponse.ExistUser = AuthResponse.ExistUser(authService.verifyEmail(emailRequest))
+
+    @PostMapping("/phone")
+    @ResponseStatus(HttpStatus.OK)
+    fun newPhoneCheck(
+        @Valid @RequestBody phoneRequest: AuthRequest.VerifyPhone
+    ): AuthResponse.ExistUser = AuthResponse.ExistUser(authService.verifyPhone(phoneRequest))
 
     @DeleteMapping("")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -47,13 +49,17 @@ class AuthController(
     ): AuthResponse.ExistUsername =
         AuthResponse.ExistUsername(authService.checkDuplicateUsername(usernameRequest.username))
 
-    @PostMapping("/verify-code")
+    @PostMapping("/verify-code/email")
     @ResponseStatus(HttpStatus.OK)
     fun verifyCode(
         @Valid @RequestBody verifyRequest: AuthRequest.VerifyCodeEmail
-    ): AuthResponse.VerifyingCode {
-        return AuthResponse.VerifyingCode(authService.verifyCodeWithEmail(verifyRequest))
-    }
+    ): AuthResponse.VerifyingCode = AuthResponse.VerifyingCode(authService.verifyCodeWithEmail(verifyRequest))
+
+    @PostMapping("/verify-code/phone")
+    @ResponseStatus(HttpStatus.OK)
+    fun verifyCode(
+        @Valid @RequestBody verifyRequest: AuthRequest.VerifyCodePhone
+    ): AuthResponse.VerifyingCode = AuthResponse.VerifyingCode(authService.verifyCodeWithPhone(verifyRequest))
 
     @PostMapping("/signup")
     fun signup(

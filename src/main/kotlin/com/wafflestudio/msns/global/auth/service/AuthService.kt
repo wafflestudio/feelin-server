@@ -55,6 +55,18 @@ class AuthService(
             }
     }
 
+    fun verifyPhone(phoneRequest: AuthRequest.VerifyPhone): Boolean {
+        val countryCode = phoneRequest.countryCode
+        val phoneNumber = phoneRequest.phone
+
+        val isNew: Boolean = userRepository.existsByPhoneNumberAndCountryCode(phoneNumber, countryCode)
+        return if (isNew) {
+            val code = createRandomCode()
+            generateTokenWithPhone(countryCode, phoneNumber, code, JWT.JOIN)
+            true
+        } else false
+    }
+
     fun signUp(userId: UUID, signUpRequest: UserRequest.SignUp): ResponseEntity<UserResponse.SimpleUserInfo> {
         val newUser: User =
             if (!signUpRequest.email.isNullOrBlank()) createUserWithEmail(userId, signUpRequest)
@@ -101,18 +113,20 @@ class AuthService(
     }
 
     fun createUserWithPhoneNumber(userId: UUID, signUpRequest: UserRequest.SignUp): User {
+        val countryCode: String = signUpRequest.countryCode!!
         val phoneNumber: String = signUpRequest.phoneNumber!!
         val username = signUpRequest.username
         val encryptedPassword = passwordEncoder.encode(signUpRequest.password)
         if (checkDuplicateUsername(username))
             throw AlreadyExistUserException("User already exists using this username/phoneNumber.")
 
-        verificationTokenRepository.findByPhoneNumber(phoneNumber)
-            ?.also { if (!it.verified) throw UnauthorizedVerificationTokenException("email unauthorized") }
+        verificationTokenRepository.findByCountryCodeAndPhoneNumber(countryCode, phoneNumber)
+            ?.also { if (!it.verified) throw UnauthorizedVerificationTokenException("phone unauthorized") }
             ?: throw VerificationTokenNotFoundException("verification token not created")
 
         return User(
             userId = userId,
+            countryCode = countryCode,
             phoneNumber = phoneNumber,
             username = username,
             password = encryptedPassword,
@@ -121,10 +135,10 @@ class AuthService(
         )
     }
 
-    fun checkDuplicateUsername(username: String): Boolean = userRepository.findByUsername(username) != null
+    fun checkDuplicateUsername(username: String): Boolean = userRepository.existsByUsername(username)
 
-    fun verifyCodeWithEmail(verifyRequest: AuthRequest.VerifyCodeEmail): Boolean {
-        return verificationTokenRepository.findByEmail(verifyRequest.email)
+    fun verifyCodeWithEmail(verifyRequest: AuthRequest.VerifyCodeEmail): Boolean =
+        verificationTokenRepository.findByEmail(verifyRequest.email)
             ?.also {
                 if (!jwtTokenProvider.validateToken(it.accessToken))
                     throw JWTExpiredException("jwt token expired")
@@ -137,7 +151,24 @@ class AuthService(
             ?.let { verificationTokenRepository.save(it) }
             ?.let { true }
             ?: false
-    }
+
+    fun verifyCodeWithPhone(verifyRequest: AuthRequest.VerifyCodePhone): Boolean =
+        verificationTokenRepository.findByCountryCodeAndPhoneNumber(
+            verifyRequest.countryCode,
+            verifyRequest.phoneNumber
+        )
+            ?.also {
+                if (!jwtTokenProvider.validateToken(it.accessToken))
+                    throw JWTExpiredException("jwt token expired")
+            }
+            ?.also {
+                if (verifyRequest.code != it.authenticationCode)
+                    throw InvalidVerificationCodeException("invalid code")
+            }
+            ?.apply { this.verified = true }
+            ?.let { verificationTokenRepository.save(it) }
+            ?.let { true }
+            ?: false
 
     fun refreshToken(refreshToken: String): AuthResponse.NewToken {
         if (!jwtTokenProvider.validateToken(refreshToken)) throw JWTExpiredException("token is expired.")
@@ -156,13 +187,13 @@ class AuthService(
                 this.refreshToken = jwtTokenProvider.generateToken(id, JWT.REFRESH)
             }
             ?.let { verificationTokenRepository.save(it) }
-            ?.let { AuthResponse.NewToken(it.accessToken, it.refreshToken) }
+            ?.let { AuthResponse.NewToken(it.accessToken, it.refreshToken!!) }
             ?: throw VerificationTokenNotFoundException("verification token is not found with the refresh token.")
     }
 
     fun updateTokens(user: User, accessToken: String, refreshToken: String) {
         val verificationToken = verificationTokenRepository.findByEmail(user.email)
-            ?: verificationTokenRepository.findByPhoneNumber(user.phoneNumber)!!
+            ?: verificationTokenRepository.findByCountryCodeAndPhoneNumber(user.countryCode, user.phoneNumber)!!
         verificationToken
             .apply {
                 this.accessToken = accessToken
@@ -195,7 +226,36 @@ class AuthService(
                     VerificationToken(
                         email = email,
                         accessToken = accessJWT,
-                        refreshToken = "",
+                        authenticationCode = code
+                    )
+                )
+            }
+
+        return accessJWT
+    }
+
+    private fun generateTokenWithPhone(
+        countryCode: String,
+        phoneNumber: String,
+        code: String,
+        type: JWT
+    ): String {
+        val userId = UUID.randomUUID()
+        val accessJWT = jwtTokenProvider.generateToken(userId, type)
+        val existingToken = verificationTokenRepository.findByCountryCodeAndPhoneNumber(countryCode, phoneNumber)
+
+        existingToken
+            ?.apply {
+                this.accessToken = accessJWT
+                this.authenticationCode = code
+            }
+            ?.let { verificationTokenRepository.save(it) }
+            ?: run {
+                verificationTokenRepository.save(
+                    VerificationToken(
+                        countryCode = countryCode,
+                        phoneNumber = phoneNumber,
+                        accessToken = accessJWT,
                         authenticationCode = code
                     )
                 )

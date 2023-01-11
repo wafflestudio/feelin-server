@@ -12,7 +12,7 @@ interface VerificationTokenRepository : JpaRepository<VerificationToken, Long?> 
 
     fun findByRefreshToken(refreshToken: String): VerificationToken?
 
-    fun findByPhoneNumber(phoneNumber: String): VerificationToken?
+    fun findByCountryCodeAndPhoneNumber(countryCode: String, phoneNumber: String): VerificationToken?
 
     @Transactional
     @Modifying
