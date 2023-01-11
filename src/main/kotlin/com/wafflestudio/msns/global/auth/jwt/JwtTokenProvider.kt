@@ -34,6 +34,8 @@ class JwtTokenProvider(
         System.out.println("jwtSecretKey: $jwtSecretKey")
     }
 
+    val tokenPrefix = "Bearer "
+    val headerString = "Authentication"
     private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
 
     fun generateToken(id: UUID, type: JWT): String {
@@ -127,8 +129,6 @@ class JwtTokenProvider(
     }
 
     companion object {
-        private val tokenPrefix = "Bearer "
-        private val headerString = "Authentication"
         private val jwtJoinExpirationInMs: Long = Duration.ofMinutes(10).toMillis()
         private val jwtExpirationInMs: Long = Duration.ofHours(1).toMillis()
         private val jwtRefreshExpirationInMs: Long = Duration.ofDays(14).toMillis()
