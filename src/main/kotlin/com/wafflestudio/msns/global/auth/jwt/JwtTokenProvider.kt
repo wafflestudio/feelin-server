@@ -24,15 +24,13 @@ import java.util.UUID
 
 @Component
 class JwtTokenProvider(
+    @Value("\${spring.jwt.secret}") private val jwtSecretKey: String,
     private val userRepository: UserRepository,
     private val verificationTokenRepository: VerificationTokenRepository,
 ) {
-    private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
     val tokenPrefix = "Bearer "
     val headerString = "Authentication"
-
-    @Value("\${spring.jwt.secret}")
-    val jwtSecretKey: String = ""
+    private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
 
     private val jwtJoinExpirationInMs: Long = Duration.ofMinutes(10).toMillis()
 
@@ -128,5 +126,11 @@ class JwtTokenProvider(
         val authorities = userPrincipal.authorities
 
         return AuthenticationToken(userPrincipal, null, authorities)
+    }
+
+    companion object {
+        private val jwtJoinExpirationInMs: Long = Duration.ofMinutes(10).toMillis()
+        private val jwtExpirationInMs: Long = Duration.ofHours(1).toMillis()
+        private val jwtRefreshExpirationInMs: Long = Duration.ofDays(14).toMillis()
     }
 }
