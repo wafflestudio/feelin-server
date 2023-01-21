@@ -52,6 +52,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
 
+    implementation("com.amazonaws:aws-java-sdk-sns:1.12.305")
+
     implementation("org.hibernate.validator:hibernate-validator")
 
     implementation("io.springfox:springfox-swagger2:3.0.0")
