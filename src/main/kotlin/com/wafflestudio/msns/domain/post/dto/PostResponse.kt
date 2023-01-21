@@ -7,25 +7,12 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class PostResponse {
-    data class UserPageResponse(
-        val id: Long,
-        val title: String,
-        val createdAt: LocalDateTime?,
-        val thumbnail: String,
-    ) {
-        constructor(post: Post) : this(
-            id = post.id,
-            title = post.title,
-            createdAt = post.createdAt,
-            thumbnail = post.playlist.thumbnail,
-        )
-    }
-
     data class PreviewResponse(
         val id: Long,
         val title: String,
         val content: String,
         val createdAt: LocalDateTime?,
+        val updatedAt: LocalDateTime?,
         val playlist: PlaylistResponse.PreviewResponse,
         val likes: Int
     ) {
@@ -34,6 +21,7 @@ class PostResponse {
             title = post.title,
             content = post.content,
             createdAt = post.createdAt,
+            updatedAt = post.updatedAt,
             playlist = PlaylistResponse.PreviewResponse(post.playlist),
             likes = post.likes.size
         )
@@ -42,6 +30,7 @@ class PostResponse {
             title: String,
             content: String,
             createdAt: LocalDateTime?,
+            updatedAt: LocalDateTime?,
             playlist_id: UUID,
             thumbnail: String,
             likes: Int
@@ -50,6 +39,7 @@ class PostResponse {
             title = title,
             content = content,
             createdAt = createdAt,
+            updatedAt = updatedAt,
             playlist = PlaylistResponse.PreviewResponse(playlist_id, thumbnail),
             likes = likes
         )

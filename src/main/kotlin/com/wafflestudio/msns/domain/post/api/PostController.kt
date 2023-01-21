@@ -5,7 +5,6 @@ import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.post.service.PostService
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.global.auth.CurrentUser
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.Sort
@@ -52,9 +51,11 @@ class PostController(
         @PageableDefault(
             size = 20, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
+        @RequestParam("cursor", required = false) cursor: String?,
         @RequestParam("userId", required = false, defaultValue = "-1") userId: Long,
         @CurrentUser user: User
-    ): Page<PostResponse.PreviewResponse> = postService.getPosts(pageable, if (userId < 0) user.id else userId)
+    ): ResponseEntity<Slice<PostResponse.PreviewResponse>> =
+        postService.getPosts(if (userId < 0) user.id else userId, cursor, pageable)
 
     @GetMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)

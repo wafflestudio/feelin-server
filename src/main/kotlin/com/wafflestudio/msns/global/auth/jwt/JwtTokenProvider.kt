@@ -29,15 +29,14 @@ class JwtTokenProvider(
     private val userRepository: UserRepository,
     private val verificationTokenRepository: VerificationTokenRepository,
 ) {
+    @PostConstruct
+    fun init() {
+        System.out.println("jwtSecretKey: $jwtSecretKey")
+    }
+
     val tokenPrefix = "Bearer "
     val headerString = "Authentication"
     private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
-
-    private val jwtJoinExpirationInMs: Long = Duration.ofMinutes(10).toMillis()
-
-    private val jwtExpirationInMs: Long = Duration.ofHours(1).toMillis()
-
-    private val jwtRefreshExpirationInMs: Long = Duration.ofDays(14).toMillis()
 
     fun generateToken(id: UUID, type: JWT): String {
         val claims: MutableMap<String, Any> = hashMapOf("id" to id.toString())
