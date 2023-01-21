@@ -21,6 +21,7 @@ import com.wafflestudio.msns.global.enum.JWT
 import com.wafflestudio.msns.global.mail.dto.MailDto
 import com.wafflestudio.msns.global.mail.service.MailContentBuilder
 import com.wafflestudio.msns.global.mail.service.MailService
+import com.wafflestudio.msns.global.sms.service.SMSService
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -34,6 +35,7 @@ import java.util.UUID
 class AuthService(
     private val userRepository: UserRepository,
     private val mailService: MailService,
+    private val smsService: SMSService,
     private val verificationTokenRepository: VerificationTokenRepository,
     private val mailContentBuilder: MailContentBuilder,
     private val passwordEncoder: PasswordEncoder,
@@ -55,16 +57,17 @@ class AuthService(
             }
     }
 
-    fun verifyPhone(phoneRequest: AuthRequest.VerifyPhone): Boolean {
+    suspend fun verifyPhone(phoneRequest: AuthRequest.VerifyPhone): Boolean {
         val countryCode = phoneRequest.countryCode
-        val phoneNumber = phoneRequest.phone
+        val phoneNumber = phoneRequest.phoneNumber
 
-        val isNew: Boolean = userRepository.existsByPhoneNumberAndCountryCode(phoneNumber, countryCode)
-        return if (isNew) {
+        val isNotNew: Boolean = userRepository.existsByPhoneNumberAndCountryCode(phoneNumber, countryCode)
+        return if (isNotNew) { true } else {
             val code = createRandomCode()
             generateTokenWithPhone(countryCode, phoneNumber, code, JWT.JOIN)
-            true
-        } else false
+            smsService.sendSMS(countryCode, phoneNumber, code)
+            false
+        }
     }
 
     fun signUp(userId: UUID, signUpRequest: UserRequest.SignUp): ResponseEntity<UserResponse.SimpleUserInfo> {

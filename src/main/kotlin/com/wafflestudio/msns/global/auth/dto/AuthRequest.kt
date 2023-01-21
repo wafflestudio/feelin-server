@@ -22,7 +22,7 @@ class AuthRequest {
             regexp = "^[0-9]{3}[-]+[0-9]{4}[-]+[0-9]{4}\$",
             message = "wrong phone number format"
         )
-        val phone: String,
+        val phoneNumber: String,
     )
 
     data class VerifyCodeEmail(

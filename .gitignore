@@ -30,6 +30,7 @@ out/
 src/main/resources/application-mail.yml
 src/main/resources/application-jwt.yml
 src/main/resources/application-deploy.yml
+src/main/resources/application-verification.yml
 
 ### NetBeans ###
 /nbproject/private/
