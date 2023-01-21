@@ -1,15 +1,10 @@
 package com.wafflestudio.msns.domain.user.api
 
-import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.service.UserService
 import com.wafflestudio.msns.global.auth.CurrentUser
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
-import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -47,13 +42,4 @@ class UserController(
         @CurrentUser user: User,
         @Valid @RequestBody putRequest: UserRequest.PutProfile
     ): UserResponse.MyProfileResponse = userService.putMyProfile(user, putRequest)
-
-    @GetMapping("/{user_id}/posts")
-    @ResponseStatus(HttpStatus.OK)
-    fun getPosts(
-        @PageableDefault(
-            size = 30, sort = ["createdAt"], direction = Sort.Direction.DESC
-        ) pageable: Pageable,
-        @PathVariable("user_id") userId: Long
-    ): Page<PostResponse.UserPageResponse> = userService.getMyPosts(pageable, userId)
 }

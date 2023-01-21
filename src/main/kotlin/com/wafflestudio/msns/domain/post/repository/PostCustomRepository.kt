@@ -7,9 +7,15 @@ import org.springframework.data.domain.Slice
 
 interface PostCustomRepository {
     fun getFeed(
-        user: User,
+        loginUser: User,
         viewFollowers: Boolean,
         cursor: String?,
         pageable: Pageable
     ): Slice<PostResponse.FeedResponse>
+
+    fun getAllByUserId(
+        userId: Long,
+        cursor: String?,
+        pageable: Pageable
+    ): Slice<PostResponse.PreviewResponse>
 }

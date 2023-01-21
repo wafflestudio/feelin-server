@@ -20,7 +20,6 @@ import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.FollowRepository
 import com.wafflestudio.msns.domain.user.repository.LikeRepository
 import org.modelmapper.ModelMapper
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.http.HttpHeaders
@@ -93,15 +92,25 @@ class PostService(
         return customCursorEndDate + customCursorId
     }
 
-    fun getPosts(pageable: Pageable, userId: Long): Page<PostResponse.PreviewResponse> =
-        postRepository.findAllWithUserId(pageable, userId)
+    fun getPosts(
+        userId: Long,
+        cursor: String?,
+        pageable: Pageable
+    ): ResponseEntity<Slice<PostResponse.PreviewResponse>> {
+        val httpHeaders = HttpHeaders()
+        val httpBody: Slice<PostResponse.PreviewResponse> = postRepository.getAllByUserId(userId, cursor, pageable)
+        val lastElement: PostResponse.PreviewResponse? = httpBody.content.lastOrNull()
+        val nextCursor: String? = generateCustomCursor(lastElement?.updatedAt, lastElement?.id)
+        httpHeaders.set("cursor", nextCursor)
+        return ResponseEntity(httpBody, httpHeaders, HttpStatus.OK)
+    }
 
     suspend fun getPostById(user: User, postId: Long): PostResponse.DetailResponse =
         postRepository.findPostById(postId)
             ?.let { post ->
                 webClientService.getPlaylist(post.playlist.playlistId)
                     .let { webDto ->
-                        modelMapper.map(webDto, PlaylistResponse.DetailResponse::class.java)
+                        modelMapper.map(webDto, PlaylistResponse.APIResponse::class.java)
                             .also { playlist ->
                                 val playlistOrder: List<Int> =
                                     post.playlist.playlistOrder.split(" ").map { track -> track.toInt() }
@@ -117,7 +126,7 @@ class PostService(
                                     UserResponse.PreviewResponse(post.user),
                                     post.createdAt,
                                     post.updatedAt,
-                                    playlist,
+                                    PlaylistResponse.DetailResponse(playlist),
                                     likeRepository.countByPost_Id(postId),
                                     likeRepository.existsByPost_IdAndUser_Id(postId, user.id)
                                 )

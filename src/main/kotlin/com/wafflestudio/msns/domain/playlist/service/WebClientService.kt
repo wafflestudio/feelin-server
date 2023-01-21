@@ -16,7 +16,7 @@ import java.util.UUID
 class WebClientService(
     private val webClient: WebClient
 ) {
-    suspend fun getPlaylist(playlistId: UUID): PlaylistResponse.DetailResponse =
+    suspend fun getPlaylist(playlistId: UUID): PlaylistResponse.APIResponse =
         webClient
             .get()
             .uri("/playlists/$playlistId")
