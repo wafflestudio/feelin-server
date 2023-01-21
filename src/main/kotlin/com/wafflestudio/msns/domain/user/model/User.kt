@@ -54,7 +54,7 @@ class User(
     @Column(name = "profile_image_url")
     var profileImageUrl: String? = null,
 
-    @Size(max=1000)
+    @Size(max = 1000)
     @Column(name = "introduction")
     var introduction: String = "",
 
