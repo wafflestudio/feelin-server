@@ -14,9 +14,6 @@ interface PostRepository : JpaRepository<Post, Long?>, PostCustomRepository {
     fun findPostById(id: Long): Post?
 
     @Query(nativeQuery = true)
-    fun findAllWithUserId(pageable: Pageable, @Param("userId") userId: Long): Page<PostResponse.PreviewResponse>
-
-    @Query(nativeQuery = true)
     fun findAllWithMyId(pageable: Pageable, @Param("myId") myId: Long): Page<PostResponse.UserPageResponse>
 
     @Transactional

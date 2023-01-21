@@ -26,6 +26,7 @@ class PostResponse {
         val title: String,
         val content: String,
         val createdAt: LocalDateTime?,
+        val updatedAt: LocalDateTime?,
         val playlist: PlaylistResponse.PreviewResponse,
         val likes: Int
     ) {
@@ -34,6 +35,7 @@ class PostResponse {
             title = post.title,
             content = post.content,
             createdAt = post.createdAt,
+            updatedAt = post.updatedAt,
             playlist = PlaylistResponse.PreviewResponse(post.playlist),
             likes = post.likes.size
         )
@@ -42,6 +44,7 @@ class PostResponse {
             title: String,
             content: String,
             createdAt: LocalDateTime?,
+            updatedAt: LocalDateTime?,
             playlist_id: UUID,
             thumbnail: String,
             likes: Int
@@ -50,6 +53,7 @@ class PostResponse {
             title = title,
             content = content,
             createdAt = createdAt,
+            updatedAt = updatedAt,
             playlist = PlaylistResponse.PreviewResponse(playlist_id, thumbnail),
             likes = likes
         )
