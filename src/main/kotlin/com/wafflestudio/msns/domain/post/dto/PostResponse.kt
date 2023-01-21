@@ -7,20 +7,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class PostResponse {
-    data class UserPageResponse(
-        val id: Long,
-        val title: String,
-        val createdAt: LocalDateTime?,
-        val thumbnail: String,
-    ) {
-        constructor(post: Post) : this(
-            id = post.id,
-            title = post.title,
-            createdAt = post.createdAt,
-            thumbnail = post.playlist.thumbnail,
-        )
-    }
-
     data class PreviewResponse(
         val id: Long,
         val title: String,

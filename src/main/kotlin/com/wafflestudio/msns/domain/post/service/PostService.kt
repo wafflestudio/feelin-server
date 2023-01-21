@@ -110,7 +110,7 @@ class PostService(
             ?.let { post ->
                 webClientService.getPlaylist(post.playlist.playlistId)
                     .let { webDto ->
-                        modelMapper.map(webDto, PlaylistResponse.DetailResponse::class.java)
+                        modelMapper.map(webDto, PlaylistResponse.APIResponse::class.java)
                             .also { playlist ->
                                 val playlistOrder: List<Int> =
                                     post.playlist.playlistOrder.split(" ").map { track -> track.toInt() }
@@ -126,7 +126,7 @@ class PostService(
                                     UserResponse.PreviewResponse(post.user),
                                     post.createdAt,
                                     post.updatedAt,
-                                    playlist,
+                                    PlaylistResponse.DetailResponse(playlist),
                                     likeRepository.countByPost_Id(postId),
                                     likeRepository.existsByPost_IdAndUser_Id(postId, user.id)
                                 )

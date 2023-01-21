@@ -20,10 +20,24 @@ class PlaylistResponse {
         val thumbnail: String
     )
 
-    data class DetailResponse(
+    data class APIResponse(
         val id: UUID,
         val title: String,
         var tracks: List<TrackResponse.APIDto>,
         val preview: PreviewDto
     )
+
+    data class DetailResponse(
+        val id: UUID,
+        val thumbnail: String,
+        val title: String,
+        var tracks: List<TrackResponse.APIDto>
+    ) {
+        constructor(playlistResponse: APIResponse) : this(
+            id = playlistResponse.id,
+            thumbnail = playlistResponse.preview.thumbnail,
+            title = playlistResponse.title,
+            tracks = playlistResponse.tracks
+        )
+    }
 }
