@@ -17,11 +17,11 @@ class TestController(
     @ResponseStatus(HttpStatus.OK)
     fun test(
         @PathVariable("id") id: UUID
-    ): PlaylistResponse.DetailResponse? =
+    ): PlaylistResponse.APIResponse? =
         webClient
             .get()
             .uri("/playlists/$id")
             .retrieve() // HttpStatus.OK
-            .bodyToMono(PlaylistResponse.DetailResponse::class.java)
+            .bodyToMono(PlaylistResponse.APIResponse::class.java)
             .block()
 }

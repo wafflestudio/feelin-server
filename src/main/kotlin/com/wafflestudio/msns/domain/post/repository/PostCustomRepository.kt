@@ -12,4 +12,10 @@ interface PostCustomRepository {
         cursor: String?,
         pageable: Pageable
     ): Slice<PostResponse.FeedResponse>
+
+    fun getAllByUserId(
+        userId: Long,
+        cursor: String?,
+        pageable: Pageable
+    ): Slice<PostResponse.PreviewResponse>
 }

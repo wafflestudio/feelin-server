@@ -21,24 +21,22 @@ import java.security.SignatureException
 import java.time.Duration
 import java.util.Date
 import java.util.UUID
+import javax.annotation.PostConstruct
 
 @Component
 class JwtTokenProvider(
+    @Value("\${spring.jwt.secret}") private val jwtSecretKey: String,
     private val userRepository: UserRepository,
     private val verificationTokenRepository: VerificationTokenRepository,
 ) {
-    private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
+    @PostConstruct
+    fun init() {
+        System.out.println("jwtSecretKey: $jwtSecretKey")
+    }
+
     val tokenPrefix = "Bearer "
     val headerString = "Authentication"
-
-    @Value("\${spring.jwt.secret}")
-    val jwtSecretKey: String = ""
-
-    private val jwtJoinExpirationInMs: Long = Duration.ofMinutes(10).toMillis()
-
-    private val jwtExpirationInMs: Long = Duration.ofHours(1).toMillis()
-
-    private val jwtRefreshExpirationInMs: Long = Duration.ofDays(14).toMillis()
+    private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
 
     fun generateToken(id: UUID, type: JWT): String {
         val claims: MutableMap<String, Any> = hashMapOf("id" to id.toString())
@@ -128,5 +126,11 @@ class JwtTokenProvider(
         val authorities = userPrincipal.authorities
 
         return AuthenticationToken(userPrincipal, null, authorities)
+    }
+
+    companion object {
+        private val jwtJoinExpirationInMs: Long = Duration.ofMinutes(10).toMillis()
+        private val jwtExpirationInMs: Long = Duration.ofHours(1).toMillis()
+        private val jwtRefreshExpirationInMs: Long = Duration.ofDays(14).toMillis()
     }
 }

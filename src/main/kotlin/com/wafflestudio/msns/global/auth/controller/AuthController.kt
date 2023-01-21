@@ -35,6 +35,7 @@ class AuthController(
     @PostMapping("/phone")
     @ResponseStatus(HttpStatus.OK)
     suspend fun newPhoneCheck(
+    fun newPhoneCheck(
         @Valid @RequestBody phoneRequest: AuthRequest.VerifyPhone
     ): AuthResponse.ExistUser = AuthResponse.ExistUser(authService.verifyPhone(phoneRequest))
 
