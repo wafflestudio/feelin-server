@@ -13,22 +13,25 @@ import javax.validation.constraints.Email
     uniqueConstraints =
     [
         UniqueConstraint(columnNames = ["email"]),
-        UniqueConstraint(columnNames = ["phone_number"])
+        UniqueConstraint(columnNames = ["phone_number", "country_code"])
     ]
 )
 class VerificationToken(
     @Column(name = "email", unique = true)
     @field:Email
-    var email: String,
+    var email: String? = null,
 
     @Column(name = "phone_number")
     var phoneNumber: String? = null,
+
+    @Column(name = "country_code")
+    var countryCode: String? = null,
 
     @Column(name = "access_token")
     var accessToken: String,
 
     @Column(name = "refresh_token")
-    var refreshToken: String,
+    var refreshToken: String? = null,
 
     @Column(name = "authentication_code")
     var authenticationCode: String,
