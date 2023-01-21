@@ -12,6 +12,7 @@ import javax.persistence.Table
 import javax.persistence.UniqueConstraint
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Size
 
 @Entity
 @Table(
@@ -53,6 +54,7 @@ class User(
     @Column(name = "profile_image_url")
     var profileImageUrl: String? = null,
 
+    @Size(max=1000)
     @Column(name = "introduction")
     var introduction: String = "",
 
