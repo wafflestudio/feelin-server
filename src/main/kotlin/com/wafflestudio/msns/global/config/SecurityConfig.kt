@@ -78,11 +78,7 @@ class SecurityConfig(
             .and()
             .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
             .and()
-            .addFilter(
-                SignInAuthenticationFilter(
-                    authenticationManager(), jwtTokenProvider, objectMapper, userRepository, authService
-                )
-            )
+            .addFilter(SignInAuthenticationFilter(authenticationManager(), jwtTokenProvider, objectMapper, authService))
             .addFilter(JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider, authService))
             .authorizeRequests()
             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
