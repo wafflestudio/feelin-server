@@ -24,7 +24,7 @@ import javax.validation.Valid
 @RequestMapping("/api/v1/auth")
 class AuthController(
     private val authService: AuthService,
-    private val userService: UserService
+    private val userService: UserService,
 ) {
     @PostMapping("/email")
     @ResponseStatus(HttpStatus.OK)

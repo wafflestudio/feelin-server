@@ -2,7 +2,6 @@ package com.wafflestudio.msns.global.auth.filter
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.msns.domain.user.dto.UserResponse
-import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.LoginRequest
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.UserPrincipal
@@ -23,8 +22,7 @@ class SignInAuthenticationFilter(
     authenticationManager: AuthenticationManager?,
     private val jwtTokenProvider: JwtTokenProvider,
     private val objectMapper: ObjectMapper,
-    private val userRepository: UserRepository,
-    private val authService: AuthService
+    private val authService: AuthService,
 ) : UsernamePasswordAuthenticationFilter(authenticationManager) {
     init {
         setRequiresAuthenticationRequestMatcher(AntPathRequestMatcher("/api/v1/auth/signin", "POST"))

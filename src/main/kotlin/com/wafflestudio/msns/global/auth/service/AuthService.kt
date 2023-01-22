@@ -124,8 +124,9 @@ class AuthService(
         val phoneNumber: String = signUpRequest.phoneNumber!!
         val username = signUpRequest.username
         val encryptedPassword = passwordEncoder.encode(signUpRequest.password)
-        if (checkDuplicateUsername(username))
+        if (checkDuplicateUsername(username)) {
             throw AlreadyExistUserException("User already exists using this username/phoneNumber.")
+        }
 
         verificationTokenRepository.findByCountryCodeAndPhoneNumber(countryCode, phoneNumber)
             ?.also { if (!it.verified) throw UnauthorizedVerificationTokenException("phone unauthorized") }
@@ -142,7 +143,7 @@ class AuthService(
         )
     }
 
-    fun checkDuplicateUsername(username: String): Boolean = userRepository.existsByUsername(username)
+    fun checkDuplicateUsername(username: String) = userRepository.existsByUsername(username)
 
     fun verifyCodeWithEmail(verifyRequest: AuthRequest.VerifyCodeEmail): Boolean =
         verificationTokenRepository.findByEmail(verifyRequest.email)
