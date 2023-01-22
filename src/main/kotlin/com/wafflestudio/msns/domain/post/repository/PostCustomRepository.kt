@@ -4,6 +4,7 @@ import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.user.model.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
+import java.util.UUID
 
 interface PostCustomRepository {
     fun getFeed(
@@ -14,7 +15,7 @@ interface PostCustomRepository {
     ): Slice<PostResponse.FeedResponse>
 
     fun getAllByUserId(
-        userId: Long,
+        userId: UUID,
         cursor: String?,
         pageable: Pageable
     ): Slice<PostResponse.PreviewResponse>

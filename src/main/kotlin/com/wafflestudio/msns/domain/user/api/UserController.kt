@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import java.util.*
 import javax.validation.Valid
 
 @RestController
@@ -32,7 +33,7 @@ class UserController(
     @ResponseStatus(HttpStatus.OK)
     fun getUserProfile(
         @CurrentUser loginUser: User,
-        @PathVariable("user_id") userId: Long
+        @PathVariable("user_id") userId: UUID
     ): UserResponse.ProfileResponse =
         userService.getProfileByUserId(loginUser, userId)
 

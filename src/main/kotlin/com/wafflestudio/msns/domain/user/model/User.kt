@@ -2,6 +2,7 @@ package com.wafflestudio.msns.domain.user.model
 
 import com.wafflestudio.msns.domain.model.BaseTimeEntity
 import com.wafflestudio.msns.domain.post.model.Post
+import org.hibernate.annotations.Type
 import java.time.LocalDate
 import java.util.UUID
 import javax.persistence.Column
@@ -21,7 +22,8 @@ import javax.validation.constraints.Size
     indexes = [Index(columnList = "username"), Index(columnList = "phone_number, country_code")]
 )
 class User(
-    @Column(name = "user_id", nullable = false, unique = true, columnDefinition = "BINARY(16)")
+    @Column(name = "user_id", nullable = false, unique = true, columnDefinition = "CHAR(36)")
+    @Type(type = "uuid-char")
     val userId: UUID,
 
     @field:NotBlank
@@ -54,7 +56,7 @@ class User(
     @Column(name = "profile_image_url")
     var profileImageUrl: String? = null,
 
-    @Size(max = 1000)
+    @Size(max = 500)
     @Column(name = "introduction")
     var introduction: String = "",
 

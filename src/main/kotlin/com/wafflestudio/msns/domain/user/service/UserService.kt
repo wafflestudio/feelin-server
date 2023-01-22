@@ -14,6 +14,7 @@ import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Service
 @Transactional
@@ -47,8 +48,8 @@ class UserService(
             followRepository.countByFromUser_Id(user.id)
         )
 
-    fun getProfileByUserId(loginUser: User, userId: Long): UserResponse.ProfileResponse =
-        userRepository.findByIdOrNull(userId)
+    fun getProfileByUserId(loginUser: User, id: UUID): UserResponse.ProfileResponse =
+        userRepository.findByIdOrNull(id)
             ?.let { user ->
                 UserResponse.ProfileResponse(
                     user.id,
@@ -56,10 +57,10 @@ class UserService(
                     user.name,
                     user.profileImageUrl,
                     user.introduction,
-                    postRepository.countByUser_Id(user.id),
-                    followRepository.countByToUser_Id(user.id),
-                    followRepository.countByFromUser_Id(user.id),
-                    followRepository.existsByFromUser_IdAndToUser_Id(loginUser.id, userId)
+                    postRepository.countByUser_Id(id),
+                    followRepository.countByToUser_Id(id),
+                    followRepository.countByFromUser_Id(id),
+                    followRepository.existsByFromUser_IdAndToUser_Id(loginUser.id, id)
                 )
             }
             ?: throw UserNotFoundException("user is not found with the userId.")

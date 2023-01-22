@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
+import java.util.*
 import javax.validation.Valid
 
 @RestController
@@ -52,36 +53,36 @@ class PostController(
             size = 20, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
         @RequestParam("cursor", required = false) cursor: String?,
-        @RequestParam("userId", required = false, defaultValue = "-1") userId: Long,
+        @RequestParam("userId", required = false, defaultValue = "00000000-0000-0000-0000-000000000000") userId: UUID,
         @CurrentUser user: User
     ): ResponseEntity<Slice<PostResponse.PreviewResponse>> =
-        postService.getPosts(if (userId < 0) user.id else userId, cursor, pageable)
+        postService.getPosts(if (userId == UUID(0, 0)) user.id else userId, cursor, pageable)
 
     @GetMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     suspend fun getPost(
-        @PathVariable("postId") postId: Long,
+        @PathVariable("postId") postId: UUID,
         @CurrentUser user: User
     ): PostResponse.DetailResponse = postService.getPostById(user, postId)
 
     @GetMapping("/{postId}/playlist/order")
     @ResponseStatus(HttpStatus.OK)
     fun getPostPlaylistOrder(
-        @PathVariable("postId") postId: Long
+        @PathVariable("postId") postId: UUID
     ): PostResponse.PlaylistOrderResponse = postService.getPostPlaylistOrder(postId)
 
     @PutMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     fun modifyPost(
         @Valid @RequestBody putRequest: PostRequest.PutRequest,
-        @PathVariable("postId") postId: Long,
+        @PathVariable("postId") postId: UUID,
         @CurrentUser user: User
     ) = postService.modifyPost(putRequest, postId, user)
 
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     fun deletePost(
-        @PathVariable("postId") postId: Long,
+        @PathVariable("postId") postId: UUID,
         @CurrentUser user: User
     ) = postService.deletePost(postId, user)
 }

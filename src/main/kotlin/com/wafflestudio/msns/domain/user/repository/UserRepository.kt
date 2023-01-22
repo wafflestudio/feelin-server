@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
-interface UserRepository : JpaRepository<User, Long?> {
+interface UserRepository : JpaRepository<User, UUID?> {
     fun findByEmail(email: String): User?
 
     fun findByUserId(userId: UUID): User?
@@ -22,5 +22,5 @@ interface UserRepository : JpaRepository<User, Long?> {
     fun findSignInUser(@Param("account") account: String): User?
 
     @Transactional
-    fun deleteUserById(userId: Long)
+    fun deleteUserById(id: UUID)
 }

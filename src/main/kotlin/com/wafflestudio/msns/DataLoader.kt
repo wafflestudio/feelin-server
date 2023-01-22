@@ -47,7 +47,7 @@ class DataLoader(
         )
 
         artistRepository.save(artistA)
-
+        System.out.println(artistA.id)
         val albumA = Album(
             title = "THE SERMON!",
             description = "Blue Note 4011",

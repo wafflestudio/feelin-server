@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("api/v1/follows")
@@ -25,20 +26,20 @@ class FollowController(
     @ResponseStatus(HttpStatus.CREATED)
     fun makeFollow(
         @CurrentUser user: User,
-        @PathVariable("user_id") userId: Long
+        @PathVariable("user_id") userId: UUID
     ) = followService.makeFollow(fromUser = user, toUserId = userId)
 
     @GetMapping("/followings/{user_id}")
     @ResponseStatus(HttpStatus.OK)
     fun getFollowings(
-        @PathVariable("user_id") userId: Long,
+        @PathVariable("user_id") userId: UUID,
         @PageableDefault(size = 10) pageable: Pageable
     ): Page<UserResponse.FollowListResponse> = followService.getFollowings(pageable, userId)
 
     @GetMapping("/followers/{user_id}")
     @ResponseStatus(HttpStatus.OK)
     fun getFollowers(
-        @PathVariable("user_id") userId: Long,
+        @PathVariable("user_id") userId: UUID,
         @PageableDefault(size = 10) pageable: Pageable
     ): Page<UserResponse.FollowListResponse> = followService.getFollowers(pageable, userId)
 
@@ -46,6 +47,6 @@ class FollowController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteFollow(
         @CurrentUser user: User,
-        @PathVariable("user_id") userId: Long
+        @PathVariable("user_id") userId: UUID
     ) = followService.deleteFollow(user, userId)
 }
