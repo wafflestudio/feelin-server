@@ -38,7 +38,7 @@ class AuthController(
         @Valid @RequestBody phoneRequest: AuthRequest.VerifyPhone
     ): AuthResponse.ExistUser = AuthResponse.ExistUser(authService.verifyPhone(phoneRequest))
 
-    @DeleteMapping("")
+    @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun withdrawal(@CurrentUser user: User) = userService.withdrawUser(user)
 
