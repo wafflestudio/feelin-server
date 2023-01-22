@@ -10,7 +10,6 @@ import javax.persistence.Entity
 import javax.persistence.Index
 import javax.persistence.OneToMany
 import javax.persistence.Table
-import javax.persistence.UniqueConstraint
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Size
@@ -18,8 +17,23 @@ import javax.validation.constraints.Size
 @Entity
 @Table(
     name = "user",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["username", "phone_number"])],
-    indexes = [Index(columnList = "username"), Index(columnList = "phone_number, country_code")]
+    indexes = [
+        Index(
+            name = "unique_idx_username",
+            columnList = "username",
+            unique = true
+        ),
+        Index(
+            name = "unique_idx_pn_cc",
+            columnList = "phone_number, country_code",
+            unique = true
+        ),
+        Index(
+            name = "unique_idx_email",
+            columnList = "email",
+            unique = true
+        )
+    ]
 )
 class User(
     @Column(name = "user_id", nullable = false, unique = true, columnDefinition = "CHAR(36)")
@@ -57,7 +71,7 @@ class User(
     var profileImageUrl: String? = null,
 
     @Size(max = 500)
-    @Column(name = "introduction")
+    @Column(name = "introduction", length = 500)
     var introduction: String = "",
 
     @OneToMany(mappedBy = "user")

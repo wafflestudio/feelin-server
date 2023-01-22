@@ -18,8 +18,12 @@ interface UserRepository : JpaRepository<User, UUID?> {
 
     fun existsByPhoneNumberAndCountryCode(phoneNumber: String, countryCode: String): Boolean
 
+    fun existsByEmail(email: String): Boolean
+
     @Query("SELECT u FROM User u WHERE u.email = :account OR u.username = :account OR u.phoneNumber = :account")
     fun findSignInUser(@Param("account") account: String): User?
+
+    fun findByCountryCodeAndPhoneNumber(countryCode: String, phoneNumber: String): User?
 
     @Transactional
     fun deleteUserById(id: UUID)

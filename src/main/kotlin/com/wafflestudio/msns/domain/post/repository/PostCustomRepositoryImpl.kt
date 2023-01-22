@@ -5,7 +5,6 @@ import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.core.types.Projections
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.Expressions
-import com.querydsl.core.types.dsl.StringExpressions
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
@@ -20,7 +19,7 @@ import com.wafflestudio.msns.global.util.QueryDslUtil
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
-import java.util.*
+import java.util.UUID
 
 class PostCustomRepositoryImpl(
     private val queryFactory: JPAQueryFactory
