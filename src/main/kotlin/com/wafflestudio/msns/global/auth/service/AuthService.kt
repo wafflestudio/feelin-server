@@ -22,6 +22,7 @@ import com.wafflestudio.msns.global.mail.dto.MailDto
 import com.wafflestudio.msns.global.mail.service.MailContentBuilder
 import com.wafflestudio.msns.global.mail.service.MailService
 import com.wafflestudio.msns.global.sms.service.SMSService
+import com.wafflestudio.msns.global.util.RandomUtil
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -40,21 +41,22 @@ class AuthService(
     private val mailContentBuilder: MailContentBuilder,
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val webClientService: WebClientService
+    private val webClientService: WebClientService,
+    private val randomUtil: RandomUtil,
 ) {
     fun verifyEmail(emailRequest: AuthRequest.VerifyEmail): Boolean {
         val email = emailRequest.email
+        val user = userRepository.findByEmail(email)
+        if (user != null) {
+            return true
+        }
 
-        return userRepository.findByEmail(email)
-            ?.let { true }
-            ?: return run {
-                val code = createRandomCode()
-                generateTokenWithEmail(email, code, JWT.JOIN)
-                val message = mailContentBuilder.messageBuild(code, "register")
-                val mail = MailDto.Email(email, "Register Feelin", message, false)
-                mailService.sendMail(mail)
-                false
-            }
+        val code = randomUtil.generateRandomCode(6)
+        generateTokenWithEmail(email, code, JWT.JOIN)
+        val message = mailContentBuilder.messageBuild(code, "register")
+        val mail = MailDto.Email(email, "Register Feelin", message, false)
+        mailService.sendMail(mail)
+        return false
     }
 
     suspend fun verifyPhone(phoneRequest: AuthRequest.VerifyPhone): Boolean {
@@ -62,8 +64,10 @@ class AuthService(
         val phoneNumber = phoneRequest.phoneNumber
 
         val isNotNew: Boolean = userRepository.existsByPhoneNumberAndCountryCode(phoneNumber, countryCode)
-        return if (isNotNew) { true } else {
-            val code = createRandomCode()
+        return if (isNotNew) {
+            true
+        } else {
+            val code = randomUtil.generateRandomCode(6)
             generateTokenWithPhone(countryCode, phoneNumber, code, JWT.JOIN)
             smsService.sendSMS(countryCode, phoneNumber, code)
             false
@@ -208,10 +212,6 @@ class AuthService(
 
     fun checkAuthorizedByAccessToken(accessToken: String): Boolean =
         verificationTokenRepository.findByAccessToken(accessToken)?.verified == true
-
-    private fun createRandomCode(): String {
-        return (100000..999999).random().toString()
-    }
 
     private fun generateTokenWithEmail(email: String, code: String, type: JWT): String {
         val userId = UUID.randomUUID()
