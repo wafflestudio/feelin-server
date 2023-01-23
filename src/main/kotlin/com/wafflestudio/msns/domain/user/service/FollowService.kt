@@ -8,10 +8,14 @@ import com.wafflestudio.msns.domain.user.model.Follow
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.FollowRepository
 import com.wafflestudio.msns.domain.user.repository.UserRepository
+import com.wafflestudio.msns.global.util.CursorUtil
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -38,11 +42,35 @@ class FollowService(
             ?: throw UserNotFoundException("The user you want to follow is not found.")
     }
 
-    fun getFollowings(pageable: Pageable, fromUserId: UUID): Page<UserResponse.FollowListResponse> =
-        followRepository.getFollowingsByFromUserId(pageable, fromUserId)
+    fun getFollowings(
+        loginUser: User,
+        cursor: String?,
+        pageable: Pageable,
+        fromUserId: UUID
+    ): ResponseEntity<Slice<UserResponse.FollowListResponse>> {
+        val httpHeaders = HttpHeaders()
+        val httpBody: Slice<UserResponse.FollowListResponse> =
+            followRepository.getFollowingsByFromUserId(loginUser, cursor, pageable, fromUserId)
+        val lastElement: UserResponse.FollowListResponse? = httpBody.content.lastOrNull()
+        val nextCursor: String? = CursorUtil.generateCustomCursor(lastElement?.createdAt)
+        httpHeaders.set("cursor", nextCursor)
+        return ResponseEntity(httpBody, httpHeaders, HttpStatus.OK)
+    }
 
-    fun getFollowers(pageable: Pageable, toUserId: UUID): Page<UserResponse.FollowListResponse> =
-        followRepository.getFollowingsByToUserId(pageable, toUserId)
+    fun getFollowers(
+        loginUser: User,
+        cursor: String?,
+        pageable: Pageable,
+        toUserId: UUID
+    ): ResponseEntity<Slice<UserResponse.FollowListResponse>> {
+        val httpHeaders = HttpHeaders()
+        val httpBody: Slice<UserResponse.FollowListResponse> =
+            followRepository.getFollowingsByToUserId(loginUser, cursor, pageable, toUserId)
+        val lastElement: UserResponse.FollowListResponse? = httpBody.content.lastOrNull()
+        val nextCursor: String? = CursorUtil.generateCustomCursor(lastElement?.createdAt)
+        httpHeaders.set("cursor", nextCursor)
+        return ResponseEntity(httpBody, httpHeaders, HttpStatus.OK)
+    }
 
     fun deleteFollow(fromUser: User, toUserId: UUID) =
         followRepository.deleteFollowByFromUser_IdAndToUser_Id(fromUser.id, toUserId)

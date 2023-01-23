@@ -43,6 +43,7 @@ class PostCustomRepositoryImpl(
                         post.user
                     ),
                     post.updatedAt,
+                    post.createdAt,
                     Projections.constructor(
                         PlaylistResponse.PreviewResponse::class.java,
                         post.playlist
@@ -64,10 +65,10 @@ class PostCustomRepositoryImpl(
                 .on(post.user.eq(follow.toUser))
                 .where(
                     follow.fromUser.eq(loginUser).and(
-                        ltPostUpdated(cursor)
+                        ltPostUpdatedAt(cursor)
                     )
                 )
-        else fetch.where(ltPostUpdated(cursor))
+        else fetch.where(ltPostUpdatedAt(cursor))
 
         val query = fetch.fetch()
             as MutableList<PostResponse.FeedResponse>
@@ -81,24 +82,21 @@ class PostCustomRepositoryImpl(
         return SliceImpl(query, pageable, hasNext)
     }
 
-    private fun ltPostUpdated(cursor: String?): BooleanExpression? {
+    private fun ltPostUpdatedAt(cursor: String?): BooleanExpression? {
         if (cursor == null) return null
 
-        val stringTemplate = Expressions.stringTemplate(
+        val updatedAtStringTemplate = Expressions.stringTemplate(
             "DATE_FORMAT({0}, {1})",
             post.updatedAt,
-            ConstantImpl.create("%Y%m%d%H%i%s")
+            ConstantImpl.create("%Y%m%d%H%i%S%f")
+        )
+        val createdAtStringTemplate = Expressions.stringTemplate(
+            "DATE_FORMAT({0}, {1})",
+            post.createdAt,
+            ConstantImpl.create("%Y%m%d%H%i%S%f")
         )
 
-        return stringTemplate
-            .concat(
-                Expressions.stringTemplate(
-                    "DATE_FORMAT({0}, {1})",
-                    post.createdAt,
-                    ConstantImpl.create("%Y%m%d%H%i%s")
-                )
-            )
-            .lt(cursor)
+        return updatedAtStringTemplate.concat(createdAtStringTemplate).lt(cursor)
     }
 
     override fun getAllByUserId(
@@ -125,7 +123,7 @@ class PostCustomRepositoryImpl(
             )
             .from(post)
             .join(post.user, user)
-            .where(user.id.eq(userId).and(ltPostUpdated(cursor)))
+            .where(user.id.eq(userId).and(ltPostUpdatedAt(cursor)))
             .orderBy(*orders.toTypedArray())
             .limit(pageable.pageSize.toLong() + 1)
 

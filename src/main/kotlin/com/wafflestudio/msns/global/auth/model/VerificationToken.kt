@@ -12,13 +12,8 @@ import javax.validation.constraints.Email
     name = "verify_token",
     indexes = [
         Index(
-            name = "unique_idx_pn_cc",
-            columnList = "phone_number, country_code",
-            unique = true
-        ),
-        Index(
-            name = "unique_idx_email",
-            columnList = "email",
+            name = "unique_idx_pn_cc_email",
+            columnList = "phone_number, country_code, email",
             unique = true
         )
     ]
