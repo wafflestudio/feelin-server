@@ -27,7 +27,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 @Component
-@Profile("local", "deploy")
+@Profile("dev")
 class DataLoader(
     private val userRepository: UserRepository,
     private val artistRepository: ArtistRepository,
@@ -83,7 +83,7 @@ class DataLoader(
             userId = UUID.randomUUID(),
             email = "userB@feelin.com",
             countryCode = "82",
-            phoneNumber = "010-0000-0001",
+            phoneNumber = "010-0000-0010",
             password = passwordEncoder.encode("feelin-user"),
             username = "userB",
             name = "John Doe",

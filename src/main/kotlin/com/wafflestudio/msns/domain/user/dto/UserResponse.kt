@@ -6,7 +6,7 @@ import java.util.UUID
 
 class UserResponse {
     data class SimpleUserInfo(
-        val id: Long,
+        val id: UUID,
         val email: String,
         val username: String,
         val phoneNumber: String,
@@ -20,7 +20,7 @@ class UserResponse {
     }
 
     data class DetailResponse(
-        val id: Long,
+        val id: UUID,
         val email: String,
         val username: String,
         val phoneNumber: String,
@@ -29,7 +29,7 @@ class UserResponse {
     )
 
     data class MyProfileResponse(
-        val id: Long,
+        val id: UUID,
         val username: String,
         val name: String,
         val profileImageUrl: String?,
@@ -40,7 +40,7 @@ class UserResponse {
     )
 
     data class ProfileResponse(
-        val id: Long,
+        val id: UUID,
         val username: String,
         val name: String,
         val profileImageUrl: String?,
@@ -52,7 +52,7 @@ class UserResponse {
     )
 
     data class PreviewResponse(
-        val id: Long,
+        val id: UUID,
         val username: String,
         val profileImageUrl: String?
     ) {
@@ -69,7 +69,7 @@ class UserResponse {
     )
 
     data class LikeResponse(
-        val id: Long,
+        val id: UUID,
         val username: String,
         val profileImageUrl: String?
     ) {
@@ -81,7 +81,7 @@ class UserResponse {
     }
 
     data class FollowListResponse(
-        val id: Long,
+        val id: UUID,
         val username: String,
         val profileImageUrl: String?
     )
