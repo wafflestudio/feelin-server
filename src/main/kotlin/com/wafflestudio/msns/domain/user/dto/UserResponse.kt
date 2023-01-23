@@ -2,6 +2,7 @@ package com.wafflestudio.msns.domain.user.dto
 
 import com.wafflestudio.msns.domain.user.model.User
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 class UserResponse {
@@ -83,6 +84,8 @@ class UserResponse {
     data class FollowListResponse(
         val id: UUID,
         val username: String,
-        val profileImageUrl: String?
+        val profileImageUrl: String?,
+        val createdAt: LocalDateTime?,
+        val isFollowing: Boolean
     )
 }

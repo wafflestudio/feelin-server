@@ -19,6 +19,7 @@ import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.FollowRepository
 import com.wafflestudio.msns.domain.user.repository.LikeRepository
+import com.wafflestudio.msns.global.util.CursorUtil
 import org.modelmapper.ModelMapper
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -27,7 +28,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -76,21 +76,9 @@ class PostService(
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<PostResponse.FeedResponse> = postRepository.getFeed(user, viewFollowers, cursor, pageable)
         val lastElement: PostResponse.FeedResponse? = httpBody.content.lastOrNull()
-        val nextCursor: String? = generateCustomCursor(lastElement?.updatedAt, lastElement?.id)
+        val nextCursor: String? = CursorUtil.generateCustomCursor(lastElement?.updatedAt, lastElement?.createdAt)
         httpHeaders.set("cursor", nextCursor)
         return ResponseEntity(httpBody, httpHeaders, HttpStatus.OK)
-    }
-
-    private fun generateCustomCursor(cursorEndDate: LocalDateTime?, cursorId: UUID?): String? {
-        if (cursorEndDate == null && cursorId == null) return null
-
-        val customCursorEndDate = cursorEndDate.toString()
-            .replace("T".toRegex(), "")
-            .replace("-".toRegex(), "")
-            .replace(":".toRegex(), "")
-            .substring(0 until 14)
-        val customCursorId = String.format("%1$" + 40 + "s", cursorId).replace('-', '0')
-        return customCursorEndDate + customCursorId
     }
 
     fun getPosts(
@@ -101,7 +89,7 @@ class PostService(
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<PostResponse.PreviewResponse> = postRepository.getAllByUserId(userId, cursor, pageable)
         val lastElement: PostResponse.PreviewResponse? = httpBody.content.lastOrNull()
-        val nextCursor: String? = generateCustomCursor(lastElement?.updatedAt, lastElement?.id)
+        val nextCursor: String? = CursorUtil.generateCustomCursor(lastElement?.updatedAt, lastElement?.createdAt)
         httpHeaders.set("cursor", nextCursor)
         return ResponseEntity(httpBody, httpHeaders, HttpStatus.OK)
     }

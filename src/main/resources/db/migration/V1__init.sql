@@ -117,26 +117,20 @@ create table verify_token
 );
 
 alter table album
-    add unique index unique_idx_title (title);
+    add unique index idx_album_title (title);
 alter table artist
-    add unique index unique_idx_an (artist_name);
+    add unique index idx_artist_an (artist_name);
 alter table follow
-    add unique index unique_idx_tui_fui (to_user_id, from_user_id);
+    add unique index idx_follow_tui_fui (to_user_id, from_user_id);
 alter table likes
-    add unique index unique_ui_pi (user_id, post_id);
+    add unique index idx_likes_ui_pi (user_id, post_id);
 alter table playlist
-    add unique index unique_idx_pi (playlist_id);
+    add unique index idx_playlist_pi (playlist_id);
 alter table track
-    add unique index unique_idx_title (title);
+    add unique index idx_track_title (title);
 alter table user
-    add unique index unique_idx_pn_cc (phone_number, country_code);
+    add unique index idx_user_pn_cc_email (phone_number, country_code, email);
 alter table user
-    add unique index unique_idx_email (email);
-alter table user
-    add unique index unique_idx_ui (user_id);
-alter table user
-    add unique index unique_idx_username (username);
+    add unique index idx_user_username (username);
 alter table verify_token
-    add unique index unique_idx_pn_cc (phone_number, country_code);
-alter table verify_token
-    add unique index unique_idx_email (email);
+    add unique index idx_verify_token_pn_cc_email (phone_number, country_code, email);
