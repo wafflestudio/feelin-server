@@ -1,15 +1,3 @@
-alter table user
-    drop index unique_idx_pn_cc;
-alter table user
-    drop index unique_idx_email;
-alter table user
-    add unique index unique_idx_pn_cc_email (phone_number, country_code, email);
-alter table verify_token
-    drop index unique_idx_pn_cc;
-alter table verify_token
-    drop index unique_idx_email;
-alter table verify_token
-    add unique index unique_idx_pn_cc_email (phone_number, country_code, email);
 insert into user (id, created_at, updated_at, birth_date, country_code, email, introduction, name, password,
                   phone_number, profile_image_url, role, user_id,
                   username) value ('9f62fc9d-7c42-4684-bdfa-03ee754e1c76', now(), now(), '2000-01-01', '',
