@@ -67,6 +67,7 @@ class PostResponse {
         val content: String,
         val user: UserResponse.PreviewResponse,
         val updatedAt: LocalDateTime?,
+        val createdAt: LocalDateTime?,
         val playlist: PlaylistResponse.PreviewResponse,
         val likes: Int,
         val doesLike: Boolean

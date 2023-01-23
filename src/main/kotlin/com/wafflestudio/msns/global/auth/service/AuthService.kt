@@ -12,6 +12,7 @@ import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
 import com.wafflestudio.msns.global.auth.dto.LoginRequest
 import com.wafflestudio.msns.global.auth.exception.ForbiddenVerificationTokenException
+import com.wafflestudio.msns.global.auth.exception.InvalidBirthFormException
 import com.wafflestudio.msns.global.auth.exception.InvalidSignUpFormException
 import com.wafflestudio.msns.global.auth.exception.InvalidVerificationCodeException
 import com.wafflestudio.msns.global.auth.exception.JWTExpiredException
@@ -33,6 +34,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.UUID
 import java.util.concurrent.ThreadLocalRandom
 
@@ -119,7 +121,6 @@ class AuthService(
     }
 
     fun signInWithUser(user: User, password: String): ResponseEntity<UserResponse.SimpleUserInfo?> {
-        val encodedPassword = passwordEncoder.encode(password)
         val isMatched: Boolean = passwordEncoder.matches(password, user.password)
         if (!isMatched) throw SignInFailedException("wrong password")
 
@@ -180,7 +181,13 @@ class AuthService(
             username = username,
             password = encryptedPassword,
             name = signUpRequest.name,
-            birthDate = signUpRequest.birthDate.let { date -> LocalDate.parse(date, DateTimeFormatter.ISO_DATE) },
+            birthDate = signUpRequest.birthDate.let { date ->
+                try {
+                    LocalDate.parse(date, DateTimeFormatter.ISO_DATE)
+                } catch (e: DateTimeParseException) {
+                    throw InvalidBirthFormException("invalid birth date form")
+                }
+            },
         )
     }
 
