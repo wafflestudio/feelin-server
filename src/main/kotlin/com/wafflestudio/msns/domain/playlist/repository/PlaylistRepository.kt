@@ -8,11 +8,11 @@ import org.springframework.data.repository.query.Param
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
-interface PlaylistRepository : JpaRepository<Playlist, Long?> {
+interface PlaylistRepository : JpaRepository<Playlist, UUID?> {
     fun findByPlaylistId(playlistId: UUID): Playlist?
 
     @Transactional
     @Modifying
     @Query("DELETE FROM Playlist playlist WHERE playlist.user_id = :userId", nativeQuery = true)
-    fun deleteMappingByUserId(@Param("userId") userId: Long)
+    fun deleteMappingByUserId(@Param("userId") userId: UUID)
 }

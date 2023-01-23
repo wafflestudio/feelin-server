@@ -7,6 +7,7 @@ import com.wafflestudio.msns.domain.user.service.UserService
 import com.wafflestudio.msns.global.auth.CurrentUser
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
+import com.wafflestudio.msns.global.auth.dto.LoginRequest
 import com.wafflestudio.msns.global.auth.service.AuthService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -66,6 +67,11 @@ class AuthController(
         @Valid @RequestBody signUpRequest: UserRequest.SignUp
     ): ResponseEntity<UserResponse.SimpleUserInfo> =
         authService.signUp(UUID.randomUUID(), signUpRequest)
+
+    @PostMapping("/signin")
+    fun signup(
+        @Valid @RequestBody loginRequest: LoginRequest
+    ): ResponseEntity<UserResponse.SimpleUserInfo?> = authService.signIn(loginRequest)
 
     @PostMapping("/refresh")
     @ResponseStatus(HttpStatus.OK)

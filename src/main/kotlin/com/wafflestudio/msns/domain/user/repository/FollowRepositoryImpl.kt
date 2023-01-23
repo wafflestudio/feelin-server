@@ -8,13 +8,14 @@ import com.wafflestudio.msns.domain.user.model.QUser.user
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import java.util.UUID
 
 class FollowRepositoryImpl(
     private val queryFactory: JPAQueryFactory
-) : FollowRepositoryCustom {
+) : FollowCustomRepository {
     override fun getFollowingsByFromUserId(
         pageable: Pageable,
-        fromUserId: Long
+        fromUserId: UUID
     ): Page<UserResponse.FollowListResponse> {
 
         val fetch = queryFactory
@@ -38,7 +39,7 @@ class FollowRepositoryImpl(
 
     override fun getFollowingsByToUserId(
         pageable: Pageable,
-        toUserId: Long
+        toUserId: UUID
     ): Page<UserResponse.FollowListResponse> {
 
         val fetch = queryFactory

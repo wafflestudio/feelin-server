@@ -3,17 +3,24 @@ package com.wafflestudio.msns.global.auth.model
 import com.wafflestudio.msns.domain.model.BaseTimeEntity
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.Index
 import javax.persistence.Table
-import javax.persistence.UniqueConstraint
 import javax.validation.constraints.Email
 
 @Entity
 @Table(
     name = "verify_token",
-    uniqueConstraints =
-    [
-        UniqueConstraint(columnNames = ["email"]),
-        UniqueConstraint(columnNames = ["phone_number", "country_code"])
+    indexes = [
+        Index(
+            name = "unique_idx_pn_cc",
+            columnList = "phone_number, country_code",
+            unique = true
+        ),
+        Index(
+            name = "unique_idx_email",
+            columnList = "email",
+            unique = true
+        )
     ]
 )
 class VerificationToken(

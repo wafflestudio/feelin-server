@@ -1,24 +1,34 @@
 spring:
-  profiles:
-    active: local
-    group:
-      local: mail, jwt, verification
-      deploy: deploy
+    profiles:
+        active: local
+        group:
+            local: mail, jwt, verification, flyway
+            deploy: deploy
 ---
 spring:
-  config:
-    activate:
-      on-profile: local
-  datasource:
-    url: jdbc:mysql://localhost:3306/feelin?serverTimezone=Asia/Seoul
-    username: feelin
-    password: feelinuser
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  sql:
-    init:
-      mode: always
-  jpa:
-    generate-ddl: true
-    hibernate:
-      ddl-auto: create
-    show-sql: true
+    config:
+        activate:
+            on-profile: local
+    datasource:
+        url: jdbc:mysql://localhost:3306/feelin?serverTimezone=Asia/Seoul
+        username: feelin
+        password: feelinuser
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    sql:
+        init:
+            mode: always
+    jpa:
+        generate-ddl: false
+        hibernate:
+            ddl-auto: validate
+        show-sql: true
+        properties:
+            hibernate:
+                jdbc:
+                    lob:
+                        non_contextual_creation: true
+---
+logging:
+    level:
+        org.hibernate.SQL: debug
+        org.hibernate.type.descriptor.sql: trace
