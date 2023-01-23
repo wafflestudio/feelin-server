@@ -1,5 +1,11 @@
 insert into user (id, created_at, updated_at, birth_date, country_code, email, introduction, name, password,
                   phone_number, profile_image_url, role, user_id,
+                  username) value ('fbfc94ca-755e-4eb4-b4e9-36820a9b44ca', now(), now(), '2000-01-01', '',
+                                   'admin@feelin.com', 'Hello World!', 'John Doe',
+                                   '$2a$12$j9ykWp4H6hHQiojtMqG1vOr9SSwUThke0FigQ4p3Gbfs8eAbxmLve', '', null, 'user',
+                                   '4b07590d-11f0-449e-be4b-58b529a2f152', 'admin');
+insert into user (id, created_at, updated_at, birth_date, country_code, email, introduction, name, password,
+                  phone_number, profile_image_url, role, user_id,
                   username) value ('9f62fc9d-7c42-4684-bdfa-03ee754e1c76', now(), now(), '2000-01-01', '',
                                    'userA@feelin.com', 'Hello World!', 'John Doe',
                                    '$2a$12$vzyebY9I0ttBTg9Zb2G8.OPxBzhO5YVCAYsezCvMP79Q.y8VBCwSm', '', null, 'user',
