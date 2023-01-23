@@ -5,10 +5,12 @@ import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.core.types.Projections
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.Expressions
+import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.QFollow.follow
 import com.wafflestudio.msns.domain.user.model.QUser.user
+import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.global.util.QueryDslUtil
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -19,6 +21,7 @@ class FollowCustomRepositoryImpl(
     private val queryFactory: JPAQueryFactory
 ) : FollowCustomRepository {
     override fun getFollowingsByFromUserId(
+        loginUser: User,
         cursor: String?,
         pageable: Pageable,
         fromUserId: UUID
@@ -31,7 +34,11 @@ class FollowCustomRepositoryImpl(
                     user.id,
                     user.username,
                     user.profileImageUrl,
-                    follow.createdAt
+                    follow.createdAt,
+                    JPAExpressions
+                        .selectFrom(follow)
+                        .where(follow.toUser.eq(user).and(follow.fromUser.eq(loginUser)))
+                        .exists()
                 )
             )
             .from(follow)
@@ -54,6 +61,7 @@ class FollowCustomRepositoryImpl(
     }
 
     override fun getFollowingsByToUserId(
+        loginUser: User,
         cursor: String?,
         pageable: Pageable,
         toUserId: UUID
@@ -67,6 +75,10 @@ class FollowCustomRepositoryImpl(
                     user.username,
                     user.profileImageUrl,
                     follow.createdAt,
+                    JPAExpressions
+                        .selectFrom(follow)
+                        .where(follow.toUser.eq(user).and(follow.fromUser.eq(loginUser)))
+                        .exists()
                 )
             )
             .from(follow)

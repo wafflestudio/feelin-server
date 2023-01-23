@@ -43,13 +43,14 @@ class FollowService(
     }
 
     fun getFollowings(
+        loginUser: User,
         cursor: String?,
         pageable: Pageable,
         fromUserId: UUID
     ): ResponseEntity<Slice<UserResponse.FollowListResponse>> {
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<UserResponse.FollowListResponse> =
-            followRepository.getFollowingsByFromUserId(cursor, pageable, fromUserId)
+            followRepository.getFollowingsByFromUserId(loginUser, cursor, pageable, fromUserId)
         val lastElement: UserResponse.FollowListResponse? = httpBody.content.lastOrNull()
         val nextCursor: String? = CursorUtil.generateCustomCursor(lastElement?.createdAt)
         httpHeaders.set("cursor", nextCursor)
@@ -57,13 +58,14 @@ class FollowService(
     }
 
     fun getFollowers(
+        loginUser: User,
         cursor: String?,
         pageable: Pageable,
         toUserId: UUID
     ): ResponseEntity<Slice<UserResponse.FollowListResponse>> {
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<UserResponse.FollowListResponse> =
-            followRepository.getFollowingsByToUserId(cursor, pageable, toUserId)
+            followRepository.getFollowingsByToUserId(loginUser, cursor, pageable, toUserId)
         val lastElement: UserResponse.FollowListResponse? = httpBody.content.lastOrNull()
         val nextCursor: String? = CursorUtil.generateCustomCursor(lastElement?.createdAt)
         httpHeaders.set("cursor", nextCursor)

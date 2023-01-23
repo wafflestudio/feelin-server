@@ -37,16 +37,20 @@ class FollowController(
     fun getFollowings(
         @PathVariable("user_id") userId: UUID,
         @RequestParam("cursor", required = false) cursor: String?,
-        @PageableDefault(size = 10, sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable
-    ): ResponseEntity<Slice<UserResponse.FollowListResponse>> = followService.getFollowings(cursor, pageable, userId)
+        @PageableDefault(size = 10, sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable,
+        @CurrentUser user: User
+    ): ResponseEntity<Slice<UserResponse.FollowListResponse>> =
+        followService.getFollowings(user, cursor, pageable, userId)
 
     @GetMapping("/followers/{user_id}")
     @ResponseStatus(HttpStatus.OK)
     fun getFollowers(
         @PathVariable("user_id") userId: UUID,
         @RequestParam("cursor", required = false) cursor: String?,
-        @PageableDefault(size = 10, sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable
-    ): ResponseEntity<Slice<UserResponse.FollowListResponse>> = followService.getFollowers(cursor, pageable, userId)
+        @PageableDefault(size = 10, sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable,
+        @CurrentUser user: User
+    ): ResponseEntity<Slice<UserResponse.FollowListResponse>> =
+        followService.getFollowers(user, cursor, pageable, userId)
 
     @DeleteMapping("/{user_id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

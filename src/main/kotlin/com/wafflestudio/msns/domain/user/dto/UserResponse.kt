@@ -85,6 +85,7 @@ class UserResponse {
         val id: UUID,
         val username: String,
         val profileImageUrl: String?,
-        val createdAt: LocalDateTime?
+        val createdAt: LocalDateTime?,
+        val isFollowing: Boolean
     )
 }
