@@ -2,7 +2,6 @@ package com.wafflestudio.msns.global.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wafflestudio.msns.domain.user.repository.UserRepository
-import com.wafflestudio.msns.global.auth.filter.SignInAuthenticationFilter
 import com.wafflestudio.msns.global.auth.jwt.JwtAuthenticationEntryPoint
 import com.wafflestudio.msns.global.auth.jwt.JwtAuthenticationFilter
 import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
@@ -78,11 +77,6 @@ class SecurityConfig(
             .and()
             .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
             .and()
-            .addFilter(
-                SignInAuthenticationFilter(
-                    authenticationManager(), jwtTokenProvider, objectMapper, userRepository, authService
-                )
-            )
             .addFilter(JwtAuthenticationFilter(authenticationManager(), jwtTokenProvider, authService))
             .authorizeRequests()
             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()

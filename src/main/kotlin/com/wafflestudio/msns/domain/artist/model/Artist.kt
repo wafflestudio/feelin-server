@@ -5,14 +5,24 @@ import com.wafflestudio.msns.domain.model.BaseEntity
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
+import javax.persistence.Index
 import javax.persistence.OneToMany
 import javax.persistence.Table
 import javax.validation.constraints.NotBlank
 
 @Entity
-@Table(name = "artist")
+@Table(
+    name = "artist",
+    indexes = [
+        Index(
+            name = "unique_idx_an",
+            columnList = "artist_name",
+            unique = true
+        )
+    ]
+)
 class Artist(
-    @Column(unique = true)
+    @Column(name = "artist_name", unique = true)
     @field:NotBlank
     val artistName: String,
 

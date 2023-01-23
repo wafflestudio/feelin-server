@@ -5,7 +5,6 @@ import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.core.types.Projections
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.core.types.dsl.Expressions
-import com.querydsl.core.types.dsl.StringExpressions
 import com.querydsl.jpa.JPAExpressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
@@ -20,6 +19,7 @@ import com.wafflestudio.msns.global.util.QueryDslUtil
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
+import java.util.UUID
 
 class PostCustomRepositoryImpl(
     private val queryFactory: JPAQueryFactory
@@ -91,12 +91,18 @@ class PostCustomRepositoryImpl(
         )
 
         return stringTemplate
-            .concat(StringExpressions.lpad(post.id.stringValue(), 10, '0'))
+            .concat(
+                Expressions.stringTemplate(
+                    "DATE_FORMAT({0}, {1})",
+                    post.createdAt,
+                    ConstantImpl.create("%Y%m%d%H%i%s")
+                )
+            )
             .lt(cursor)
     }
 
     override fun getAllByUserId(
-        userId: Long,
+        userId: UUID,
         cursor: String?,
         pageable: Pageable
     ): Slice<PostResponse.PreviewResponse> {

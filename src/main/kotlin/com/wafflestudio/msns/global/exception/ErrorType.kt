@@ -5,6 +5,7 @@ enum class ErrorType(
 ) {
     INVALID_REQUEST(0),
     INVALID_POST_TITLE(1),
+    INVALID_SIGN_IN(2),
 
     NOT_ALLOWED(3000),
     UNAUTHORIZED_EMAIL(3001),

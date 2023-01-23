@@ -4,6 +4,7 @@ import com.wafflestudio.msns.domain.model.BaseTimeEntity
 import com.wafflestudio.msns.domain.playlist.model.Playlist
 import com.wafflestudio.msns.domain.user.model.Like
 import com.wafflestudio.msns.domain.user.model.User
+import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.ManyToOne
 import javax.persistence.Table
@@ -22,6 +23,7 @@ class Post(
     var title: String,
 
     @Size(max = 1000)
+    @Column(name = "content", length = 1000)
     var content: String,
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = [])

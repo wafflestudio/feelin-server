@@ -8,9 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails
 class UserPrincipal(
     val user: User
 ) : UserDetails {
-
     override fun getUsername(): String {
-        return user.email
+        return user.userId.toString()
     }
 
     override fun getPassword(): String {

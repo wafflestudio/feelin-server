@@ -54,6 +54,8 @@ dependencies {
 
     implementation("com.amazonaws:aws-java-sdk-sns:1.12.305")
 
+    implementation("org.flywaydb:flyway-core:6.4.2")
+
     implementation("org.hibernate.validator:hibernate-validator")
 
     implementation("io.springfox:springfox-swagger2:3.0.0")
