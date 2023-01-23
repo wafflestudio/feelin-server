@@ -8,20 +8,21 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
-interface LikeRepository : JpaRepository<Like, Long?> {
-    fun findAllByPost_Id(pageable: Pageable, postId: Long): Page<Like>?
-
-    @Transactional
-    fun deleteAllByPost_Id(postId: Long)
+interface LikeRepository : JpaRepository<Like, UUID?> {
+    fun findAllByPost_Id(pageable: Pageable, postId: UUID): Page<Like>?
 
     @Transactional
-    fun deleteByPost_IdAndUser_Id(postId: Long, userId: Long)
+    fun deleteAllByPost_Id(postId: UUID)
+
+    @Transactional
+    fun deleteByPost_IdAndUser_Id(postId: UUID, userId: UUID)
 
     @Transactional
     @Modifying
     @Query("DELETE FROM Likes l WHERE l.user_id = :userId", nativeQuery = true)
-    fun deleteMappingByUserId(@Param("userId") userId: Long)
+    fun deleteMappingByUserId(@Param("userId") userId: UUID)
 
     @Transactional
     @Modifying
@@ -30,9 +31,9 @@ interface LikeRepository : JpaRepository<Like, Long?> {
             "(SELECT p.id FROM Post p WHERE p.user_id = :userId)",
         nativeQuery = true
     )
-    fun deleteMappingByUserIdOfPost(@Param("userId") userId: Long)
+    fun deleteMappingByUserIdOfPost(@Param("userId") userId: UUID)
 
-    fun countByPost_Id(postId: Long): Long
+    fun countByPost_Id(postId: UUID): Long
 
-    fun existsByPost_IdAndUser_Id(postId: Long, userId: Long): Boolean
+    fun existsByPost_IdAndUser_Id(postId: UUID, userId: UUID): Boolean
 }

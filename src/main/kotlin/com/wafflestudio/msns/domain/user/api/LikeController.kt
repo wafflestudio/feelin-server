@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/likes")
@@ -26,15 +27,15 @@ class LikeController(
     @ResponseStatus(HttpStatus.CREATED)
     fun writeLike(
         @CurrentUser user: User,
-        @PathVariable("post_id") postId: Long
+        @PathVariable("post_id") postId: UUID
     ) = likeService.writeLike(user, postId)
 
     @GetMapping("/posts/{post_id}")
     @ResponseStatus(HttpStatus.OK)
     fun getLikes(
-        @PathVariable("post_id") postId: Long,
+        @PathVariable("post_id") postId: UUID,
         @PageableDefault(
-            size = 30, sort = ["createdAt"], direction = Sort.Direction.DESC
+            size = 20, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
     ): Page<LikeResponse.DetailResponse> = likeService.getLikes(pageable, postId)
 
@@ -42,6 +43,6 @@ class LikeController(
     @ResponseStatus(HttpStatus.OK)
     fun deleteLike(
         @CurrentUser user: User,
-        @PathVariable("post_id") postId: Long
+        @PathVariable("post_id") postId: UUID
     ) = likeService.deleteLike(user, postId)
 }

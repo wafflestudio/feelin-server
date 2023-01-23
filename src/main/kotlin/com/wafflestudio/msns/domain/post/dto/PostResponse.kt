@@ -8,7 +8,7 @@ import java.util.UUID
 
 class PostResponse {
     data class PreviewResponse(
-        val id: Long,
+        val id: UUID,
         val title: String,
         val content: String,
         val createdAt: LocalDateTime?,
@@ -26,7 +26,7 @@ class PostResponse {
             likes = post.likes.size
         )
         constructor(
-            post_id: Long,
+            post_id: UUID,
             title: String,
             content: String,
             createdAt: LocalDateTime?,
@@ -46,7 +46,7 @@ class PostResponse {
     }
 
     data class DetailResponse(
-        val id: Long,
+        val id: UUID,
         val title: String,
         val content: String,
         val user: UserResponse.PreviewResponse,
@@ -62,7 +62,7 @@ class PostResponse {
     )
 
     data class FeedResponse(
-        val id: Long,
+        val id: UUID,
         val title: String,
         val content: String,
         val user: UserResponse.PreviewResponse,

@@ -4,10 +4,13 @@ import com.wafflestudio.msns.domain.playlist.service.WebClientService
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.exception.AlreadyExistUserException
+import com.wafflestudio.msns.domain.user.exception.SignInFailedException
+import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
+import com.wafflestudio.msns.global.auth.dto.LoginRequest
 import com.wafflestudio.msns.global.auth.exception.ForbiddenVerificationTokenException
 import com.wafflestudio.msns.global.auth.exception.InvalidSignUpFormException
 import com.wafflestudio.msns.global.auth.exception.InvalidVerificationCodeException
@@ -18,6 +21,7 @@ import com.wafflestudio.msns.global.auth.jwt.JwtTokenProvider
 import com.wafflestudio.msns.global.auth.model.VerificationToken
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 import com.wafflestudio.msns.global.enum.JWT
+import com.wafflestudio.msns.global.enum.Verify
 import com.wafflestudio.msns.global.mail.dto.MailDto
 import com.wafflestudio.msns.global.mail.service.MailContentBuilder
 import com.wafflestudio.msns.global.mail.service.MailService
@@ -30,6 +34,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
+import java.util.concurrent.ThreadLocalRandom
 
 @Service
 class AuthService(
@@ -44,37 +49,36 @@ class AuthService(
 ) {
     fun verifyEmail(emailRequest: AuthRequest.VerifyEmail): Boolean {
         val email = emailRequest.email
+        val userExists: Boolean = userRepository.existsByEmail(email)
 
-        return userRepository.findByEmail(email)
-            ?.let { true }
-            ?: return run {
-                val code = createRandomCode()
-                generateTokenWithEmail(email, code, JWT.JOIN)
-                val message = mailContentBuilder.messageBuild(code, "register")
-                val mail = MailDto.Email(email, "Register Feelin", message, false)
-                mailService.sendMail(mail)
-                false
-            }
+        val code = createRandomCode()
+        generateTokenWithEmail(email, code, JWT.JOIN)
+        val message = mailContentBuilder.messageBuild(code, "register")
+        val mail = MailDto.Email(email, "Join Feelin", message, false)
+        mailService.sendMail(mail)
+
+        return userExists
     }
 
     suspend fun verifyPhone(phoneRequest: AuthRequest.VerifyPhone): Boolean {
         val countryCode = phoneRequest.countryCode
         val phoneNumber = phoneRequest.phoneNumber
+        val userExists: Boolean = userRepository.existsByPhoneNumberAndCountryCode(phoneNumber, countryCode)
 
-        val isNotNew: Boolean = userRepository.existsByPhoneNumberAndCountryCode(phoneNumber, countryCode)
-        return if (isNotNew) { true } else {
-            val code = createRandomCode()
-            generateTokenWithPhone(countryCode, phoneNumber, code, JWT.JOIN)
-            smsService.sendSMS(countryCode, phoneNumber, code)
-            false
-        }
+        val code = createRandomCode()
+        generateTokenWithPhone(countryCode, phoneNumber, code, JWT.JOIN)
+        smsService.sendSMS(countryCode, phoneNumber, code)
+
+        return userExists
     }
 
     fun signUp(userId: UUID, signUpRequest: UserRequest.SignUp): ResponseEntity<UserResponse.SimpleUserInfo> {
         val newUser: User =
-            if (!signUpRequest.email.isNullOrBlank()) createUserWithEmail(userId, signUpRequest)
-            else if (!signUpRequest.phoneNumber.isNullOrBlank()) createUserWithPhoneNumber(userId, signUpRequest)
-            else throw InvalidSignUpFormException("either email or phone number is needed for sign-up.")
+            if (!signUpRequest.email.isNullOrBlank())
+                createUserWithEmail(userId, signUpRequest)
+            else if (!signUpRequest.phoneNumber.isNullOrBlank() && !signUpRequest.countryCode.isNullOrBlank())
+                createUserWithPhoneNumber(userId, signUpRequest)
+            else throw InvalidSignUpFormException("either email or phone is needed for sign-up.")
 
         webClientService.createUser(userId, signUpRequest.username)
         val accessJWT = jwtTokenProvider.generateToken(userId, JWT.SIGN_IN)
@@ -85,6 +89,48 @@ class AuthService(
         responseHeaders.set("Refresh-Token", refreshJWT)
 
         return userRepository.save(newUser)
+            .also { updateTokens(it, accessJWT, refreshJWT) }
+            .let {
+                ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .headers(responseHeaders)
+                    .body(UserResponse.SimpleUserInfo(it))
+            }
+    }
+
+    fun signIn(loginRequest: LoginRequest): ResponseEntity<UserResponse.SimpleUserInfo?> {
+        val account = loginRequest.account
+        val password = loginRequest.password
+        return when (loginRequest.type) {
+            Verify.EMAIL -> {
+                val user = userRepository.findByEmail(account)
+                    ?: throw UserNotFoundException("user not found with email")
+                signInWithUser(user, password)
+            }
+            Verify.PHONE -> {
+                val countryCode = account.substring(0 until 3)
+                val phoneNumber = account.substring(3)
+                val user = userRepository.findByCountryCodeAndPhoneNumber(countryCode, phoneNumber)
+                    ?: throw UserNotFoundException("user not found with phone")
+                signInWithUser(user, password)
+            }
+            Verify.NONE -> throw SignInFailedException("need valid verification type")
+        }
+    }
+
+    fun signInWithUser(user: User, password: String): ResponseEntity<UserResponse.SimpleUserInfo?> {
+        val encodedPassword = passwordEncoder.encode(password)
+        val isMatched: Boolean = passwordEncoder.matches(password, user.password)
+        if (!isMatched) throw SignInFailedException("wrong password")
+
+        val accessJWT = jwtTokenProvider.generateToken(user.userId, JWT.SIGN_IN)
+        val refreshJWT = jwtTokenProvider.generateToken(user.userId, JWT.REFRESH)
+
+        val responseHeaders = HttpHeaders()
+        responseHeaders.set("Access-Token", accessJWT)
+        responseHeaders.set("Refresh-Token", refreshJWT)
+
+        return userRepository.save(user)
             .also { updateTokens(it, accessJWT, refreshJWT) }
             .let {
                 ResponseEntity
@@ -209,9 +255,7 @@ class AuthService(
     fun checkAuthorizedByAccessToken(accessToken: String): Boolean =
         verificationTokenRepository.findByAccessToken(accessToken)?.verified == true
 
-    private fun createRandomCode(): String {
-        return (100000..999999).random().toString()
-    }
+    private fun createRandomCode(): String = ThreadLocalRandom.current().nextInt(100000, 1000000).toString()
 
     private fun generateTokenWithEmail(email: String, code: String, type: JWT): String {
         val userId = UUID.randomUUID()

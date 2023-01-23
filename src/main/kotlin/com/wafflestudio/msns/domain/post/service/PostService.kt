@@ -28,6 +28,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Service
 @Transactional
@@ -80,7 +81,7 @@ class PostService(
         return ResponseEntity(httpBody, httpHeaders, HttpStatus.OK)
     }
 
-    private fun generateCustomCursor(cursorEndDate: LocalDateTime?, cursorId: Long?): String? {
+    private fun generateCustomCursor(cursorEndDate: LocalDateTime?, cursorId: UUID?): String? {
         if (cursorEndDate == null && cursorId == null) return null
 
         val customCursorEndDate = cursorEndDate.toString()
@@ -88,12 +89,12 @@ class PostService(
             .replace("-".toRegex(), "")
             .replace(":".toRegex(), "")
             .substring(0 until 14)
-        val customCursorId = String.format("%1$" + 10 + "s", cursorId).replace(' ', '0')
+        val customCursorId = String.format("%1$" + 40 + "s", cursorId).replace('-', '0')
         return customCursorEndDate + customCursorId
     }
 
     fun getPosts(
-        userId: Long,
+        userId: UUID,
         cursor: String?,
         pageable: Pageable
     ): ResponseEntity<Slice<PostResponse.PreviewResponse>> {
@@ -105,7 +106,7 @@ class PostService(
         return ResponseEntity(httpBody, httpHeaders, HttpStatus.OK)
     }
 
-    suspend fun getPostById(user: User, postId: Long): PostResponse.DetailResponse =
+    suspend fun getPostById(user: User, postId: UUID): PostResponse.DetailResponse =
         postRepository.findPostById(postId)
             ?.let { post ->
                 webClientService.getPlaylist(post.playlist.playlistId)
@@ -135,7 +136,7 @@ class PostService(
             }
             ?: throw PostNotFoundException("post is not found with the given id.")
 
-    fun modifyPost(putRequest: PostRequest.PutRequest, postId: Long, user: User) {
+    fun modifyPost(putRequest: PostRequest.PutRequest, postId: UUID, user: User) {
         val title = putRequest.title
             .also { if (it.isBlank()) throw InvalidTitleException("title is blank.") }
         val content = putRequest.content
@@ -158,7 +159,7 @@ class PostService(
             ?: throw PlaylistNotFoundException("playlist is not found with the given id.")
     }
 
-    fun deletePost(postId: Long, user: User) {
+    fun deletePost(postId: UUID, user: User) {
         postRepository.findPostById(postId)
             ?.also { if (it.user.id != user.id) throw ForbiddenDeletePostException("user cannot delete other's post.") }
             ?.let { likeRepository.deleteAllByPost_Id(postId) }
@@ -166,7 +167,7 @@ class PostService(
             ?: throw PostNotFoundException("post is not found with the id.")
     }
 
-    fun getPostPlaylistOrder(postId: Long): PostResponse.PlaylistOrderResponse =
+    fun getPostPlaylistOrder(postId: UUID): PostResponse.PlaylistOrderResponse =
         postRepository.findPostById(postId)
             ?.let { PostResponse.PlaylistOrderResponse(it.playlist.playlistOrder) }
             ?: throw PostNotFoundException("post is not found with the id.")

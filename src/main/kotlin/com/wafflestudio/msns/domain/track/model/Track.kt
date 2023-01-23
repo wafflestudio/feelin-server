@@ -6,12 +6,22 @@ import com.wafflestudio.msns.domain.model.BaseEntity
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
+import javax.persistence.Index
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 import javax.persistence.Table
 
 @Entity
-@Table(name = "track")
+@Table(
+    name = "track",
+    indexes = [
+        Index(
+            name = "unique_idx_title",
+            columnList = "title",
+            unique = true
+        )
+    ]
+)
 class Track(
     @Column(unique = true)
     val title: String,
