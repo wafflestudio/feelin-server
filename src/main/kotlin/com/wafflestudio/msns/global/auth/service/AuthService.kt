@@ -78,7 +78,7 @@ class AuthService(
                 createUserWithEmail(userId, signUpRequest)
             else if (!signUpRequest.phoneNumber.isNullOrBlank() && !signUpRequest.countryCode.isNullOrBlank())
                 createUserWithPhoneNumber(userId, signUpRequest)
-            else throw InvalidSignUpFormException("either email or phone number is needed for sign-up.")
+            else throw InvalidSignUpFormException("either email or phone is needed for sign-up.")
 
         webClientService.createUser(userId, signUpRequest.username)
         val accessJWT = jwtTokenProvider.generateToken(userId, JWT.SIGN_IN)
@@ -108,13 +108,13 @@ class AuthService(
                 signInWithUser(user, password)
             }
             Verify.PHONE -> {
-                val countryCode = account.substring(0 until 2)
-                val phoneNumber = account.substring(2)
+                val countryCode = account.substring(0 until 3)
+                val phoneNumber = account.substring(3)
                 val user = userRepository.findByCountryCodeAndPhoneNumber(countryCode, phoneNumber)
                     ?: throw UserNotFoundException("user not found with phone")
                 signInWithUser(user, password)
             }
-            Verify.NONE -> throw SignInFailedException("need verification type")
+            Verify.NONE -> throw SignInFailedException("need valid verification type")
         }
     }
 
