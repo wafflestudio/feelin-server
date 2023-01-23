@@ -29,7 +29,7 @@ class JwtTokenProvider(
     private val verificationTokenRepository: VerificationTokenRepository,
 ) {
     val tokenPrefix = "Bearer "
-    val headerString = "Authentication"
+    val headerString = "Authorization"
     private val logger = LoggerFactory.getLogger(JwtTokenProvider::class.java)
 
     fun generateToken(id: UUID, type: JWT): String {
