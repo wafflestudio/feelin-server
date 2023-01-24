@@ -1,5 +1,7 @@
 package com.wafflestudio.msns.domain.user.dto
 
+import com.wafflestudio.msns.domain.post.dto.PostResponse
+import com.wafflestudio.msns.global.enum.Report
 import java.util.UUID
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
@@ -24,5 +26,34 @@ class UserRequest {
         @field:NotBlank val username: String,
         @field:NotNull val profileImageUrl: String,
         @field:NotNull val introduction: String
+    )
+
+    data class ReportDto(
+        @field:NotNull val reportType: Report,
+        @field:NotNull val username: String,
+        val post: PostResponse.ReportResponse?,
+        @field:NotBlank val description: String
+    )
+
+    data class SlackReportDto(
+        val attachments: List<SlackReportMessageDto>
+    )
+
+    data class SlackReportMessageDto(
+        val fallback: String,
+        val color: String,
+        val pretext: String,
+        val author_name: String,
+        val author_icon: String,
+        val title: String,
+        val text: String,
+        val fields: List<SlackReportFieldDto>?,
+        val footer: String
+    )
+
+    data class SlackReportFieldDto(
+        val title: String,
+        val value: String,
+        val short: Boolean
     )
 }

@@ -1,6 +1,6 @@
 package com.wafflestudio.msns.global.auth.service
 
-import com.wafflestudio.msns.domain.playlist.service.WebClientService
+import com.wafflestudio.msns.domain.playlist.service.PlaylistClientService
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.exception.AlreadyExistUserException
@@ -47,7 +47,7 @@ class AuthService(
     private val mailContentBuilder: MailContentBuilder,
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val webClientService: WebClientService
+    private val playlistClientService: PlaylistClientService
 ) {
     fun verifyEmail(emailRequest: AuthRequest.VerifyEmail): Boolean {
         val email = emailRequest.email
@@ -82,7 +82,7 @@ class AuthService(
                 createUserWithPhoneNumber(userId, signUpRequest)
             else throw InvalidSignUpFormException("either email or phone is needed for sign-up.")
 
-        webClientService.createUser(userId, signUpRequest.username)
+        playlistClientService.createUser(userId, signUpRequest.username)
         val accessJWT = jwtTokenProvider.generateToken(userId, JWT.SIGN_IN)
         val refreshJWT = jwtTokenProvider.generateToken(userId, JWT.REFRESH)
 
@@ -135,7 +135,7 @@ class AuthService(
             .also { updateTokens(it, accessJWT, refreshJWT) }
             .let {
                 ResponseEntity
-                    .status(HttpStatus.CREATED)
+                    .status(HttpStatus.OK)
                     .headers(responseHeaders)
                     .body(UserResponse.SimpleUserInfo(it))
             }
