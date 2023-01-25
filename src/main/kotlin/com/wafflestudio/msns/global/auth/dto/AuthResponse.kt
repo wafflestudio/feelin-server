@@ -1,8 +1,12 @@
 package com.wafflestudio.msns.global.auth.dto
 
 class AuthResponse {
-    data class ExistUser(
-        val existUser: Boolean,
+    data class ExistEmail(
+        val existEmail: Boolean,
+    )
+
+    data class ExistPhone(
+        val existPhone: Boolean,
     )
 
     data class VerifyingCode(

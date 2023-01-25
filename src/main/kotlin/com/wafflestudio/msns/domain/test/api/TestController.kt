@@ -1,11 +1,14 @@
 package com.wafflestudio.msns.domain.test.api
 
 import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
+import com.wafflestudio.msns.domain.playlist.service.PlaylistClientService
 import com.wafflestudio.msns.domain.user.dto.UserRequest
+import com.wafflestudio.msns.domain.user.dto.UserResponse
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.reactive.function.client.WebClient
@@ -13,11 +16,13 @@ import reactor.core.publisher.Mono
 import java.util.UUID
 
 @RestController
+@RequestMapping("/api/v1/test")
 class TestController(
     private val playlistClient: WebClient,
-    private val slackClient: WebClient
+    private val slackClient: WebClient,
+    private val playlistClientService: PlaylistClientService
 ) {
-    @GetMapping("/test/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     fun test(
         @PathVariable("id") id: UUID
@@ -29,7 +34,7 @@ class TestController(
             .bodyToMono(PlaylistResponse.APIResponse::class.java)
             .block()
 
-    @PostMapping("/test/report")
+    @PostMapping("/report")
     @ResponseStatus(HttpStatus.OK)
     fun testReport(): String? {
         val slackReport = UserRequest.SlackReportDto(
@@ -55,4 +60,12 @@ class TestController(
             .bodyToMono(String::class.java)
             .block()
     }
+
+    @PostMapping("/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun createUser(): UserResponse.PostAPIDto? =
+        playlistClientService.createUser(
+            UUID.fromString("f127733b-c716-46b1-987a-5ef7b4a158eb"),
+            "nasty-user"
+        )
 }

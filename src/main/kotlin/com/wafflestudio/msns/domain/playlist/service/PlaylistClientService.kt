@@ -26,11 +26,12 @@ class PlaylistClientService(
                 else throw InternalServerException("Internal Server Error.")
             }
 
-    fun createUser(userId: UUID, username: String): Mono<UserResponse.PostAPIDto> =
+    fun createUser(userId: UUID, username: String): UserResponse.PostAPIDto? =
         playlistClient
             .post()
             .uri("/users")
             .body(Mono.just(UserRequest.PostAPIDto(userId, username)), UserRequest.PostAPIDto::class.java)
             .retrieve()
             .bodyToMono(UserResponse.PostAPIDto::class.java)
+            .block()
 }
