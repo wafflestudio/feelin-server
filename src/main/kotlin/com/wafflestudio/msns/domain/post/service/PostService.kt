@@ -40,7 +40,7 @@ class PostService(
     private val modelMapper: ModelMapper,
     private val followRepository: FollowRepository
 ) {
-    fun writePost(createRequest: PostRequest.CreateRequest, user: User) {
+    fun writePost(createRequest: PostRequest.CreateRequest, user: User): PostResponse.CreateResponse {
         val title = createRequest.title
             .also { if (it.isBlank()) throw InvalidTitleException("title is blank.") }
         val content = createRequest.content
@@ -57,7 +57,7 @@ class PostService(
                     thumbnail = createRequest.playlist.thumbnail
                 )
             )
-        postRepository.save(
+        return postRepository.save(
             Post(
                 user = user,
                 title = title,
@@ -65,6 +65,14 @@ class PostService(
                 playlist = playlist
             )
         )
+            .let { newPost ->
+                PostResponse.CreateResponse(
+                    newPost.id,
+                    newPost.title,
+                    newPost.content,
+                    newPost.playlist.thumbnail
+                )
+            }
     }
 
     fun getFeed(

@@ -77,4 +77,11 @@ class PostResponse {
         val title: String,
         val content: String
     )
+
+    data class CreateResponse(
+        val id: UUID,
+        val title: String,
+        val content: String,
+        val thumbnail: String
+    )
 }
