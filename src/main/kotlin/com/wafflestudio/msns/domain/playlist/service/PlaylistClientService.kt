@@ -13,11 +13,11 @@ import reactor.core.publisher.Mono
 import java.util.UUID
 
 @Service
-class WebClientService(
-    private val webClient: WebClient
+class PlaylistClientService(
+    private val playlistClient: WebClient
 ) {
     suspend fun getPlaylist(playlistId: UUID): PlaylistResponse.APIResponse =
-        webClient
+        playlistClient
             .get()
             .uri("/playlists/$playlistId")
             .awaitExchange { res ->
@@ -26,11 +26,12 @@ class WebClientService(
                 else throw InternalServerException("Internal Server Error.")
             }
 
-    fun createUser(userId: UUID, username: String): Mono<UserResponse.PostAPIDto> =
-        webClient
+    fun createUser(userId: UUID, username: String): UserResponse.PostAPIDto? =
+        playlistClient
             .post()
             .uri("/users")
             .body(Mono.just(UserRequest.PostAPIDto(userId, username)), UserRequest.PostAPIDto::class.java)
             .retrieve()
             .bodyToMono(UserResponse.PostAPIDto::class.java)
+            .block()
 }

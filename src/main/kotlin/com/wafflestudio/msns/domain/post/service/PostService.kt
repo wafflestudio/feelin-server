@@ -5,7 +5,7 @@ import com.wafflestudio.msns.domain.playlist.exception.InvalidPlaylistOrderExcep
 import com.wafflestudio.msns.domain.playlist.exception.PlaylistNotFoundException
 import com.wafflestudio.msns.domain.playlist.model.Playlist
 import com.wafflestudio.msns.domain.playlist.repository.PlaylistRepository
-import com.wafflestudio.msns.domain.playlist.service.WebClientService
+import com.wafflestudio.msns.domain.playlist.service.PlaylistClientService
 import com.wafflestudio.msns.domain.post.dto.PostRequest
 import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.post.exception.ForbiddenDeletePostException
@@ -36,11 +36,11 @@ class PostService(
     private val postRepository: PostRepository,
     private val playlistRepository: PlaylistRepository,
     private val likeRepository: LikeRepository,
-    private val webClientService: WebClientService,
+    private val playlistClientService: PlaylistClientService,
     private val modelMapper: ModelMapper,
     private val followRepository: FollowRepository
 ) {
-    fun writePost(createRequest: PostRequest.CreateRequest, user: User) {
+    fun writePost(createRequest: PostRequest.CreateRequest, user: User): PostResponse.CreateResponse {
         val title = createRequest.title
             .also { if (it.isBlank()) throw InvalidTitleException("title is blank.") }
         val content = createRequest.content
@@ -57,7 +57,7 @@ class PostService(
                     thumbnail = createRequest.playlist.thumbnail
                 )
             )
-        postRepository.save(
+        return postRepository.save(
             Post(
                 user = user,
                 title = title,
@@ -65,6 +65,14 @@ class PostService(
                 playlist = playlist
             )
         )
+            .let { newPost ->
+                PostResponse.CreateResponse(
+                    newPost.id,
+                    newPost.title,
+                    newPost.content,
+                    newPost.playlist.thumbnail
+                )
+            }
     }
 
     fun getFeed(
@@ -97,7 +105,7 @@ class PostService(
     suspend fun getPostById(user: User, postId: UUID): PostResponse.DetailResponse =
         postRepository.findPostById(postId)
             ?.let { post ->
-                webClientService.getPlaylist(post.playlist.playlistId)
+                playlistClientService.getPlaylist(post.playlist.playlistId)
                     .let { webDto ->
                         modelMapper.map(webDto, PlaylistResponse.APIResponse::class.java)
                             .also { playlist ->

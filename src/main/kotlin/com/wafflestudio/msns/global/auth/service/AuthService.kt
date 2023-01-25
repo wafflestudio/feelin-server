@@ -1,6 +1,6 @@
 package com.wafflestudio.msns.global.auth.service
 
-import com.wafflestudio.msns.domain.playlist.service.WebClientService
+import com.wafflestudio.msns.domain.playlist.service.PlaylistClientService
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.exception.AlreadyExistUserException
@@ -47,44 +47,47 @@ class AuthService(
     private val mailContentBuilder: MailContentBuilder,
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val webClientService: WebClientService
+    private val playlistClientService: PlaylistClientService
 ) {
-    fun verifyEmail(emailRequest: AuthRequest.VerifyEmail): Boolean {
-        val email = emailRequest.email
-        val userExists: Boolean = userRepository.existsByEmail(email)
+    fun checkExistUserByEmail(emailRequest: AuthRequest.VerifyEmail): AuthResponse.ExistEmail =
+        AuthResponse.ExistEmail(userRepository.existsByEmail(emailRequest.email))
+
+    fun checkExistUserByPhone(phoneRequest: AuthRequest.VerifyPhone): AuthResponse.ExistPhone =
+        AuthResponse.ExistPhone(
+            userRepository.existsByPhoneNumberAndCountryCode(phoneRequest.phoneNumber, phoneRequest.countryCode)
+        )
+
+    fun sendVerifyingEmail(emailRequest: AuthRequest.VerifyEmail) {
+        val newEmail: String = emailRequest.email
 
         val code = createRandomCode()
-        generateTokenWithEmail(email, code, JWT.JOIN)
+        generateTokenWithEmail(newEmail, code, JWT.JOIN)
         val message = mailContentBuilder.messageBuild(code, "register")
-        val mail = MailDto.Email(email, "Join Feelin", message, false)
+        val mail = MailDto.Email(newEmail, "Join Feelin", message, false)
         mailService.sendMail(mail)
-
-        return userExists
     }
 
-    suspend fun verifyPhone(phoneRequest: AuthRequest.VerifyPhone): Boolean {
-        val countryCode = phoneRequest.countryCode
-        val phoneNumber = phoneRequest.phoneNumber
-        val userExists: Boolean = userRepository.existsByPhoneNumberAndCountryCode(phoneNumber, countryCode)
+    suspend fun sendVerifyingPhone(phoneRequest: AuthRequest.VerifyPhone) {
+        val newCountryCode = phoneRequest.countryCode
+        val newPhoneNumber = phoneRequest.phoneNumber
 
         val code = createRandomCode()
-        generateTokenWithPhone(countryCode, phoneNumber, code, JWT.JOIN)
-        smsService.sendSMS(countryCode, phoneNumber, code)
-
-        return userExists
+        generateTokenWithPhone(newCountryCode, newPhoneNumber, code, JWT.JOIN)
+        smsService.sendSMS(newCountryCode, newPhoneNumber, code)
     }
 
-    fun signUp(userId: UUID, signUpRequest: UserRequest.SignUp): ResponseEntity<UserResponse.SimpleUserInfo> {
+    fun signUp(signUpRequest: UserRequest.SignUp): ResponseEntity<UserResponse.SimpleUserInfo> {
+        val newId: UUID = UUID.randomUUID()
         val newUser: User =
             if (!signUpRequest.email.isNullOrBlank())
-                createUserWithEmail(userId, signUpRequest)
+                createUserWithEmail(newId, signUpRequest)
             else if (!signUpRequest.phoneNumber.isNullOrBlank() && !signUpRequest.countryCode.isNullOrBlank())
-                createUserWithPhoneNumber(userId, signUpRequest)
+                createUserWithPhoneNumber(newId, signUpRequest)
             else throw InvalidSignUpFormException("either email or phone is needed for sign-up.")
 
-        webClientService.createUser(userId, signUpRequest.username)
-        val accessJWT = jwtTokenProvider.generateToken(userId, JWT.SIGN_IN)
-        val refreshJWT = jwtTokenProvider.generateToken(userId, JWT.REFRESH)
+        playlistClientService.createUser(newId, signUpRequest.username)
+        val accessJWT = jwtTokenProvider.generateToken(newId, JWT.SIGN_IN)
+        val refreshJWT = jwtTokenProvider.generateToken(newId, JWT.REFRESH)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.set("Access-Token", accessJWT)
@@ -135,7 +138,7 @@ class AuthService(
             .also { updateTokens(it, accessJWT, refreshJWT) }
             .let {
                 ResponseEntity
-                    .status(HttpStatus.CREATED)
+                    .status(HttpStatus.OK)
                     .headers(responseHeaders)
                     .body(UserResponse.SimpleUserInfo(it))
             }

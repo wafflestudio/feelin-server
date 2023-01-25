@@ -34,7 +34,7 @@ class PostController(
     fun writePost(
         @Valid @RequestBody createRequest: PostRequest.CreateRequest,
         @CurrentUser user: User
-    ) = postService.writePost(createRequest, user)
+    ): PostResponse.CreateResponse = postService.writePost(createRequest, user)
 
     @GetMapping("/feed")
     fun getFeeds(
