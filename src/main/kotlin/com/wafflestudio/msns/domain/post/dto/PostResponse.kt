@@ -72,4 +72,9 @@ class PostResponse {
         val likes: Int,
         val doesLike: Boolean
     )
+
+    data class ReportResponse(
+        val title: String,
+        val content: String
+    )
 }

@@ -69,7 +69,7 @@ class AuthController(
         authService.signUp(UUID.randomUUID(), signUpRequest)
 
     @PostMapping("/signin")
-    fun signup(
+    fun signIn(
         @Valid @RequestBody loginRequest: LoginRequest
     ): ResponseEntity<UserResponse.SimpleUserInfo?> = authService.signIn(loginRequest)
 
