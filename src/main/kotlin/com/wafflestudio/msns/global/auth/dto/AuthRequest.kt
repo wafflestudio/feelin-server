@@ -36,7 +36,7 @@ class AuthRequest {
         val code: String
     )
 
-    data class Username(
+    data class VerifyUsername(
         val username: String
     )
 }

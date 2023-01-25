@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 import javax.validation.Valid
 
 @RestController
@@ -31,32 +30,42 @@ class AuthController(
     @ResponseStatus(HttpStatus.OK)
     fun newEmailCheck(
         @Valid @RequestBody emailRequest: AuthRequest.VerifyEmail
-    ): AuthResponse.ExistUser = AuthResponse.ExistUser(authService.verifyEmail(emailRequest))
+    ): AuthResponse.ExistEmail = authService.checkExistUserByEmail(emailRequest)
 
     @PostMapping("/phone")
     @ResponseStatus(HttpStatus.OK)
-    suspend fun newPhoneCheck(
+    fun newPhoneCheck(
         @Valid @RequestBody phoneRequest: AuthRequest.VerifyPhone
-    ): AuthResponse.ExistUser = AuthResponse.ExistUser(authService.verifyPhone(phoneRequest))
+    ): AuthResponse.ExistPhone = authService.checkExistUserByPhone(phoneRequest)
+
+    @PostMapping("/username")
+    @ResponseStatus(HttpStatus.OK)
+    fun checkDuplicateUsername(
+        @Valid @RequestBody usernameRequest: AuthRequest.VerifyUsername
+    ): AuthResponse.ExistUsername =
+        AuthResponse.ExistUsername(authService.checkDuplicateUsername(usernameRequest.username))
 
     @DeleteMapping("")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun withdrawal(@CurrentUser user: User) = userService.withdrawUser(user)
 
-    @PostMapping("/username")
+    @PostMapping("/email/verify-code/send")
     @ResponseStatus(HttpStatus.OK)
-    fun checkDuplicateUsername(
-        @Valid @RequestBody usernameRequest: AuthRequest.Username
-    ): AuthResponse.ExistUsername =
-        AuthResponse.ExistUsername(authService.checkDuplicateUsername(usernameRequest.username))
+    fun sendVerifyingEmail(@Valid @RequestBody emailRequest: AuthRequest.VerifyEmail) =
+        authService.sendVerifyingEmail(emailRequest)
 
-    @PostMapping("/verify-code/email")
+    @PostMapping("/phone/verify-code/send")
+    @ResponseStatus(HttpStatus.OK)
+    suspend fun sendVerifyingPhone(@Valid @RequestBody phoneRequest: AuthRequest.VerifyPhone) =
+        authService.sendVerifyingPhone(phoneRequest)
+
+    @PostMapping("/email/verify-code")
     @ResponseStatus(HttpStatus.OK)
     fun verifyCode(
         @Valid @RequestBody verifyRequest: AuthRequest.VerifyCodeEmail
     ): AuthResponse.VerifyingCode = AuthResponse.VerifyingCode(authService.verifyCodeWithEmail(verifyRequest))
 
-    @PostMapping("/verify-code/phone")
+    @PostMapping("/phone/verify-code")
     @ResponseStatus(HttpStatus.OK)
     fun verifyCode(
         @Valid @RequestBody verifyRequest: AuthRequest.VerifyCodePhone
@@ -66,7 +75,7 @@ class AuthController(
     fun signup(
         @Valid @RequestBody signUpRequest: UserRequest.SignUp
     ): ResponseEntity<UserResponse.SimpleUserInfo> =
-        authService.signUp(UUID.randomUUID(), signUpRequest)
+        authService.signUp(signUpRequest)
 
     @PostMapping("/signin")
     fun signIn(
