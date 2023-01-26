@@ -58,7 +58,6 @@ class DataLoader(
         albumRepository.save(albumA)
 
         val admin = User(
-            userId = UUID.randomUUID(),
             email = "admin@feelin.com",
             countryCode = "82",
             phoneNumber = "010-1234-5678",
@@ -69,7 +68,6 @@ class DataLoader(
         )
 
         val userA = User(
-            userId = UUID.randomUUID(),
             email = "userA@feelin.com",
             countryCode = "82",
             phoneNumber = "010-0000-0001",
@@ -80,7 +78,6 @@ class DataLoader(
         )
 
         val userB = User(
-            userId = UUID.randomUUID(),
             email = "userB@feelin.com",
             countryCode = "82",
             phoneNumber = "010-0000-0010",
@@ -94,12 +91,12 @@ class DataLoader(
         userRepository.save(userA)
         userRepository.save(userB)
 
-        val jwtA = jwtTokenProvider.generateToken(admin.userId, JWT.SIGN_IN)
-        val jwtB = jwtTokenProvider.generateToken(admin.userId, JWT.REFRESH)
-        val jwtC = jwtTokenProvider.generateToken(userA.userId, JWT.SIGN_IN)
-        val jwtD = jwtTokenProvider.generateToken(userA.userId, JWT.REFRESH)
-        val jwtE = jwtTokenProvider.generateToken(userB.userId, JWT.SIGN_IN)
-        val jwtF = jwtTokenProvider.generateToken(userB.userId, JWT.REFRESH)
+        val jwtA = jwtTokenProvider.generateToken(admin.id, JWT.SIGN_IN)
+        val jwtB = jwtTokenProvider.generateToken(admin.id, JWT.REFRESH)
+        val jwtC = jwtTokenProvider.generateToken(userA.id, JWT.SIGN_IN)
+        val jwtD = jwtTokenProvider.generateToken(userA.id, JWT.REFRESH)
+        val jwtE = jwtTokenProvider.generateToken(userB.id, JWT.SIGN_IN)
+        val jwtF = jwtTokenProvider.generateToken(userB.id, JWT.REFRESH)
 
         val verificationTokenA = VerificationToken(
             email = admin.email,

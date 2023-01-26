@@ -16,5 +16,9 @@ interface VerificationTokenRepository : JpaRepository<VerificationToken, Long?> 
 
     @Transactional
     @Modifying
-    fun deleteVerificationTokenByEmailOrPhoneNumber(email: String, phoneNumber: String)
+    fun deleteVerificationTokenByEmailOrPhoneNumberAndCountryCode(
+        email: String,
+        phoneNumber: String,
+        countryCode: String
+    )
 }

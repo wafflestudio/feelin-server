@@ -1,6 +1,7 @@
 package com.wafflestudio.msns.domain.user.service
 
 import com.wafflestudio.msns.domain.playlist.repository.PlaylistRepository
+import com.wafflestudio.msns.domain.playlist.service.PlaylistClientService
 import com.wafflestudio.msns.domain.post.repository.PostRepository
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
@@ -24,7 +25,8 @@ class UserService(
     private val verificationTokenRepository: VerificationTokenRepository,
     private val followRepository: FollowRepository,
     private val likeRepository: LikeRepository,
-    private val playlistRepository: PlaylistRepository
+    private val playlistRepository: PlaylistRepository,
+    private val playlistClientService: PlaylistClientService
 ) {
     fun getMyself(user: User): UserResponse.DetailResponse =
         UserResponse.DetailResponse(
@@ -67,6 +69,7 @@ class UserService(
 
     fun putMyProfile(user: User, putRequest: UserRequest.PutProfile): UserResponse.MyProfileResponse =
         user.apply {
+            this.name = putRequest.name
             this.username = putRequest.username.also {
                 if ((userRepository.findByUsername(it)?.id ?: user.id) != user.id)
                     throw ForbiddenUsernameException("There is another user using this name.")
@@ -88,17 +91,23 @@ class UserService(
                 )
             }
 
-    fun withdrawUser(user: User) =
-        run {
-            followRepository.deleteFollowsByFromUser_Id(user.id)
-            followRepository.deleteFollowsByToUser_Id(user.id)
-            likeRepository.deleteMappingByUserId(user.id)
-            likeRepository.deleteMappingByUserIdOfPost(user.id)
+    @Transactional
+    suspend fun withdrawUser(user: User, accessToken: String) {
+        followRepository.deleteFollowsByFromUser_Id(user.id)
+        followRepository.deleteFollowsByToUser_Id(user.id)
+        likeRepository.deleteMappingByUserId(user.id)
+        likeRepository.deleteMappingByUserIdOfPost(user.id)
 
-            postRepository.deleteAllUserPosts(user.id)
-            playlistRepository.deleteMappingByUserId(user.id)
-            verificationTokenRepository.deleteVerificationTokenByEmailOrPhoneNumber(user.email, user.phoneNumber)
+        playlistClientService.withdrawUser(user.id, accessToken)
 
-            userRepository.deleteUserById(user.id)
-        }
+        postRepository.deleteAllUserPostsByUserId(user.id.toString())
+        playlistRepository.deleteMappingByUserId(user.id.toString())
+        verificationTokenRepository.deleteVerificationTokenByEmailOrPhoneNumberAndCountryCode(
+            user.email,
+            user.phoneNumber,
+            user.countryCode
+        )
+
+        userRepository.deleteUserById(user.id)
+    }
 }

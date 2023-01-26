@@ -49,11 +49,11 @@ class AuthService(
     private val jwtTokenProvider: JwtTokenProvider,
     private val playlistClientService: PlaylistClientService
 ) {
-    fun checkExistUserByEmail(emailRequest: AuthRequest.VerifyEmail): AuthResponse.ExistEmail =
-        AuthResponse.ExistEmail(userRepository.existsByEmail(emailRequest.email))
+    fun checkExistUserByEmail(emailRequest: AuthRequest.VerifyEmail): AuthResponse.ExistUser =
+        AuthResponse.ExistUser(userRepository.existsByEmail(emailRequest.email))
 
-    fun checkExistUserByPhone(phoneRequest: AuthRequest.VerifyPhone): AuthResponse.ExistPhone =
-        AuthResponse.ExistPhone(
+    fun checkExistUserByPhone(phoneRequest: AuthRequest.VerifyPhone): AuthResponse.ExistUser =
+        AuthResponse.ExistUser(
             userRepository.existsByPhoneNumberAndCountryCode(phoneRequest.phoneNumber, phoneRequest.countryCode)
         )
 
@@ -77,17 +77,16 @@ class AuthService(
     }
 
     fun signUp(signUpRequest: UserRequest.SignUp): ResponseEntity<UserResponse.SimpleUserInfo> {
-        val newId: UUID = UUID.randomUUID()
         val newUser: User =
             if (!signUpRequest.email.isNullOrBlank())
-                createUserWithEmail(newId, signUpRequest)
+                createUserWithEmail(signUpRequest)
             else if (!signUpRequest.phoneNumber.isNullOrBlank() && !signUpRequest.countryCode.isNullOrBlank())
-                createUserWithPhoneNumber(newId, signUpRequest)
+                createUserWithPhoneNumber(signUpRequest)
             else throw InvalidSignUpFormException("either email or phone is needed for sign-up.")
 
-        playlistClientService.createUser(newId, signUpRequest.username)
-        val accessJWT = jwtTokenProvider.generateToken(newId, JWT.SIGN_IN)
-        val refreshJWT = jwtTokenProvider.generateToken(newId, JWT.REFRESH)
+        playlistClientService.createUser(newUser.id, signUpRequest.username)
+        val accessJWT = jwtTokenProvider.generateToken(newUser.id, JWT.SIGN_IN)
+        val refreshJWT = jwtTokenProvider.generateToken(newUser.id, JWT.REFRESH)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.set("Access-Token", accessJWT)
@@ -127,8 +126,8 @@ class AuthService(
         val isMatched: Boolean = passwordEncoder.matches(password, user.password)
         if (!isMatched) throw SignInFailedException("wrong password")
 
-        val accessJWT = jwtTokenProvider.generateToken(user.userId, JWT.SIGN_IN)
-        val refreshJWT = jwtTokenProvider.generateToken(user.userId, JWT.REFRESH)
+        val accessJWT = jwtTokenProvider.generateToken(user.id, JWT.SIGN_IN)
+        val refreshJWT = jwtTokenProvider.generateToken(user.id, JWT.REFRESH)
 
         val responseHeaders = HttpHeaders()
         responseHeaders.set("Access-Token", accessJWT)
@@ -144,7 +143,7 @@ class AuthService(
             }
     }
 
-    fun createUserWithEmail(userId: UUID, signUpRequest: UserRequest.SignUp): User {
+    fun createUserWithEmail(signUpRequest: UserRequest.SignUp): User {
         val email: String = signUpRequest.email!!
         val username = signUpRequest.username
         val encryptedPassword = passwordEncoder.encode(signUpRequest.password)
@@ -156,7 +155,6 @@ class AuthService(
             ?: throw VerificationTokenNotFoundException("verification token not created")
 
         return User(
-            userId = userId,
             email = email,
             username = username,
             password = encryptedPassword,
@@ -165,7 +163,7 @@ class AuthService(
         )
     }
 
-    fun createUserWithPhoneNumber(userId: UUID, signUpRequest: UserRequest.SignUp): User {
+    fun createUserWithPhoneNumber(signUpRequest: UserRequest.SignUp): User {
         val countryCode: String = signUpRequest.countryCode!!
         val phoneNumber: String = signUpRequest.phoneNumber!!
         val username = signUpRequest.username
@@ -178,7 +176,6 @@ class AuthService(
             ?: throw VerificationTokenNotFoundException("verification token not created")
 
         return User(
-            userId = userId,
             countryCode = countryCode,
             phoneNumber = phoneNumber,
             username = username,
@@ -268,8 +265,7 @@ class AuthService(
     private fun createRandomCode(): String = ThreadLocalRandom.current().nextInt(100000, 1000000).toString()
 
     private fun generateTokenWithEmail(email: String, code: String, type: JWT): String {
-        val userId = UUID.randomUUID()
-        val accessJWT = jwtTokenProvider.generateToken(userId, type)
+        val accessJWT = jwtTokenProvider.generateToken(UUID.randomUUID(), type)
         val existingToken = verificationTokenRepository.findByEmail(email)
 
         existingToken
@@ -297,8 +293,7 @@ class AuthService(
         code: String,
         type: JWT
     ): String {
-        val userId = UUID.randomUUID()
-        val accessJWT = jwtTokenProvider.generateToken(userId, type)
+        val accessJWT = jwtTokenProvider.generateToken(UUID.randomUUID(), type)
         val existingToken = verificationTokenRepository.findByCountryCodeAndPhoneNumber(countryCode, phoneNumber)
 
         existingToken

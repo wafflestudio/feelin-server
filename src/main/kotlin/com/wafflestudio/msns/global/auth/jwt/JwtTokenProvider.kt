@@ -1,6 +1,7 @@
 package com.wafflestudio.msns.global.auth.jwt
 
 import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
+import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.model.AuthenticationToken
 import com.wafflestudio.msns.global.auth.model.UserPrincipal
@@ -14,6 +15,7 @@ import io.jsonwebtoken.UnsupportedJwtException
 import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
 import java.security.Key
@@ -54,7 +56,7 @@ class JwtTokenProvider(
 
     fun generateToken(authentication: Authentication, type: JWT): String {
         val verificationTokenPrincipal = authentication.principal as UserPrincipal
-        return generateToken(verificationTokenPrincipal.user.userId, type)
+        return generateToken(verificationTokenPrincipal.user.id, type)
     }
 
     fun validateToken(authToken: String?): Boolean {
@@ -114,7 +116,7 @@ class JwtTokenProvider(
             .body
 
         val id: UUID = UUID.fromString(claims.get("id", String::class.java))
-        val user = userRepository.findByUserId(id)
+        val user: User = userRepository.findByIdOrNull(id)
             ?: throw UserNotFoundException("user not found with the userId")
         val userPrincipal = UserPrincipal(user)
         val authorities = userPrincipal.authorities
