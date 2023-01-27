@@ -27,8 +27,8 @@ interface LikeRepository : JpaRepository<Like, UUID?> {
     @Transactional
     @Modifying
     @Query(
-        "delete from likes l WHERE l.post_id in " +
-            "(SELECT p.id FROM post p WHERE p.user_id = :userId)",
+        "delete from likes l where l.post_id in " +
+            "(select p.id from post p where p.user_id = :userId)",
         nativeQuery = true
     )
     fun deleteMappingByUserIdOfPost(@Param("userId") userId: UUID)
