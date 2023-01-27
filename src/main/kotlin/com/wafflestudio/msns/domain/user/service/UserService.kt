@@ -98,8 +98,6 @@ class UserService(
         likeRepository.deleteMappingByUserId(user.id.toString())
         likeRepository.deleteMappingByUserIdOfPost(user.id.toString())
 
-        playlistClientService.withdrawUser(user.id, accessToken)
-
         postRepository.deleteAllByUserId(user.id)
         playlistRepository.deleteAllByUserId(user.id)
         verificationTokenRepository.deleteVerificationTokenByEmailOrPhoneNumberAndCountryCode(
@@ -109,5 +107,6 @@ class UserService(
         )
 
         userRepository.deleteUserById(user.id)
+        playlistClientService.withdrawUser(user.id, accessToken)
     }
 }
