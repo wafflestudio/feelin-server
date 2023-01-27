@@ -21,8 +21,8 @@ interface LikeRepository : JpaRepository<Like, UUID?> {
 
     @Transactional
     @Modifying
-    @Query("delete from likes l WHERE l.user_id = :userId", nativeQuery = true)
-    fun deleteMappingByUserId(@Param("userId") userId: UUID)
+    @Query("delete from likes l where l.user_id = :userId", nativeQuery = true)
+    fun deleteMappingByUserId(@Param("userId") userId: String)
 
     @Transactional
     @Modifying
@@ -31,7 +31,7 @@ interface LikeRepository : JpaRepository<Like, UUID?> {
             "(select p.id from post p where p.user_id = :userId)",
         nativeQuery = true
     )
-    fun deleteMappingByUserIdOfPost(@Param("userId") userId: UUID)
+    fun deleteMappingByUserIdOfPost(@Param("userId") userId: String)
 
     fun countByPost_Id(postId: UUID): Long
 

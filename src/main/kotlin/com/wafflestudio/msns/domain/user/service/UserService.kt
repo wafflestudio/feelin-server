@@ -95,8 +95,8 @@ class UserService(
     suspend fun withdrawUser(user: User, accessToken: String) {
         followRepository.deleteFollowsByFromUser_Id(user.id)
         followRepository.deleteFollowsByToUser_Id(user.id)
-        likeRepository.deleteMappingByUserId(user.id)
-        likeRepository.deleteMappingByUserIdOfPost(user.id)
+        likeRepository.deleteMappingByUserId(user.id.toString())
+        likeRepository.deleteMappingByUserIdOfPost(user.id.toString())
 
         playlistClientService.withdrawUser(user.id, accessToken)
 
