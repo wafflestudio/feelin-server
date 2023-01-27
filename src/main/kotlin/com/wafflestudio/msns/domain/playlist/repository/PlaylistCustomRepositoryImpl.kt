@@ -6,7 +6,7 @@ import java.util.UUID
 
 class PlaylistCustomRepositoryImpl(
     private val queryFactory: JPAQueryFactory
-): PlaylistCustomRepository {
+) : PlaylistCustomRepository {
     override fun deleteAllByUserId(userId: UUID) {
         queryFactory
             .delete(playlist)
