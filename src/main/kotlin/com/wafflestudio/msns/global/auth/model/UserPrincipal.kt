@@ -9,7 +9,7 @@ class UserPrincipal(
     val user: User
 ) : UserDetails {
     override fun getUsername(): String {
-        return user.userId.toString()
+        return user.id.toString()
     }
 
     override fun getPassword(): String {

@@ -30,13 +30,13 @@ class AuthController(
     @ResponseStatus(HttpStatus.OK)
     fun newEmailCheck(
         @Valid @RequestBody emailRequest: AuthRequest.VerifyEmail
-    ): AuthResponse.ExistEmail = authService.checkExistUserByEmail(emailRequest)
+    ): AuthResponse.ExistUser = authService.checkExistUserByEmail(emailRequest)
 
     @PostMapping("/phone")
     @ResponseStatus(HttpStatus.OK)
     fun newPhoneCheck(
         @Valid @RequestBody phoneRequest: AuthRequest.VerifyPhone
-    ): AuthResponse.ExistPhone = authService.checkExistUserByPhone(phoneRequest)
+    ): AuthResponse.ExistUser = authService.checkExistUserByPhone(phoneRequest)
 
     @PostMapping("/username")
     @ResponseStatus(HttpStatus.OK)
@@ -47,7 +47,10 @@ class AuthController(
 
     @DeleteMapping("")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun withdrawal(@CurrentUser user: User) = userService.withdrawUser(user)
+    suspend fun withdrawal(
+        @RequestHeader("Authorization") accessToken: String,
+        @CurrentUser user: User
+    ) = userService.withdrawUser(user, accessToken)
 
     @PostMapping("/email/verify-code/send")
     @ResponseStatus(HttpStatus.OK)

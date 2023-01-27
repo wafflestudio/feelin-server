@@ -2,6 +2,7 @@ package com.wafflestudio.msns.domain.playlist.model
 
 import com.wafflestudio.msns.domain.model.BaseTimeEntity
 import com.wafflestudio.msns.domain.user.model.User
+import org.hibernate.annotations.Type
 import java.util.UUID
 import javax.persistence.Entity
 import javax.persistence.ManyToOne
@@ -27,7 +28,8 @@ class Playlist(
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     val user: User,
 
-    @Column(name = "playlist_id", nullable = false, unique = true, columnDefinition = "BINARY(16)")
+    @Column(name = "playlist_id", nullable = false, unique = true, columnDefinition = "CHAR(36)")
+    @Type(type = "uuid-char")
     val playlistId: UUID,
 
     @Column(name = "playlist_order", columnDefinition = "MEDIUMTEXT")
