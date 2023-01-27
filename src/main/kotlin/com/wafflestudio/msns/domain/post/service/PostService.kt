@@ -1,5 +1,6 @@
 package com.wafflestudio.msns.domain.post.service
 
+import com.wafflestudio.msns.domain.artist.dto.ArtistResponse
 import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
 import com.wafflestudio.msns.domain.playlist.exception.InvalidPlaylistOrderException
 import com.wafflestudio.msns.domain.playlist.exception.PlaylistNotFoundException
@@ -13,6 +14,7 @@ import com.wafflestudio.msns.domain.post.exception.ForbiddenPutPostException
 import com.wafflestudio.msns.domain.post.exception.InvalidTitleException
 import com.wafflestudio.msns.domain.post.exception.PostNotFoundException
 import com.wafflestudio.msns.domain.post.model.Post
+import com.wafflestudio.msns.domain.post.model.PostMainTrack
 import com.wafflestudio.msns.domain.post.repository.PostRepository
 import com.wafflestudio.msns.domain.track.dto.TrackResponse
 import com.wafflestudio.msns.domain.user.dto.UserResponse
@@ -38,21 +40,28 @@ class PostService(
     private val playlistClientService: PlaylistClientService,
     private val modelMapper: ModelMapper
 ) {
-    fun writePost(createRequest: PostRequest.CreateRequest, user: User): PostResponse.CreateResponse {
+    suspend fun writePost(createRequest: PostRequest.CreateRequest, user: User): PostResponse.CreateResponse {
         val title = createRequest.title
             .also { if (it.isBlank()) throw InvalidTitleException("title is blank.") }
         val content = createRequest.content
-        val order: List<Int> = createRequest.playlist.order.split(" ").map { it.toInt() }.sorted()
-        val length: Int = createRequest.playlist.length
-        if (order != 1.rangeTo(length).toList())
+        val playlistDto = createRequest.playlist
+        val order: List<Int> = playlistDto.order.split(" ").map { it.toInt() }.sorted()
+        val length: Int = playlistDto.length
+        if (order != (1..length).toList())
             throw InvalidPlaylistOrderException("playlist order must be list of 1, ..., length")
-        val playlist = playlistRepository.findByPlaylistId(createRequest.playlist.id)
+
+        val playlistMainTracks: MutableList<PostMainTrack> =
+            playlistClientService.getPlaylist(playlistDto.id).tracks.subList(0, 3)
+                .map { PostMainTrack(it.title, getArtistNameString(it.artists), it.album.thumbnail) }
+                as MutableList<PostMainTrack>
+
+        val playlist = playlistRepository.findByPlaylistId(playlistDto.id)
             ?: playlistRepository.save(
                 Playlist(
                     user = user,
-                    playlistId = createRequest.playlist.id,
-                    playlistOrder = createRequest.playlist.order,
-                    thumbnail = createRequest.playlist.thumbnail
+                    playlistId = playlistDto.id,
+                    playlistOrder = playlistDto.order,
+                    thumbnail = playlistDto.thumbnail
                 )
             )
         return postRepository.save(
@@ -60,7 +69,8 @@ class PostService(
                 user = user,
                 title = title,
                 content = content,
-                playlist = playlist
+                playlist = playlist,
+                mainTracks = playlistMainTracks
             )
         )
             .let { newPost ->
@@ -68,7 +78,7 @@ class PostService(
                     newPost.id,
                     newPost.title,
                     newPost.content,
-                    newPost.playlist.thumbnail
+                    PostResponse.PlaylistPostResponse(playlist.thumbnail)
                 )
             }
     }
@@ -165,4 +175,6 @@ class PostService(
         postRepository.findPostById(postId)
             ?.let { PostResponse.PlaylistOrderResponse(it.playlist.playlistOrder) }
             ?: throw PostNotFoundException("post is not found with the id.")
+
+    private fun getArtistNameString(artists: List<ArtistResponse.APIDto>): String = artists.joinToString { it.name }
 }

@@ -77,6 +77,10 @@ class PostResponse {
         val id: UUID,
         val title: String,
         val content: String,
+        val playlist: PlaylistPostResponse
+    )
+
+    data class PlaylistPostResponse(
         val thumbnail: String
     )
 }
