@@ -138,4 +138,11 @@ class PostCustomRepositoryImpl(
 
         return SliceImpl(query, pageable, hasNext)
     }
+
+    override fun deleteAllByUserId(userId: UUID) {
+        queryFactory
+            .delete(post)
+            .where(post.user.id.eq(userId))
+            .execute()
+    }
 }

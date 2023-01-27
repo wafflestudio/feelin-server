@@ -100,8 +100,8 @@ class UserService(
 
         playlistClientService.withdrawUser(user.id, accessToken)
 
-        postRepository.deleteAllUserPostsByUserId(user.id.toString())
-        playlistRepository.deleteMappingByUserId(user.id.toString())
+        postRepository.deleteAllByUserId(user.id)
+        playlistRepository.deleteAllByUserId(user.id)
         verificationTokenRepository.deleteVerificationTokenByEmailOrPhoneNumberAndCountryCode(
             user.email,
             user.phoneNumber,

@@ -11,10 +11,5 @@ import java.util.UUID
 interface PostRepository : JpaRepository<Post, UUID?>, PostCustomRepository {
     fun findPostById(id: UUID): Post?
 
-    @Transactional
-    @Modifying
-    @Query("DELETE FROM Post p WHERE p.user_id = :id", nativeQuery = true)
-    fun deleteAllUserPostsByUserId(@Param("id") id: String)
-
     fun countByUser_Id(userId: UUID): Long
 }
