@@ -14,4 +14,10 @@ class PostRequest {
         val content: String,
         val playlist: PlaylistRequest.PutRequest,
     )
+
+    data class ReportRequest(
+        val id: String,
+        val title: String,
+        val content: String
+    )
 }

@@ -13,6 +13,6 @@ interface PlaylistRepository : JpaRepository<Playlist, UUID?> {
 
     @Transactional
     @Modifying
-    @Query("DELETE FROM Playlist playlist WHERE playlist.user_id = :userId", nativeQuery = true)
-    fun deleteMappingByUserId(@Param("userId") userId: UUID)
+    @Query("DELETE FROM Playlist playlist WHERE playlist.user_id = :id", nativeQuery = true)
+    fun deleteMappingByUserId(@Param("id") id: String)
 }

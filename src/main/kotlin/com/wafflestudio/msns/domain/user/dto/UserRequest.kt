@@ -1,6 +1,6 @@
 package com.wafflestudio.msns.domain.user.dto
 
-import com.wafflestudio.msns.domain.post.dto.PostResponse
+import com.wafflestudio.msns.domain.post.dto.PostRequest
 import com.wafflestudio.msns.global.enum.Report
 import java.util.UUID
 import javax.validation.constraints.NotBlank
@@ -23,15 +23,16 @@ class UserRequest {
     )
 
     data class PutProfile(
+        @field:NotBlank val name: String,
         @field:NotBlank val username: String,
-        @field:NotNull val profileImageUrl: String,
+        val profileImageUrl: String?,
         @field:NotNull val introduction: String
     )
 
     data class ReportDto(
         @field:NotNull val reportType: Report,
         @field:NotNull val username: String,
-        val post: PostResponse.ReportResponse?,
+        val post: PostRequest.ReportRequest?,
         @field:NotBlank val description: String
     )
 

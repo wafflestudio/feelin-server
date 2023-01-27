@@ -24,7 +24,7 @@ class ReportClientService(
                         listOf(
                             UserRequest.SlackReportFieldDto(
                                 title = "📚신고 게시물📚",
-                                value = "제목: " + it.title + " / " + "내용: " + it.content,
+                                value = "아이디: " + it.id + " / " + "제목: " + it.title + " / " + "내용: " + it.content,
                                 short = true
                             )
                         )

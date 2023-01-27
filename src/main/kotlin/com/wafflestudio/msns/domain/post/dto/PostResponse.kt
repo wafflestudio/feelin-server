@@ -73,11 +73,6 @@ class PostResponse {
         val doesLike: Boolean
     )
 
-    data class ReportResponse(
-        val title: String,
-        val content: String
-    )
-
     data class CreateResponse(
         val id: UUID,
         val title: String,

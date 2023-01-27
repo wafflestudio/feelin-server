@@ -3,7 +3,9 @@ package com.wafflestudio.msns.domain.post.api
 import com.wafflestudio.msns.domain.post.dto.PostRequest
 import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.post.service.PostService
+import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.model.User
+import com.wafflestudio.msns.domain.user.service.ReportClientService
 import com.wafflestudio.msns.global.auth.CurrentUser
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -27,7 +29,8 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/api/v1/posts")
 class PostController(
-    private val postService: PostService
+    private val postService: PostService,
+    private val reportClientService: ReportClientService
 ) {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
@@ -85,4 +88,11 @@ class PostController(
         @PathVariable("postId") postId: UUID,
         @CurrentUser user: User
     ) = postService.deletePost(postId, user)
+
+    @PostMapping("/report")
+    @ResponseStatus(HttpStatus.OK)
+    fun reportUser(
+        @CurrentUser user: User,
+        @Valid @RequestBody reportRequest: UserRequest.ReportDto
+    ): String? = reportClientService.noticeReport(user.username, reportRequest)
 }

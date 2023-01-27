@@ -17,7 +17,6 @@ import com.wafflestudio.msns.domain.post.repository.PostRepository
 import com.wafflestudio.msns.domain.track.dto.TrackResponse
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
-import com.wafflestudio.msns.domain.user.repository.FollowRepository
 import com.wafflestudio.msns.domain.user.repository.LikeRepository
 import com.wafflestudio.msns.global.util.CursorUtil
 import org.modelmapper.ModelMapper
@@ -37,8 +36,7 @@ class PostService(
     private val playlistRepository: PlaylistRepository,
     private val likeRepository: LikeRepository,
     private val playlistClientService: PlaylistClientService,
-    private val modelMapper: ModelMapper,
-    private val followRepository: FollowRepository
+    private val modelMapper: ModelMapper
 ) {
     fun writePost(createRequest: PostRequest.CreateRequest, user: User): PostResponse.CreateResponse {
         val title = createRequest.title

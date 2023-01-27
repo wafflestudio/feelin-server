@@ -3,13 +3,11 @@ package com.wafflestudio.msns.domain.user.api
 import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
-import com.wafflestudio.msns.domain.user.service.ReportClientService
 import com.wafflestudio.msns.domain.user.service.UserService
 import com.wafflestudio.msns.global.auth.CurrentUser
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -21,8 +19,7 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/api/v1/user")
 class UserController(
-    private val userService: UserService,
-    private val reportClientService: ReportClientService
+    private val userService: UserService
 ) {
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
@@ -46,11 +43,4 @@ class UserController(
         @CurrentUser user: User,
         @Valid @RequestBody putRequest: UserRequest.PutProfile
     ): UserResponse.MyProfileResponse = userService.putMyProfile(user, putRequest)
-
-    @PostMapping("/report")
-    @ResponseStatus(HttpStatus.OK)
-    fun reportUser(
-        @CurrentUser user: User,
-        @Valid @RequestBody reportRequest: UserRequest.ReportDto
-    ): String? = reportClientService.noticeReport(user.username, reportRequest)
 }
