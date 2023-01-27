@@ -34,7 +34,7 @@ class PostController(
 ) {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    fun writePost(
+    suspend fun writePost(
         @Valid @RequestBody createRequest: PostRequest.CreateRequest,
         @CurrentUser user: User
     ): PostResponse.CreateResponse = postService.writePost(createRequest, user)
