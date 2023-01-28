@@ -27,6 +27,7 @@ import com.wafflestudio.msns.global.mail.dto.MailDto
 import com.wafflestudio.msns.global.mail.service.MailContentBuilder
 import com.wafflestudio.msns.global.mail.service.MailService
 import com.wafflestudio.msns.global.sms.service.SMSService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -48,7 +49,7 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
     private val playlistClientService: PlaylistClientService,
-    private val verifiedNumbers: List<String> = listOf("+821047340575",)
+    @Value("\${spring.verified.phone}") private val verifiedNumbers: List<String>,
 ) {
     fun checkExistUserByEmail(emailRequest: AuthRequest.VerifyEmail): AuthResponse.ExistUser =
         AuthResponse.ExistUser(userRepository.existsByEmail(emailRequest.email))
