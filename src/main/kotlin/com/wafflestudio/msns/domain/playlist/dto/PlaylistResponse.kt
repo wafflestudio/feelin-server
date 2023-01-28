@@ -1,6 +1,7 @@
 package com.wafflestudio.msns.domain.playlist.dto
 
 import com.wafflestudio.msns.domain.playlist.model.Playlist
+import com.wafflestudio.msns.domain.post.model.Post
 import com.wafflestudio.msns.domain.track.dto.TrackResponse
 import java.util.UUID
 
@@ -38,6 +39,18 @@ class PlaylistResponse {
             thumbnail = playlistResponse.preview.thumbnail,
             title = playlistResponse.title,
             tracks = playlistResponse.tracks
+        )
+    }
+
+    data class FeedPreviewResponse(
+        val id: UUID,
+        val thumbnail: String,
+        val mainTracks: List<TrackResponse.FeedPreviewResponse>
+    ) {
+        constructor(post: Post) : this(
+            id = post.playlist.playlistId,
+            thumbnail = post.playlist.thumbnail,
+            mainTracks = post.mainTracks.map { TrackResponse.FeedPreviewResponse(it) }
         )
     }
 }

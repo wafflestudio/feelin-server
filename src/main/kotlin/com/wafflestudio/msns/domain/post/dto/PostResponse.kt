@@ -68,7 +68,7 @@ class PostResponse {
         val user: UserResponse.PreviewResponse,
         val updatedAt: LocalDateTime?,
         val createdAt: LocalDateTime?,
-        val playlist: PlaylistResponse.PreviewResponse,
+        val playlist: PlaylistResponse.FeedPreviewResponse,
         val likes: Int,
         val doesLike: Boolean
     )

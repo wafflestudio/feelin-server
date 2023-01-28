@@ -10,6 +10,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
 import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.post.model.QPost.post
+import com.wafflestudio.msns.domain.post.model.QPostMainTrack.postMainTrack
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.QFollow.follow
 import com.wafflestudio.msns.domain.user.model.QLike.like
@@ -46,8 +47,8 @@ open class PostCustomRepositoryImpl(
                     post.updatedAt,
                     post.createdAt,
                     Projections.constructor(
-                        PlaylistResponse.PreviewResponse::class.java,
-                        post.playlist
+                        PlaylistResponse.FeedPreviewResponse::class.java,
+                        post
                     ),
                     post.likes.size(),
                     JPAExpressions
@@ -57,6 +58,7 @@ open class PostCustomRepositoryImpl(
                 )
             )
             .from(post)
+            .join(post.mainTracks, postMainTrack)
             .orderBy(*orders.toTypedArray())
             .limit(pageable.pageSize.toLong() + 1)
 
