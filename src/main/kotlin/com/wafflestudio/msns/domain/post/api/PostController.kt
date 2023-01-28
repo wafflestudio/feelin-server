@@ -94,5 +94,5 @@ class PostController(
     fun reportUser(
         @CurrentUser user: User,
         @Valid @RequestBody reportRequest: UserRequest.ReportDto
-    ): String? = reportClientService.noticeReport(user.username, reportRequest)
+    ): String? = reportClientService.noticeReport(user.username, reportRequest, isUser = false)
 }

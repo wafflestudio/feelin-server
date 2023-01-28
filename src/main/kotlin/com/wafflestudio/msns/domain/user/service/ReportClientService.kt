@@ -9,13 +9,16 @@ import reactor.core.publisher.Mono
 class ReportClientService(
     private val slackClient: WebClient
 ) {
-    fun noticeReport(username: String, reportRequest: UserRequest.ReportDto): String? {
+    fun noticeReport(username: String, reportRequest: UserRequest.ReportDto, isUser: Boolean): String? {
         val slackReport = UserRequest.SlackReportDto(
             listOf(
                 UserRequest.SlackReportMessageDto(
                     "⚠️ 신고 메시지 요청이 실패했습니다. ⚠️",
                     "#FF0000",
-                    "⚠️ 사용자 신고 ⚠️",
+                    when (isUser) {
+                        true -> "⚠️ 사용자 신고 ⚠️"
+                        false -> "⚠️ 게시물 신고 ⚠️"
+                    },
                     reportRequest.username,
                     "https://avatars.githubusercontent.com/u/1299328?s=200&v=4",
                     "‼️신고 사유‼️",
