@@ -17,11 +17,6 @@ class AuthRequest {
         )
         val countryCode: String,
 
-        @field:NotBlank
-        @Pattern(
-            regexp = "^[0-9]{2}[-]+[0-9]{4}[-]+[0-9]{4}\$",
-            message = "wrong phone number format"
-        )
         val phoneNumber: String,
     )
 

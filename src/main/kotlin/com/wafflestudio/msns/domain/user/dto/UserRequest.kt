@@ -3,12 +3,13 @@ package com.wafflestudio.msns.domain.user.dto
 import com.wafflestudio.msns.domain.post.dto.PostRequest
 import com.wafflestudio.msns.global.enum.Report
 import java.util.UUID
+import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
 class UserRequest {
     data class SignUp(
-        val email: String?,
+        @field:Email val email: String?,
         val phoneNumber: String?,
         val countryCode: String?,
         @field:NotBlank val password: String,
