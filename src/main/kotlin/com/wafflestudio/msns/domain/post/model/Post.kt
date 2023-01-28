@@ -53,7 +53,7 @@ class Post(
 
 @Embeddable
 class PostMainTrack(
-    private val title: String,
-    private val artist: String,
-    private val thumbnail: String
+    val title: String,
+    val artist: String,
+    val thumbnail: String
 )
