@@ -10,9 +10,9 @@ defaults:
 
 jobs:
     deploy:
-        name: deploy (dev)
+        name: deploy (prod)
         runs-on: ubuntu-latest
-        environment: dev
+        environment: prod
         env:
             IMAGE_TAG: ${{ github.run_number }}
             BUILD_NUMBER: ${{ github.run_number }}
