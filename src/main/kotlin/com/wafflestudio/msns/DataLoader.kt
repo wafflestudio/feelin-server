@@ -27,7 +27,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 @Component
-@Profile("dev")
+@Profile("none")
 class DataLoader(
     private val userRepository: UserRepository,
     private val artistRepository: ArtistRepository,
