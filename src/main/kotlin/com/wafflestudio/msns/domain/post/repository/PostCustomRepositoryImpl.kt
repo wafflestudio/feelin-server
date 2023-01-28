@@ -58,7 +58,6 @@ open class PostCustomRepositoryImpl(
                 )
             )
             .from(post)
-            .join(post.mainTracks, postMainTrack)
             .orderBy(*orders.toTypedArray())
             .limit(pageable.pageSize.toLong() + 1)
 
