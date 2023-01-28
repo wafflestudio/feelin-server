@@ -1,9 +1,11 @@
 package com.wafflestudio.msns.global.config
 
+import com.wafflestudio.msns.global.enum.ENV
 import io.netty.channel.ChannelOption
 import io.netty.handler.timeout.ReadTimeoutHandler
 import io.netty.handler.timeout.WriteTimeoutHandler
 import io.netty.resolver.DefaultAddressResolverGroup
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
@@ -14,12 +16,14 @@ import reactor.netty.http.client.HttpClient
 import java.time.Duration
 
 @Configuration
-class WebClientConfig {
+class WebClientConfig(
+    @Value("\${spring.profiles.active}") private val env: String
+) {
     @Bean
     fun playlistClient(): WebClient =
         WebClient
             .builder()
-            .baseUrl("https://feelin-api-dev.wafflestudio.com/api/v1")
+            .baseUrl(ENV.valueOf(env.uppercase()).domain)
             .clientConnector(
                 ReactorClientHttpConnector(
                     HttpClient

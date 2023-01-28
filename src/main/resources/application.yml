@@ -2,8 +2,9 @@ spring:
     profiles:
         active: local
         group:
-            local: mail, jwt, verification, flyway
-            deploy: deploy
+            local: mail, jwt, verification, flyway, local
+            dev: dev
+            prod: prod
 ---
 spring:
     config:
