@@ -1,4 +1,5 @@
 FROM openjdk:11-jdk
+ARG ENV
 WORKDIR /app
 COPY . /app
 RUN ./gradlew bootJar
