@@ -3,7 +3,8 @@ spring:
         active: local
         group:
             local: mail, jwt, verification, flyway
-            deploy: deploy
+            dev: dev
+            prod: prod
 ---
 spring:
     config:
