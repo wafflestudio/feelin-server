@@ -19,4 +19,6 @@ interface PostCustomRepository {
         cursor: String?,
         pageable: Pageable
     ): Slice<PostResponse.PreviewResponse>
+
+    fun deleteAllByUserId(userId: UUID)
 }

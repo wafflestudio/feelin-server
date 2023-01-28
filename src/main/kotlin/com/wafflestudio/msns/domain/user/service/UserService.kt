@@ -95,13 +95,11 @@ class UserService(
     suspend fun withdrawUser(user: User, accessToken: String) {
         followRepository.deleteFollowsByFromUser_Id(user.id)
         followRepository.deleteFollowsByToUser_Id(user.id)
-        likeRepository.deleteMappingByUserId(user.id)
-        likeRepository.deleteMappingByUserIdOfPost(user.id)
+        likeRepository.deleteMappingByUserId(user.id.toString())
+        likeRepository.deleteMappingByUserIdOfPost(user.id.toString())
 
-        playlistClientService.withdrawUser(user.id, accessToken)
-
-        postRepository.deleteAllUserPostsByUserId(user.id.toString())
-        playlistRepository.deleteMappingByUserId(user.id.toString())
+        postRepository.deleteAllByUserId(user.id)
+        playlistRepository.deleteAllByUserId(user.id)
         verificationTokenRepository.deleteVerificationTokenByEmailOrPhoneNumberAndCountryCode(
             user.email,
             user.phoneNumber,
@@ -109,5 +107,6 @@ class UserService(
         )
 
         userRepository.deleteUserById(user.id)
+        playlistClientService.withdrawUser(user.id, accessToken)
     }
 }

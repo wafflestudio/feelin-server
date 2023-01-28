@@ -19,9 +19,10 @@ import com.wafflestudio.msns.global.util.QueryDslUtil
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.domain.SliceImpl
+import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
-class PostCustomRepositoryImpl(
+open class PostCustomRepositoryImpl(
     private val queryFactory: JPAQueryFactory
 ) : PostCustomRepository {
     override fun getFeed(
@@ -137,5 +138,13 @@ class PostCustomRepositoryImpl(
         }
 
         return SliceImpl(query, pageable, hasNext)
+    }
+
+    @Transactional
+    override fun deleteAllByUserId(userId: UUID) {
+        queryFactory
+            .delete(post)
+            .where(post.user.id.eq(userId))
+            .execute()
     }
 }

@@ -21,17 +21,17 @@ interface LikeRepository : JpaRepository<Like, UUID?> {
 
     @Transactional
     @Modifying
-    @Query("DELETE FROM Likes l WHERE l.user_id = :userId", nativeQuery = true)
-    fun deleteMappingByUserId(@Param("userId") userId: UUID)
+    @Query("delete from likes l where l.user_id = :userId", nativeQuery = true)
+    fun deleteMappingByUserId(@Param("userId") userId: String)
 
     @Transactional
     @Modifying
     @Query(
-        "DELETE FROM Likes l WHERE l.post_id in " +
-            "(SELECT p.id FROM Post p WHERE p.user_id = :userId)",
+        "delete from likes l where l.post_id in " +
+            "(select p.id from post p where p.user_id = :userId)",
         nativeQuery = true
     )
-    fun deleteMappingByUserIdOfPost(@Param("userId") userId: UUID)
+    fun deleteMappingByUserIdOfPost(@Param("userId") userId: String)
 
     fun countByPost_Id(postId: UUID): Long
 
