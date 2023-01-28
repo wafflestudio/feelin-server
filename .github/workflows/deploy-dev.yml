@@ -4,7 +4,7 @@ on:
   push:
     branches: [ develop ]
 
-defaults:sdf
+defaults:
   run:
     working-directory: .
 
