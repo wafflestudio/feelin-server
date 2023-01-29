@@ -6,6 +6,7 @@ import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.model.AuthenticationToken
 import com.wafflestudio.msns.global.auth.model.UserPrincipal
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
+import com.wafflestudio.msns.global.enum.ENV
 import com.wafflestudio.msns.global.enum.JWT
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
@@ -27,6 +28,7 @@ import java.util.UUID
 @Component
 class JwtTokenProvider(
     @Value("\${spring.jwt.secret}") private val jwtSecretKey: String,
+    @Value("\${spring.profiles.active}") private val env: String,
     private val userRepository: UserRepository,
     private val verificationTokenRepository: VerificationTokenRepository,
 ) {
@@ -39,10 +41,9 @@ class JwtTokenProvider(
         val now = Date()
         val expiryDate = Date(
             now.time + when (type) {
-                JWT.JOIN -> jwtExpirationInMs
-                JWT.SIGN_UP -> jwtJoinExpirationInMs
-                JWT.SIGN_IN -> jwtExpirationInMs
-                JWT.REFRESH -> jwtRefreshExpirationInMs
+                JWT.JOIN -> jwtJoinExpirationInMs
+                JWT.ACCESS -> jwtExpirationInMs(env)
+                JWT.REFRESH -> jwtRefreshExpirationInMs(env)
             }
         )
         val key: Key = Keys.hmacShaKeyFor(jwtSecretKey.toByteArray())
@@ -126,7 +127,17 @@ class JwtTokenProvider(
 
     companion object {
         private val jwtJoinExpirationInMs: Long = Duration.ofMinutes(10).toMillis()
-        private val jwtExpirationInMs: Long = Duration.ofHours(1).toMillis()
-        private val jwtRefreshExpirationInMs: Long = Duration.ofDays(14).toMillis()
+        private fun jwtExpirationInMs(env: String): Long =
+            when (ENV.valueOf(env.uppercase())) {
+                ENV.LOCAL -> Duration.ofHours(1).toMillis()
+                ENV.DEV -> Duration.ofSeconds(30).toMillis()
+                ENV.PROD -> Duration.ofHours(1).toMillis()
+            }
+        private fun jwtRefreshExpirationInMs(env: String): Long =
+            when (ENV.valueOf(env.uppercase())) {
+                ENV.LOCAL -> Duration.ofDays(14).toMillis()
+                ENV.DEV -> Duration.ofMinutes(2).toMillis()
+                ENV.PROD -> Duration.ofDays(14).toMillis()
+            }
     }
 }
