@@ -34,7 +34,7 @@ open class BlockCustomRepositoryImpl(
                     user.id,
                     user.username,
                     user.profileImageUrl,
-                    QFollow.follow.createdAt,
+                    block.createdAt,
                 )
             )
             .from(block)

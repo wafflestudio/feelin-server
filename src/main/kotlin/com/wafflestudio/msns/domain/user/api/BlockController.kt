@@ -34,7 +34,7 @@ class BlockController(
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    fun getFollowings(
+    fun getBlocks(
         @RequestParam("cursor", required = false) cursor: String?,
         @PageableDefault(size = 10, sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable,
         @CurrentUser user: User

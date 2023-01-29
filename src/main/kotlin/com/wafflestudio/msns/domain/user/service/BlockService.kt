@@ -1,7 +1,7 @@
 package com.wafflestudio.msns.domain.user.service
 
 import com.wafflestudio.msns.domain.user.dto.UserResponse
-import com.wafflestudio.msns.domain.user.exception.AlreadyExistFollowException
+import com.wafflestudio.msns.domain.user.exception.AlreadyExistBlockException
 import com.wafflestudio.msns.domain.user.exception.ForbiddenBlockException
 import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.model.Block
@@ -40,7 +40,7 @@ class BlockService(
                         )
                     )
                 } catch (e: DataIntegrityViolationException) {
-                    throw AlreadyExistFollowException("You already blocked the user.")
+                    throw AlreadyExistBlockException("You already blocked the user.")
                 }
             }
             ?: throw UserNotFoundException("The user you want to block is not found.")
