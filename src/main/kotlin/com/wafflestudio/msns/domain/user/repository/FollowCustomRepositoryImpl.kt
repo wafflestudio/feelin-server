@@ -57,7 +57,7 @@ open class FollowCustomRepositoryImpl(
                     .and(
                         JPAExpressions
                             .selectFrom(block)
-                            .where(block.fromUser.eq(follow.toUser).and(block.fromUser.eq(loginUser)))
+                            .where(block.fromUser.eq(follow.toUser).and(block.toUser.eq(loginUser)))
                             .exists()
                             .not()
                     )
