@@ -36,7 +36,7 @@ class SignInAuthenticationFilter(
         chain: FilterChain,
         authResult: Authentication,
     ) {
-        val accessJWT = jwtTokenProvider.generateToken(authResult, JWT.SIGN_IN)
+        val accessJWT = jwtTokenProvider.generateToken(authResult, JWT.ACCESS)
         val refreshJWT = jwtTokenProvider.generateToken(authResult, JWT.REFRESH)
         response.addHeader("Access-Token", accessJWT)
         response.addHeader("Refresh-Token", refreshJWT)

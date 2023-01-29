@@ -91,11 +91,11 @@ class DataLoader(
         userRepository.save(userA)
         userRepository.save(userB)
 
-        val jwtA = jwtTokenProvider.generateToken(admin.id, JWT.SIGN_IN)
+        val jwtA = jwtTokenProvider.generateToken(admin.id, JWT.ACCESS)
         val jwtB = jwtTokenProvider.generateToken(admin.id, JWT.REFRESH)
-        val jwtC = jwtTokenProvider.generateToken(userA.id, JWT.SIGN_IN)
+        val jwtC = jwtTokenProvider.generateToken(userA.id, JWT.ACCESS)
         val jwtD = jwtTokenProvider.generateToken(userA.id, JWT.REFRESH)
-        val jwtE = jwtTokenProvider.generateToken(userB.id, JWT.SIGN_IN)
+        val jwtE = jwtTokenProvider.generateToken(userB.id, JWT.ACCESS)
         val jwtF = jwtTokenProvider.generateToken(userB.id, JWT.REFRESH)
 
         val verificationTokenA = VerificationToken(
