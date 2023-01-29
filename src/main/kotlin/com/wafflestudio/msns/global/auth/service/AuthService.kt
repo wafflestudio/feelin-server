@@ -27,6 +27,7 @@ import com.wafflestudio.msns.global.mail.dto.MailDto
 import com.wafflestudio.msns.global.mail.service.MailContentBuilder
 import com.wafflestudio.msns.global.mail.service.MailService
 import com.wafflestudio.msns.global.sms.service.SMSService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -47,7 +48,8 @@ class AuthService(
     private val mailContentBuilder: MailContentBuilder,
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val playlistClientService: PlaylistClientService
+    private val playlistClientService: PlaylistClientService,
+    @Value("\${spring.verified.phone}") private val verifiedNumbers: List<String>,
 ) {
     fun checkExistUserByEmail(emailRequest: AuthRequest.VerifyEmail): AuthResponse.ExistUser =
         AuthResponse.ExistUser(userRepository.existsByEmail(emailRequest.email))
@@ -71,9 +73,13 @@ class AuthService(
         val newCountryCode = phoneRequest.countryCode
         val newPhoneNumber = phoneRequest.phoneNumber
 
-        val code = createRandomCode()
-        generateTokenWithPhone(newCountryCode, newPhoneNumber, code, JWT.JOIN)
-        smsService.sendSMS(newCountryCode, newPhoneNumber, code)
+        if (verifiedNumbers.contains(newCountryCode + newPhoneNumber))
+            generateTokenWithPhone(newCountryCode, newPhoneNumber, code = "000000", JWT.JOIN)
+        else {
+            val code = createRandomCode()
+            generateTokenWithPhone(newCountryCode, newPhoneNumber, code = code, JWT.JOIN)
+            smsService.sendSMS(newCountryCode, newPhoneNumber, code)
+        }
     }
 
     fun signUp(signUpRequest: UserRequest.SignUp): ResponseEntity<UserResponse.SimpleUserInfo> {
