@@ -8,7 +8,6 @@ import com.querydsl.core.types.dsl.Expressions
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.QBlock.block
-import com.wafflestudio.msns.domain.user.model.QFollow
 import com.wafflestudio.msns.domain.user.model.QUser.user
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.global.util.QueryDslUtil
@@ -34,7 +33,7 @@ open class BlockCustomRepositoryImpl(
                     user.id,
                     user.username,
                     user.profileImageUrl,
-                    QFollow.follow.createdAt,
+                    block.createdAt,
                 )
             )
             .from(block)
