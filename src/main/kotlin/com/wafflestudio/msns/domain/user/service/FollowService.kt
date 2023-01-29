@@ -6,6 +6,7 @@ import com.wafflestudio.msns.domain.user.exception.ForbiddenFollowException
 import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.model.Follow
 import com.wafflestudio.msns.domain.user.model.User
+import com.wafflestudio.msns.domain.user.repository.BlockRepository
 import com.wafflestudio.msns.domain.user.repository.FollowRepository
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.util.CursorUtil
@@ -22,11 +23,12 @@ import java.util.UUID
 @Service
 class FollowService(
     private val followRepository: FollowRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val blockRepository: BlockRepository
 ) {
     fun makeFollow(fromUser: User, toUserId: UUID) {
+        if (toUserId == fromUser.id) throw ForbiddenFollowException("You cannot follow yourself.")
         userRepository.findByIdOrNull(toUserId)
-            ?.also { if (toUserId == fromUser.id) throw ForbiddenFollowException("You cannot follow yourself.") }
             ?.let { toUser ->
                 try {
                     followRepository.save(
@@ -48,9 +50,13 @@ class FollowService(
         pageable: Pageable,
         fromUserId: UUID
     ): ResponseEntity<Slice<UserResponse.FollowListResponse>> {
+        if (blockRepository.existsByFromUserAndToUser_Id(loginUser, fromUserId) ||
+            blockRepository.existsByFromUser_IdAndToUser(fromUserId, loginUser)
+        )
+            return ResponseEntity(null, null, HttpStatus.NO_CONTENT)
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<UserResponse.FollowListResponse> =
-            followRepository.getFollowingsByFromUserId(loginUser, cursor, pageable, fromUserId)
+            followRepository.getFollowsByFromUserId(loginUser, cursor, pageable, fromUserId)
         val lastElement: UserResponse.FollowListResponse? = httpBody.content.lastOrNull()
         val nextCursor: String? = CursorUtil.generateCustomCursor(lastElement?.createdAt)
         httpHeaders.set("cursor", nextCursor)
@@ -63,9 +69,13 @@ class FollowService(
         pageable: Pageable,
         toUserId: UUID
     ): ResponseEntity<Slice<UserResponse.FollowListResponse>> {
+        if (blockRepository.existsByFromUserAndToUser_Id(loginUser, toUserId) ||
+            blockRepository.existsByFromUser_IdAndToUser(toUserId, loginUser)
+        )
+            return ResponseEntity(null, null, HttpStatus.NO_CONTENT)
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<UserResponse.FollowListResponse> =
-            followRepository.getFollowingsByToUserId(loginUser, cursor, pageable, toUserId)
+            followRepository.getFollowsByToUserId(loginUser, cursor, pageable, toUserId)
         val lastElement: UserResponse.FollowListResponse? = httpBody.content.lastOrNull()
         val nextCursor: String? = CursorUtil.generateCustomCursor(lastElement?.createdAt)
         httpHeaders.set("cursor", nextCursor)
@@ -73,5 +83,5 @@ class FollowService(
     }
 
     fun deleteFollow(fromUser: User, toUserId: UUID) =
-        followRepository.deleteFollowByFromUser_IdAndToUser_Id(fromUser.id, toUserId)
+        followRepository.deleteFollowByFromUserAndToUserId(fromUser, toUserId)
 }
