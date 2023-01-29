@@ -91,7 +91,7 @@ class AuthService(
             else throw InvalidSignUpFormException("either email or phone is needed for sign-up.")
 
         playlistClientService.createUser(newUser.id, signUpRequest.username)
-        val accessJWT = jwtTokenProvider.generateToken(newUser.id, JWT.SIGN_IN)
+        val accessJWT = jwtTokenProvider.generateToken(newUser.id, JWT.ACCESS)
         val refreshJWT = jwtTokenProvider.generateToken(newUser.id, JWT.REFRESH)
 
         val responseHeaders = HttpHeaders()
@@ -132,7 +132,7 @@ class AuthService(
         val isMatched: Boolean = passwordEncoder.matches(password, user.password)
         if (!isMatched) throw SignInFailedException("wrong password")
 
-        val accessJWT = jwtTokenProvider.generateToken(user.id, JWT.SIGN_IN)
+        val accessJWT = jwtTokenProvider.generateToken(user.id, JWT.ACCESS)
         val refreshJWT = jwtTokenProvider.generateToken(user.id, JWT.REFRESH)
 
         val responseHeaders = HttpHeaders()
@@ -245,7 +245,7 @@ class AuthService(
                 }
             }
             ?.apply {
-                this.accessToken = jwtTokenProvider.generateToken(id, JWT.SIGN_IN)
+                this.accessToken = jwtTokenProvider.generateToken(id, JWT.ACCESS)
                 this.refreshToken = jwtTokenProvider.generateToken(id, JWT.REFRESH)
             }
             ?.let { verificationTokenRepository.save(it) }
