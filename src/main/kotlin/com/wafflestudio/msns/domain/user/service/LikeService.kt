@@ -40,7 +40,7 @@ class LikeService(
                 if (blockRepository.existsByFromUserAndToUser(loginUser, post.user) ||
                     blockRepository.existsByFromUserAndToUser(post.user, loginUser)
                 )
-                    return ResponseEntity(null, null, HttpStatus.NO_CONTENT)
+                    return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
             }
             ?: throw PostNotFoundException("post is not found with the id.")
         val httpHeaders = HttpHeaders()

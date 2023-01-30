@@ -60,7 +60,7 @@ class UserService(
                 if (blockRepository.existsByFromUserAndToUser(loginUser, user) ||
                     blockRepository.existsByFromUserAndToUser(user, loginUser)
                 )
-                    return ResponseEntity(null, null, HttpStatus.NO_CONTENT)
+                    return ResponseEntity(null, null, HttpStatus.NOT_FOUND)
             }
             ?.let { user ->
                 UserResponse.ProfileResponse(
@@ -75,7 +75,7 @@ class UserService(
                     followRepository.existsByFromUser_IdAndToUser_Id(loginUser.id, id)
                 )
             }
-            ?.let { httpBody -> ResponseEntity(httpBody, null, HttpStatus.NO_CONTENT) }
+            ?.let { httpBody -> ResponseEntity(httpBody, null, HttpStatus.OK) }
             ?: throw UserNotFoundException("user is not found with the userId.")
 
     fun putMyProfile(user: User, putRequest: UserRequest.PutProfile): UserResponse.MyProfileResponse =
