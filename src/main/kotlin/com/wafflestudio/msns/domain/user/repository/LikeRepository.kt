@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
-interface LikeRepository : JpaRepository<Like, UUID?> {
+interface LikeRepository : JpaRepository<Like, UUID?>, LikeCustomRepository {
     fun findAllByPost_Id(pageable: Pageable, postId: UUID): Page<Like>?
 
     @Transactional

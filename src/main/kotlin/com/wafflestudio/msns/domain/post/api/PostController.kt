@@ -50,29 +50,27 @@ class PostController(
     ): ResponseEntity<Slice<PostResponse.FeedResponse>> = postService.getFeed(user, viewFollowers, cursor, pageable)
 
     @GetMapping("")
-    @ResponseStatus(HttpStatus.OK)
     fun getPosts(
         @PageableDefault(
             size = 20, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
         @RequestParam("cursor", required = false) cursor: String?,
         @RequestParam("userId", required = false, defaultValue = "00000000-0000-0000-0000-000000000000") userId: UUID,
-        @CurrentUser user: User
+        @CurrentUser loginUser: User
     ): ResponseEntity<Slice<PostResponse.PreviewResponse>> =
-        postService.getPosts(if (userId == UUID(0, 0)) user.id else userId, cursor, pageable)
+        postService.getPosts(loginUser, if (userId == UUID(0, 0)) loginUser.id else userId, cursor, pageable)
 
     @GetMapping("/{postId}")
-    @ResponseStatus(HttpStatus.OK)
     suspend fun getPost(
         @PathVariable("postId") postId: UUID,
-        @CurrentUser user: User
-    ): PostResponse.DetailResponse = postService.getPostById(user, postId)
+        @CurrentUser loginUser: User
+    ): ResponseEntity<PostResponse.DetailResponse> = postService.getPostById(loginUser, postId)
 
     @GetMapping("/{postId}/playlist/order")
-    @ResponseStatus(HttpStatus.OK)
     fun getPostPlaylistOrder(
-        @PathVariable("postId") postId: UUID
-    ): PostResponse.PlaylistOrderResponse = postService.getPostPlaylistOrder(postId)
+        @PathVariable("postId") postId: UUID,
+        @CurrentUser loginUser: User
+    ): ResponseEntity<PostResponse.PlaylistOrderResponse> = postService.getPostPlaylistOrder(loginUser, postId)
 
     @PutMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)

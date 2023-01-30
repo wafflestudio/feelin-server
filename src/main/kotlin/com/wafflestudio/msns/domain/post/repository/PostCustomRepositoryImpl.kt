@@ -11,6 +11,7 @@ import com.wafflestudio.msns.domain.playlist.dto.PlaylistResponse
 import com.wafflestudio.msns.domain.post.dto.PostResponse
 import com.wafflestudio.msns.domain.post.model.QPost.post
 import com.wafflestudio.msns.domain.user.dto.UserResponse
+import com.wafflestudio.msns.domain.user.model.QBlock.block
 import com.wafflestudio.msns.domain.user.model.QFollow.follow
 import com.wafflestudio.msns.domain.user.model.QLike.like
 import com.wafflestudio.msns.domain.user.model.QUser.user
@@ -65,11 +66,39 @@ open class PostCustomRepositoryImpl(
                 .join(follow)
                 .on(post.user.eq(follow.toUser))
                 .where(
-                    follow.fromUser.eq(loginUser).and(
-                        ltPostUpdatedAt(cursor)
-                    )
+                    follow.fromUser.eq(loginUser)
+                        .and(
+                            JPAExpressions
+                                .selectFrom(block)
+                                .where(block.fromUser.eq(loginUser).and(block.toUser.eq(post.user)))
+                                .exists()
+                                .not()
+                        )
+                        .and(
+                            JPAExpressions
+                                .selectFrom(block)
+                                .where(block.fromUser.eq(post.user).and(block.toUser.eq(loginUser)))
+                                .exists()
+                                .not()
+                        )
+                        .and(ltPostUpdatedAt(cursor))
                 )
-        else fetch.where(ltPostUpdatedAt(cursor))
+
+        else fetch.where(
+            JPAExpressions
+                .selectFrom(block)
+                .where(block.fromUser.eq(loginUser).and(block.toUser.eq(post.user)))
+                .exists()
+                .not()
+                .and(
+                    JPAExpressions
+                        .selectFrom(block)
+                        .where(block.fromUser.eq(post.user).and(block.toUser.eq(loginUser)))
+                        .exists()
+                        .not()
+                )
+                .and(ltPostUpdatedAt(cursor))
+        )
 
         val query = fetch.fetch()
             as MutableList<PostResponse.FeedResponse>

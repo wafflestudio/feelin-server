@@ -19,6 +19,7 @@ import com.wafflestudio.msns.domain.post.repository.PostRepository
 import com.wafflestudio.msns.domain.track.dto.TrackResponse
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
+import com.wafflestudio.msns.domain.user.repository.BlockRepository
 import com.wafflestudio.msns.domain.user.repository.LikeRepository
 import com.wafflestudio.msns.global.util.CursorUtil
 import org.modelmapper.ModelMapper
@@ -37,6 +38,7 @@ class PostService(
     private val postRepository: PostRepository,
     private val playlistRepository: PlaylistRepository,
     private val likeRepository: LikeRepository,
+    private val blockRepository: BlockRepository,
     private val playlistClientService: PlaylistClientService,
     private val modelMapper: ModelMapper
 ) {
@@ -50,8 +52,9 @@ class PostService(
         if (order != (1..length).toList())
             throw InvalidPlaylistOrderException("playlist order must be list of 1, ..., length")
 
+        val playlistTracks: List<TrackResponse.APIDto> = playlistClientService.getPlaylist(playlistDto.id).tracks
         val playlistMainTracks: MutableList<PostMainTrack> =
-            playlistClientService.getPlaylist(playlistDto.id).tracks.subList(0, 3)
+            playlistTracks.subList(0, if (playlistTracks.size < 3) playlistTracks.size else 3)
                 .map { PostMainTrack(it.title, getArtistNameString(it.artists), it.album.thumbnail) }
                 as MutableList<PostMainTrack>
 
@@ -98,10 +101,15 @@ class PostService(
     }
 
     fun getPosts(
+        loginUser: User,
         userId: UUID,
         cursor: String?,
         pageable: Pageable
     ): ResponseEntity<Slice<PostResponse.PreviewResponse>> {
+        if (blockRepository.existsByFromUser_IdAndToUser(userId, loginUser) ||
+            blockRepository.existsByFromUserAndToUser_Id(loginUser, userId)
+        )
+            return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<PostResponse.PreviewResponse> = postRepository.getAllByUserId(userId, cursor, pageable)
         val lastElement: PostResponse.PreviewResponse? = httpBody.content.lastOrNull()
@@ -110,8 +118,14 @@ class PostService(
         return ResponseEntity(httpBody, httpHeaders, HttpStatus.OK)
     }
 
-    suspend fun getPostById(user: User, postId: UUID): PostResponse.DetailResponse =
+    suspend fun getPostById(loginUser: User, postId: UUID): ResponseEntity<PostResponse.DetailResponse> =
         postRepository.findPostById(postId)
+            ?.also { post ->
+                if (blockRepository.existsByFromUserAndToUser(post.user, loginUser) ||
+                    blockRepository.existsByFromUserAndToUser(loginUser, post.user)
+                )
+                    return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
+            }
             ?.let { post ->
                 playlistClientService.getPlaylist(post.playlist.playlistId)
                     .let { webDto ->
@@ -133,9 +147,10 @@ class PostService(
                                     post.updatedAt,
                                     PlaylistResponse.DetailResponse(playlist),
                                     likeRepository.countByPost_Id(postId),
-                                    likeRepository.existsByPost_IdAndUser_Id(postId, user.id)
+                                    likeRepository.existsByPost_IdAndUser_Id(postId, loginUser.id)
                                 )
                             }
+                            .let { httpBody -> ResponseEntity(httpBody, null, HttpStatus.OK) }
                     }
             }
             ?: throw PostNotFoundException("post is not found with the given id.")
@@ -171,9 +186,16 @@ class PostService(
             ?: throw PostNotFoundException("post is not found with the id.")
     }
 
-    fun getPostPlaylistOrder(postId: UUID): PostResponse.PlaylistOrderResponse =
+    fun getPostPlaylistOrder(loginUser: User, postId: UUID): ResponseEntity<PostResponse.PlaylistOrderResponse> =
         postRepository.findPostById(postId)
+            ?.also { post ->
+                if (blockRepository.existsByFromUserAndToUser(post.user, loginUser) ||
+                    blockRepository.existsByFromUserAndToUser(loginUser, post.user)
+                )
+                    return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
+            }
             ?.let { PostResponse.PlaylistOrderResponse(it.playlist.playlistOrder) }
+            ?.let { httpBody -> ResponseEntity(httpBody, null, HttpStatus.OK) }
             ?: throw PostNotFoundException("post is not found with the id.")
 
     private fun getArtistNameString(artists: List<ArtistResponse.APIDto>): String = artists.joinToString { it.name }

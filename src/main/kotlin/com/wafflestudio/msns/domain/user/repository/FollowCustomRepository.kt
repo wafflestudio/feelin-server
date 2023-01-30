@@ -7,16 +7,35 @@ import org.springframework.data.domain.Slice
 import java.util.UUID
 
 interface FollowCustomRepository {
-    fun getFollowingsByFromUserId(
+    fun getFollowsByFromUserId(
         loginUser: User,
         cursor: String?,
         pageable: Pageable,
         fromUserId: UUID
     ): Slice<UserResponse.FollowListResponse>
-    fun getFollowingsByToUserId(
+
+    fun getFollowsByToUserId(
         loginUser: User,
         cursor: String?,
         pageable: Pageable,
         toUserId: UUID
     ): Slice<UserResponse.FollowListResponse>
+
+    fun deleteFollowsByFromUserId(
+        fromUserId: UUID
+    )
+
+    fun deleteFollowsByToUserId(
+        toUserId: UUID
+    )
+
+    fun deleteFollowByFromUserAndToUserId(
+        fromUser: User,
+        toUserId: UUID
+    )
+
+    fun deleteFollowByFromUserIdAndToUser(
+        fromUserId: UUID,
+        toUser: User
+    )
 }

@@ -7,12 +7,15 @@ import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.model.User
+import com.wafflestudio.msns.domain.user.repository.BlockRepository
 import com.wafflestudio.msns.domain.user.repository.FollowRepository
 import com.wafflestudio.msns.domain.user.repository.LikeRepository
 import com.wafflestudio.msns.domain.user.repository.UserRepository
 import com.wafflestudio.msns.global.auth.exception.ForbiddenUsernameException
 import com.wafflestudio.msns.global.auth.repository.VerificationTokenRepository
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -25,6 +28,7 @@ class UserService(
     private val verificationTokenRepository: VerificationTokenRepository,
     private val followRepository: FollowRepository,
     private val likeRepository: LikeRepository,
+    private val blockRepository: BlockRepository,
     private val playlistRepository: PlaylistRepository,
     private val playlistClientService: PlaylistClientService
 ) {
@@ -50,8 +54,14 @@ class UserService(
             followRepository.countByFromUser_Id(user.id)
         )
 
-    fun getProfileByUserId(loginUser: User, id: UUID): UserResponse.ProfileResponse =
+    fun getProfileByUserId(loginUser: User, id: UUID): ResponseEntity<UserResponse.ProfileResponse> =
         userRepository.findByIdOrNull(id)
+            ?.also { user ->
+                if (blockRepository.existsByFromUserAndToUser(loginUser, user) ||
+                    blockRepository.existsByFromUserAndToUser(user, loginUser)
+                )
+                    return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
+            }
             ?.let { user ->
                 UserResponse.ProfileResponse(
                     user.id,
@@ -65,6 +75,7 @@ class UserService(
                     followRepository.existsByFromUser_IdAndToUser_Id(loginUser.id, id)
                 )
             }
+            ?.let { httpBody -> ResponseEntity(httpBody, null, HttpStatus.OK) }
             ?: throw UserNotFoundException("user is not found with the userId.")
 
     fun putMyProfile(user: User, putRequest: UserRequest.PutProfile): UserResponse.MyProfileResponse =
@@ -93,8 +104,8 @@ class UserService(
 
     @Transactional
     suspend fun withdrawUser(user: User, accessToken: String) {
-        followRepository.deleteFollowsByFromUser_Id(user.id)
-        followRepository.deleteFollowsByToUser_Id(user.id)
+        followRepository.deleteFollowsByFromUserId(user.id)
+        followRepository.deleteFollowsByToUserId(user.id)
         likeRepository.deleteMappingByUserId(user.id.toString())
         likeRepository.deleteMappingByUserIdOfPost(user.id.toString())
 
