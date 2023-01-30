@@ -53,7 +53,7 @@ class FollowService(
         if (blockRepository.existsByFromUserAndToUser_Id(loginUser, fromUserId) ||
             blockRepository.existsByFromUser_IdAndToUser(fromUserId, loginUser)
         )
-            return ResponseEntity(null, null, HttpStatus.NO_CONTENT)
+            return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<UserResponse.FollowListResponse> =
             followRepository.getFollowsByFromUserId(loginUser, cursor, pageable, fromUserId)
@@ -72,7 +72,7 @@ class FollowService(
         if (blockRepository.existsByFromUserAndToUser_Id(loginUser, toUserId) ||
             blockRepository.existsByFromUser_IdAndToUser(toUserId, loginUser)
         )
-            return ResponseEntity(null, null, HttpStatus.NO_CONTENT)
+            return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<UserResponse.FollowListResponse> =
             followRepository.getFollowsByToUserId(loginUser, cursor, pageable, toUserId)

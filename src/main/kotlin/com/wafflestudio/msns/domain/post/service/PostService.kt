@@ -108,7 +108,7 @@ class PostService(
         if (blockRepository.existsByFromUser_IdAndToUser(userId, loginUser) ||
             blockRepository.existsByFromUserAndToUser_Id(loginUser, userId)
         )
-            return ResponseEntity(null, null, HttpStatus.NO_CONTENT)
+            return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<PostResponse.PreviewResponse> = postRepository.getAllByUserId(userId, cursor, pageable)
         val lastElement: PostResponse.PreviewResponse? = httpBody.content.lastOrNull()
@@ -123,7 +123,7 @@ class PostService(
                 if (blockRepository.existsByFromUserAndToUser(post.user, loginUser) ||
                     blockRepository.existsByFromUserAndToUser(loginUser, post.user)
                 )
-                    return ResponseEntity(null, null, HttpStatus.NO_CONTENT)
+                    return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
             }
             ?.let { post ->
                 playlistClientService.getPlaylist(post.playlist.playlistId)
@@ -191,7 +191,7 @@ class PostService(
                 if (blockRepository.existsByFromUserAndToUser(post.user, loginUser) ||
                     blockRepository.existsByFromUserAndToUser(loginUser, post.user)
                 )
-                    return ResponseEntity(null, null, HttpStatus.NO_CONTENT)
+                    return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
             }
             ?.let { PostResponse.PlaylistOrderResponse(it.playlist.playlistOrder) }
             ?.let { httpBody -> ResponseEntity(httpBody, null, HttpStatus.OK) }
