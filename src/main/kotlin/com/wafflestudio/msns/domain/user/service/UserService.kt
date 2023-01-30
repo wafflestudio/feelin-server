@@ -60,7 +60,7 @@ class UserService(
                 if (blockRepository.existsByFromUserAndToUser(loginUser, user) ||
                     blockRepository.existsByFromUserAndToUser(user, loginUser)
                 )
-                    return ResponseEntity(null, null, HttpStatus.NOT_FOUND)
+                    return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
             }
             ?.let { user ->
                 UserResponse.ProfileResponse(
