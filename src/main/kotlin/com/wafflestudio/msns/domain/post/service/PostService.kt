@@ -108,7 +108,7 @@ class PostService(
         if (blockRepository.existsByFromUser_IdAndToUser(userId, loginUser) ||
             blockRepository.existsByFromUserAndToUser_Id(loginUser, userId)
         )
-            return ResponseEntity(null, null, HttpStatus.NOT_FOUND)
+            return ResponseEntity(null, null, HttpStatus.FORBIDDEN)
         val httpHeaders = HttpHeaders()
         val httpBody: Slice<PostResponse.PreviewResponse> = postRepository.getAllByUserId(userId, cursor, pageable)
         val lastElement: PostResponse.PreviewResponse? = httpBody.content.lastOrNull()
