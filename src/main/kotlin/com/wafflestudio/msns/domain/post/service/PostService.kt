@@ -52,8 +52,9 @@ class PostService(
         if (order != (1..length).toList())
             throw InvalidPlaylistOrderException("playlist order must be list of 1, ..., length")
 
+        val playlistTracks: List<TrackResponse.APIDto> = playlistClientService.getPlaylist(playlistDto.id).tracks
         val playlistMainTracks: MutableList<PostMainTrack> =
-            playlistClientService.getPlaylist(playlistDto.id).tracks.subList(0, 3)
+            playlistTracks.subList(0, if (playlistTracks.size < 3) playlistTracks.size else 3)
                 .map { PostMainTrack(it.title, getArtistNameString(it.artists), it.album.thumbnail) }
                 as MutableList<PostMainTrack>
 
