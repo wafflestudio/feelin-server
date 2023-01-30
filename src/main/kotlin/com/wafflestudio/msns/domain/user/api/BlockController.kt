@@ -2,7 +2,7 @@ package com.wafflestudio.msns.domain.user.api
 
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
-import com.wafflestudio.msns.domain.user.service.FollowService
+import com.wafflestudio.msns.domain.user.service.BlockService
 import com.wafflestudio.msns.global.auth.CurrentUser
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -21,39 +21,30 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-@RequestMapping("api/v1/follows")
-class FollowController(
-    private val followService: FollowService
+@RequestMapping("/api/v1/block")
+class BlockController(
+    private val blockService: BlockService
 ) {
     @PostMapping("/{user_id}")
     @ResponseStatus(HttpStatus.CREATED)
-    fun makeFollow(
+    fun blockUser(
         @CurrentUser user: User,
         @PathVariable("user_id") userId: UUID
-    ) = followService.makeFollow(fromUser = user, toUserId = userId)
+    ) = blockService.blockUser(fromUser = user, toUserId = userId)
 
-    @GetMapping("/followings/{user_id}")
-    fun getFollowings(
-        @PathVariable("user_id") userId: UUID,
+    @GetMapping("")
+    @ResponseStatus(HttpStatus.OK)
+    fun getBlocks(
         @RequestParam("cursor", required = false) cursor: String?,
         @PageableDefault(size = 10, sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable,
         @CurrentUser user: User
-    ): ResponseEntity<Slice<UserResponse.FollowListResponse>> =
-        followService.getFollowings(user, cursor, pageable, userId)
-
-    @GetMapping("/followers/{user_id}")
-    fun getFollowers(
-        @PathVariable("user_id") userId: UUID,
-        @RequestParam("cursor", required = false) cursor: String?,
-        @PageableDefault(size = 10, sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable,
-        @CurrentUser user: User
-    ): ResponseEntity<Slice<UserResponse.FollowListResponse>> =
-        followService.getFollowers(user, cursor, pageable, userId)
+    ): ResponseEntity<Slice<UserResponse.BlockListResponse>> =
+        blockService.getBlocks(user, cursor, pageable)
 
     @DeleteMapping("/{user_id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteFollow(
+    fun unBlockUser(
         @CurrentUser user: User,
         @PathVariable("user_id") userId: UUID
-    ) = followService.deleteFollow(user, userId)
+    ) = blockService.unBlock(fromUser = user, toUserId = userId)
 }

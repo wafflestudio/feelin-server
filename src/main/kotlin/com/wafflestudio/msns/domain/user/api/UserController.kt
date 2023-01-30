@@ -7,6 +7,7 @@ import com.wafflestudio.msns.domain.user.service.ReportClientService
 import com.wafflestudio.msns.domain.user.service.UserService
 import com.wafflestudio.msns.global.auth.CurrentUser
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -37,8 +38,7 @@ class UserController(
     fun getUserProfile(
         @CurrentUser loginUser: User,
         @PathVariable("user_id") userId: UUID
-    ): UserResponse.ProfileResponse =
-        userService.getProfileByUserId(loginUser, userId)
+    ): ResponseEntity<UserResponse.ProfileResponse> = userService.getProfileByUserId(loginUser, userId)
 
     @PutMapping("/profile")
     @ResponseStatus(HttpStatus.OK)

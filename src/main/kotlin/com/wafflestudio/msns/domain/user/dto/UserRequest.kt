@@ -58,4 +58,8 @@ class UserRequest {
         val value: String,
         val short: Boolean
     )
+
+    data class BlockRequest(
+        val id: UUID
+    )
 }
