@@ -50,7 +50,6 @@ class PostController(
     ): ResponseEntity<Slice<PostResponse.FeedResponse>> = postService.getFeed(user, viewFollowers, cursor, pageable)
 
     @GetMapping("")
-    @ResponseStatus(HttpStatus.OK)
     fun getPosts(
         @PageableDefault(
             size = 20, sort = ["createdAt"], direction = Sort.Direction.DESC
@@ -68,7 +67,6 @@ class PostController(
     ): ResponseEntity<PostResponse.DetailResponse> = postService.getPostById(loginUser, postId)
 
     @GetMapping("/{postId}/playlist/order")
-    @ResponseStatus(HttpStatus.OK)
     fun getPostPlaylistOrder(
         @PathVariable("postId") postId: UUID,
         @CurrentUser loginUser: User
