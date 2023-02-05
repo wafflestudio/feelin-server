@@ -2,7 +2,7 @@ package com.wafflestudio.msns.domain.user.service
 
 import com.wafflestudio.msns.domain.post.exception.PostNotFoundException
 import com.wafflestudio.msns.domain.post.repository.PostRepository
-import com.wafflestudio.msns.domain.user.dto.LikeResponse
+import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.Like
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.BlockRepository
@@ -34,7 +34,7 @@ class LikeService(
         cursor: String?,
         pageable: Pageable,
         postId: UUID
-    ): ResponseEntity<Slice<LikeResponse.DetailResponse>> {
+    ): ResponseEntity<Slice<UserResponse.LikeListResponse>> {
         postRepository.findPostById(postId)
             ?.also { post ->
                 if (blockRepository.existsByFromUserAndToUser(loginUser, post.user) ||
@@ -44,9 +44,9 @@ class LikeService(
             }
             ?: throw PostNotFoundException("post is not found with the id.")
         val httpHeaders = HttpHeaders()
-        val httpBody: Slice<LikeResponse.DetailResponse> =
+        val httpBody: Slice<UserResponse.LikeListResponse> =
             likeRepository.getLikes(loginUser, cursor, pageable, postId)
-        val lastElement: LikeResponse.DetailResponse? = httpBody.content.lastOrNull()
+        val lastElement: UserResponse.LikeListResponse? = httpBody.content.lastOrNull()
         val nextCursor: String? = CursorUtil.generateCustomCursor(lastElement?.createdAt)
         httpHeaders.set("cursor", nextCursor)
         return ResponseEntity(httpBody, httpHeaders, HttpStatus.OK)

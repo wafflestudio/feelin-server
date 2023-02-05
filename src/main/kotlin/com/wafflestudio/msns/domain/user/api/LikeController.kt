@@ -1,6 +1,6 @@
 package com.wafflestudio.msns.domain.user.api
 
-import com.wafflestudio.msns.domain.user.dto.LikeResponse
+import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.service.LikeService
 import com.wafflestudio.msns.global.auth.CurrentUser
@@ -40,7 +40,7 @@ class LikeController(
         @PageableDefault(
             size = 20, sort = ["createdAt"], direction = Sort.Direction.DESC
         ) pageable: Pageable,
-    ): ResponseEntity<Slice<LikeResponse.DetailResponse>> = likeService.getLikes(loginUser, cursor, pageable, postId)
+    ): ResponseEntity<Slice<UserResponse.LikeListResponse>> = likeService.getLikes(loginUser, cursor, pageable, postId)
 
     @DeleteMapping("/posts/{post_id}")
     @ResponseStatus(HttpStatus.OK)
