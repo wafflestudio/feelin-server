@@ -8,6 +8,7 @@ import com.wafflestudio.msns.domain.user.exception.SignInFailedException
 import com.wafflestudio.msns.domain.user.exception.UserNotFoundException
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.UserRepository
+import com.wafflestudio.msns.domain.user.service.ReportClientService
 import com.wafflestudio.msns.global.auth.dto.AuthRequest
 import com.wafflestudio.msns.global.auth.dto.AuthResponse
 import com.wafflestudio.msns.global.auth.dto.LoginRequest
@@ -49,6 +50,7 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
     private val playlistClientService: PlaylistClientService,
+    private val reportClientService: ReportClientService,
     @Value("\${spring.verified.phone}") private val verifiedNumbers: List<String>,
 ) {
     fun checkExistUserByEmail(emailRequest: AuthRequest.VerifyEmail): AuthResponse.ExistUser =
@@ -82,12 +84,12 @@ class AuthService(
         }
     }
 
-    fun signUp(signUpRequest: UserRequest.SignUp): ResponseEntity<UserResponse.SimpleUserInfo> {
+    suspend fun signUp(signUpRequest: UserRequest.SignUp, alert: Boolean): ResponseEntity<UserResponse.SimpleUserInfo> {
         val newUser: User =
             if (!signUpRequest.email.isNullOrBlank())
-                createUserWithEmail(signUpRequest)
+                createUserWithEmail(signUpRequest, alert)
             else if (!signUpRequest.phoneNumber.isNullOrBlank() && !signUpRequest.countryCode.isNullOrBlank())
-                createUserWithPhoneNumber(signUpRequest)
+                createUserWithPhoneNumber(signUpRequest, alert)
             else throw InvalidSignUpFormException("either email or phone is needed for sign-up.")
 
         playlistClientService.createUser(newUser.id, signUpRequest.username)
@@ -149,7 +151,7 @@ class AuthService(
             }
     }
 
-    fun createUserWithEmail(signUpRequest: UserRequest.SignUp): User {
+    suspend fun createUserWithEmail(signUpRequest: UserRequest.SignUp, alert: Boolean): User {
         val email: String = signUpRequest.email!!
         val username = signUpRequest.username
         val encryptedPassword = passwordEncoder.encode(signUpRequest.password)
@@ -167,9 +169,22 @@ class AuthService(
             name = signUpRequest.name,
             birthDate = signUpRequest.birthDate.let { date -> LocalDate.parse(date, DateTimeFormatter.ISO_DATE) },
         )
+            .also { newUser ->
+                if (alert) {
+                    reportClientService.noticeNewActivity(
+                        UserRequest.ActivityDto(
+                            username = newUser.username,
+                            account = email,
+                            type = Verify.EMAIL,
+                            post = null
+                        ),
+                        isUser = true
+                    )
+                }
+            }
     }
 
-    fun createUserWithPhoneNumber(signUpRequest: UserRequest.SignUp): User {
+    suspend fun createUserWithPhoneNumber(signUpRequest: UserRequest.SignUp, alert: Boolean): User {
         val countryCode: String = signUpRequest.countryCode!!
         val phoneNumber: String = signUpRequest.phoneNumber!!
         val username = signUpRequest.username
@@ -195,6 +210,19 @@ class AuthService(
                 }
             },
         )
+            .also { newUser ->
+                if (alert) {
+                    reportClientService.noticeNewActivity(
+                        UserRequest.ActivityDto(
+                            username = newUser.username,
+                            account = countryCode + phoneNumber,
+                            type = Verify.PHONE,
+                            post = null
+                        ),
+                        isUser = true
+                    )
+                }
+            }
     }
 
     fun checkDuplicateUsername(username: String): Boolean = userRepository.existsByUsername(username)
