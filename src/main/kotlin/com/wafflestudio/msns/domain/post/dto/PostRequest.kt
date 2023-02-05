@@ -1,6 +1,7 @@
 package com.wafflestudio.msns.domain.post.dto
 
 import com.wafflestudio.msns.domain.playlist.dto.PlaylistRequest
+import java.util.UUID
 
 class PostRequest {
     data class CreateRequest(
@@ -19,5 +20,11 @@ class PostRequest {
         val id: String,
         val title: String,
         val content: String
+    )
+
+    data class ActivityRequest(
+        val id: UUID,
+        val title: String,
+        val content: String,
     )
 }

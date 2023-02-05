@@ -17,10 +17,12 @@ import com.wafflestudio.msns.domain.post.model.Post
 import com.wafflestudio.msns.domain.post.model.PostMainTrack
 import com.wafflestudio.msns.domain.post.repository.PostRepository
 import com.wafflestudio.msns.domain.track.dto.TrackResponse
+import com.wafflestudio.msns.domain.user.dto.UserRequest
 import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
 import com.wafflestudio.msns.domain.user.repository.BlockRepository
 import com.wafflestudio.msns.domain.user.repository.LikeRepository
+import com.wafflestudio.msns.domain.user.service.ReportClientService
 import com.wafflestudio.msns.global.util.CursorUtil
 import org.modelmapper.ModelMapper
 import org.springframework.data.domain.Pageable
@@ -40,9 +42,14 @@ class PostService(
     private val likeRepository: LikeRepository,
     private val blockRepository: BlockRepository,
     private val playlistClientService: PlaylistClientService,
+    private val reportClientService: ReportClientService,
     private val modelMapper: ModelMapper
 ) {
-    suspend fun writePost(createRequest: PostRequest.CreateRequest, user: User): PostResponse.CreateResponse {
+    suspend fun writePost(
+        createRequest: PostRequest.CreateRequest,
+        user: User,
+        alert: Boolean
+    ): PostResponse.CreateResponse {
         val title = createRequest.title
             .also { if (it.isBlank()) throw InvalidTitleException("title is blank.") }
         val content = createRequest.content
@@ -76,6 +83,21 @@ class PostService(
                 mainTracks = playlistMainTracks
             )
         )
+            .also { newPost ->
+                if (alert) {
+                    if (alert) {
+                        reportClientService.noticeNewActivity(
+                            UserRequest.ActivityDto(
+                                username = user.username,
+                                account = null,
+                                type = null,
+                                post = PostRequest.ActivityRequest(newPost.id, newPost.title, newPost.content)
+                            ),
+                            isUser = false
+                        )
+                    }
+                }
+            }
             .let { newPost ->
                 PostResponse.CreateResponse(
                     newPost.id,
