@@ -69,7 +69,7 @@ class TestController(
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    fun createUser(): UserResponse.PostAPIDto? =
+    suspend fun createUser(): UserResponse.PostAPIDto? =
         playlistClientService.createUser(
             UUID.fromString("f127733b-c716-46b1-987a-5ef7b4a158eb"),
             "nasty-user"
