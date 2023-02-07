@@ -36,8 +36,9 @@ class PostController(
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun writePost(
         @Valid @RequestBody createRequest: PostRequest.CreateRequest,
-        @CurrentUser user: User
-    ): PostResponse.CreateResponse = postService.writePost(createRequest, user)
+        @CurrentUser user: User,
+        @RequestParam(name = "alert", defaultValue = true.toString(), required = false) alert: Boolean,
+    ): PostResponse.CreateResponse = postService.writePost(createRequest, user, alert)
 
     @GetMapping("/feed")
     fun getFeeds(

@@ -1,6 +1,6 @@
 package com.wafflestudio.msns.domain.user.repository
 
-import com.wafflestudio.msns.domain.user.dto.LikeResponse
+import com.wafflestudio.msns.domain.user.dto.UserResponse
 import com.wafflestudio.msns.domain.user.model.User
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -12,5 +12,5 @@ interface LikeCustomRepository {
         cursor: String?,
         pageable: Pageable,
         postId: UUID
-    ): Slice<LikeResponse.DetailResponse>
+    ): Slice<UserResponse.LikeListResponse>
 }
