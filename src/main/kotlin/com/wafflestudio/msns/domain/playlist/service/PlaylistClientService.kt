@@ -12,7 +12,6 @@ import org.springframework.web.reactive.function.client.awaitBody
 import org.springframework.web.reactive.function.client.awaitBodyOrNull
 import org.springframework.web.reactive.function.client.awaitExchange
 import org.springframework.web.reactive.function.client.awaitExchangeOrNull
-import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import java.util.UUID
 
@@ -30,14 +29,15 @@ class PlaylistClientService(
                 else throw InternalServerException("Internal Server Error.")
             }
 
-    fun createUser(id: UUID, username: String): UserResponse.PostAPIDto? =
+    suspend fun createUser(id: UUID, username: String): UserResponse.PostAPIDto =
         playlistClient
             .post()
             .uri("/users")
             .body(Mono.just(UserRequest.PostAPIDto(id, username)), UserRequest.PostAPIDto::class.java)
-            .retrieve()
-            .bodyToMono(UserResponse.PostAPIDto::class.java)
-            .block()
+            .awaitExchange { res ->
+                if (res.statusCode().is2xxSuccessful) res.awaitBody()
+                else throw InternalServerException("Internal Server Error.")
+            }
 
     suspend fun withdrawUser(id: UUID, accessToken: String) =
         playlistClient

@@ -92,7 +92,9 @@ class AuthService(
                 createUserWithPhoneNumber(signUpRequest, alert)
             else throw InvalidSignUpFormException("either email or phone is needed for sign-up.")
 
-        playlistClientService.createUser(newUser.id, signUpRequest.username)
+        val createUserResponse: UserResponse.PostAPIDto =
+            playlistClientService.createUser(newUser.id, signUpRequest.username)
+
         val accessJWT = jwtTokenProvider.generateToken(newUser.id, JWT.ACCESS)
         val refreshJWT = jwtTokenProvider.generateToken(newUser.id, JWT.REFRESH)
 
