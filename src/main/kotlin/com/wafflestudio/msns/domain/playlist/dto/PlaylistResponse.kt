@@ -21,10 +21,16 @@ class PlaylistResponse {
         val thumbnail: String
     )
 
+    data class VendorPlaylistDto(
+        val vendor: String,
+        val url: String
+    )
+
     data class APIResponse(
         val id: UUID,
         val title: String,
         var tracks: List<TrackResponse.APIDto>,
+        val originalVendorPlaylist: VendorPlaylistDto,
         val preview: PreviewDto
     )
 
@@ -32,12 +38,14 @@ class PlaylistResponse {
         val id: UUID,
         val thumbnail: String,
         val title: String,
+        val originalVendorPlaylist: VendorPlaylistDto,
         var tracks: List<TrackResponse.APIDto>
     ) {
         constructor(playlistResponse: APIResponse) : this(
             id = playlistResponse.id,
             thumbnail = playlistResponse.preview.thumbnail,
             title = playlistResponse.title,
+            originalVendorPlaylist = playlistResponse.originalVendorPlaylist,
             tracks = playlistResponse.tracks
         )
     }
