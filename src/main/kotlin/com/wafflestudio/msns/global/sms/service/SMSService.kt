@@ -13,7 +13,7 @@ class SMSService(
     suspend fun sendSMS(countryCode: String, phoneNumber: String, code: String) {
         val publishRequest = PublishRequest()
         publishRequest.phoneNumber = countryCode + phoneNumber.replace("-", "")
-        publishRequest.message = "[Feelin’] $code is your verification code.$appHash"
+        publishRequest.message = "[Feelin’] $code is your verification code.\n$appHash"
         amazonSNS.publish(publishRequest)
     }
 }
