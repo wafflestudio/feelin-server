@@ -8,13 +8,20 @@ import java.util.UUID
 class PlaylistResponse {
     data class PreviewResponse(
         val id: UUID,
-        val thumbnail: String
+        val thumbnail: String,
+        val originalVendorPlaylist: OriginalVendorResponse
     ) {
         constructor(playlist: Playlist) : this(
             id = playlist.playlistId,
-            thumbnail = playlist.thumbnail
+            thumbnail = playlist.thumbnail,
+            originalVendorPlaylist = OriginalVendorResponse(playlist.url, playlist.vendor)
         )
     }
+
+    data class OriginalVendorResponse(
+        val url: String,
+        val vendor: String
+    )
 
     data class PreviewDto(
         val id: UUID,
@@ -53,12 +60,14 @@ class PlaylistResponse {
     data class FeedPreviewResponse(
         val id: UUID,
         val thumbnail: String,
-        val mainTracks: List<TrackResponse.FeedPreviewResponse>
+        val mainTracks: List<TrackResponse.FeedPreviewResponse>,
+        val originalVendorPlaylist: OriginalVendorResponse
     ) {
         constructor(post: Post) : this(
             id = post.playlist.playlistId,
             thumbnail = post.playlist.thumbnail,
-            mainTracks = post.mainTracks.map { TrackResponse.FeedPreviewResponse(it) }
+            mainTracks = post.mainTracks.map { TrackResponse.FeedPreviewResponse(it) },
+            originalVendorPlaylist = OriginalVendorResponse(post.playlist.url, post.playlist.vendor)
         )
     }
 }
