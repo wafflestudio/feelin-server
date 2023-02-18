@@ -25,24 +25,6 @@ class PostResponse {
             playlist = PlaylistResponse.PreviewResponse(post.playlist),
             likes = post.likes.size
         )
-        constructor(
-            post_id: UUID,
-            title: String,
-            content: String,
-            createdAt: LocalDateTime?,
-            updatedAt: LocalDateTime?,
-            playlist_id: UUID,
-            thumbnail: String,
-            likes: Int
-        ) : this(
-            id = post_id,
-            title = title,
-            content = content,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-            playlist = PlaylistResponse.PreviewResponse(playlist_id, thumbnail),
-            likes = likes
-        )
     }
 
     data class DetailResponse(

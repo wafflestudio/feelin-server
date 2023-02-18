@@ -130,14 +130,18 @@ class DataLoader(
             user = admin,
             playlistId = UUID.randomUUID(),
             playlistOrder = "1 2 3",
-            thumbnail = "https://ibb.co/7R7kcgd"
+            thumbnail = "https://ibb.co/7R7kcgd",
+            url = "",
+            vendor = "spotify"
         )
 
         val playlistB = Playlist(
             user = admin,
             playlistId = UUID.randomUUID(),
             playlistOrder = "6 5 3 2 4 1",
-            thumbnail = "https://ibb.co/7R7kcgd"
+            thumbnail = "https://ibb.co/7R7kcgd",
+            url = "",
+            vendor = "spotify"
         )
 
         playlistRepository.save(playlistA)
