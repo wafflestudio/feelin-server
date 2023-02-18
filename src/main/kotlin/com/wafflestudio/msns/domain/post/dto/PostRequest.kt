@@ -8,6 +8,7 @@ class PostRequest {
         val title: String,
         val content: String,
         val playlist: PlaylistRequest.PreviewRequest,
+        val originalVendorPlaylist: PlaylistRequest.OriginalVendorRequest?
     )
 
     data class PutRequest(

@@ -8,7 +8,6 @@ class PlaylistRequest {
         val length: Int,
         val order: String,
         val thumbnail: String,
-        val originalVendorPlaylist: OriginalVendorRequest
     )
 
     data class PutRequest(
