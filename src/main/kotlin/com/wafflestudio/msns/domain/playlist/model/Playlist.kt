@@ -37,4 +37,10 @@ class Playlist(
 
     val thumbnail: String,
 
+    @Column(name = "url", nullable = false, columnDefinition = "CHAR(255)")
+    val url: String,
+
+    @Column(name = "vendor", nullable = false, columnDefinition = "CHAR(50)")
+    val vendor: String,
+
 ) : BaseTimeEntity()

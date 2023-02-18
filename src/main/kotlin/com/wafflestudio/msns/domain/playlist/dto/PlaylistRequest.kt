@@ -7,11 +7,17 @@ class PlaylistRequest {
         val id: UUID,
         val length: Int,
         val order: String,
-        val thumbnail: String
+        val thumbnail: String,
+        val originalVendorPlaylist: OriginalVendorRequest
     )
 
     data class PutRequest(
         val order: String,
         val thumbnail: String
+    )
+
+    data class OriginalVendorRequest(
+        val url: String,
+        val vendor: String
     )
 }
